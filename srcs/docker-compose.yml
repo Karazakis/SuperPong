@@ -1,0 +1,63 @@
+version: '3.0'
+
+networks:
+  srcs_mynetwork:
+    driver: bridge
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_gateway
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/config/nginx.conf:/etc/nginx/nginx.conf:rw
+      - ./nginx/ssl/:/etc/nginx/ssl/:rw
+    networks:
+      - srcs_mynetwork
+    depends_on:
+      - django
+    restart: always
+
+  django:
+    build: ./django
+    container_name: django_service
+    ports:
+      - "8000:8000"
+    volumes:
+      - django_volume:/django:rw 
+    networks:
+      - srcs_mynetwork
+    environment:
+      DB_NAME: mydatabase
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_HOST: postgres
+      DB_PORT: 5432
+    depends_on:
+      - postgres
+    restart: always
+
+  postgres:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5789:5789"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - srcs_mynetwork
+    restart: always
+
+volumes:
+  django_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/debian/main/old/superpong/srcs/django/src/project
+  postgres_data:

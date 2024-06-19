@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Pong</title>
+    <!-- Includi il CSS di Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Includi jQuery, Popper.js, e il JavaScript di Bootstrap -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Includi Three.js -->
+    <script src="/static/js/game/module/three.min.js"></script>    
+    <script src="/static/js/game/module/three.min.js" type="module"></script>
+    <script src="/static/js/game/module/three.module.js" type="module"></script>
+    <script src="/static/js/game/module/GLTFLoader.js" type="module" ></script> 
+    <!-- <script src="/static/js/game/module/OrbitControls.js" type="module"></script> -->
+    
+
+
+    
+
+    <script src="{% static '/js/game/src/Ball.js' %}" type="module"></script>
+    <script src="{% static '/js/game/src/Paddle.js' %}" type="module"></script>
+    <script src="{% static '/js/game/src/Corner.js' %}" type="module"></script>
+    <script src="{% static '/js/game/src/Ball2.js' %}" type="module"></script>
+    <script src="{% static '/js/game/src/Bot.js' %}" type="module"></script>
+    <script src="{% static '/js/game/src/Bot2.js' %}" type="module"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+    </style>
+    
+</head>
+<body id="body">
+    <div id="app">
+    </div>
+    <script>
+        // Inizializza la scena, la camera e il renderer di Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Crea le particelle del cielo stellato
+        const particlesGeometry = new THREE.BufferGeometry();
+        const counts = 5000;
+        const positionsStars = new Float32Array(counts * 3);
+
+        for (let i = 0; i < counts * 3; i++) {
+            positionsStars[i] = (Math.random() * 160) - 80;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positionsStars, 3));
+        const particlesMaterial = new THREE.PointsMaterial();
+        particlesMaterial.size = 0.2;
+        particlesMaterial.sizeAttenuation = true;
+
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        particles.position.set(0, 0, -80);
+        scene.add(particles);
+
+        // Aggiungi luce alla scena
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        // Imposta la posizione della camera
+        camera.position.z = 10;
+
+        // Funzione di animazione
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.001; // Aggiunge una rotazione lenta alle stelle
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Gestisci la ridimensionamento della finestra
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+        {% load static %}
+    <script src="{% static '/js/main.js' %}"></script>    
+</body>
+</html>

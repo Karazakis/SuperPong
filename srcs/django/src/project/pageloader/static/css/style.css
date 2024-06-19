@@ -1,0 +1,58 @@
+body {
+    font-family: 'Titillium Web', sans-serif !important;
+}
+  
+  /* Puoi anche impostare il font solo per specifici elementi */
+h1, h2, h3, h4, h5, h6, p, div {
+font-family: 'Titillium Web', sans-serif !important;
+font-weight: 700;
+}
+.context-menu {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.context-menu ul li {
+    padding: 8px;
+    cursor: pointer;
+}
+.context-menu ul li:hover {
+    background-color: #f0f0f0;
+}
+
+.chat-log {
+    height: 15vh;
+    overflow-y: scroll;
+    background-color: white;
+}
+
+#main-container {
+    margin-bottom: 25vh;
+    min-width: 70vh;
+    min-height: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: rgb(198, 213, 230) !important;
+    border: 3px ridge rgb(107, 107, 168);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.card {
+    min-width: 30vh; /* Assicura che le card abbiano una larghezza minima */
+    width: auto; /* Permette alle card di espandersi secondo necessità */
+}
+
+.card-title {
+    white-space: nowrap; /* Impedisce al testo di andare a capo */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Aggiunge i puntini di sospensione se il testo è troppo lungo */
+}

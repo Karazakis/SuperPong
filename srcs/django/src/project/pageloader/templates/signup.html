@@ -1,0 +1,45 @@
+ <div class="text-center p-4 border rounded shadow">
+        <form id="signup-form" novalidate>
+            <div class="form-group position-relative">
+                <label for="username">Nome utente:</label>
+                <input type="text" id="username" name="username" class="form-control" required minlength="3">
+                <span class="success-icon position-absolute" style="right: 10px; top: 35px;">✔</span>
+                <div id="username-error" class="error text-danger"></div>
+            </div>
+            
+            <div class="form-group position-relative">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" class="form-control" required pattern="^[a-zA-Z0-9._%+]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$">
+                <span class="success-icon position-absolute" style="right: 10px; top: 35px;">✔</span>
+                <div id="email-error" class="error text-danger"></div>
+            </div>
+
+            <div class="form-group position-relative">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="form-control" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$">
+                <span class="success-icon position-absolute" style="right: 10px; top: 35px;">✔</span>
+                <div id="password-error" class="error text-danger"></div>
+            </div>
+
+            <div id="signup-error" class="error text-danger"></div>
+
+            <button type="submit" class="btn btn-primary">Signup</button>
+        </form>
+
+        <button id="go-back-btn" class="btn btn-secondary mt-3">Go Back</button>
+    </div>
+</div>
+<style>
+    .error {
+        margin-top: 5px;
+        font-size: 0.9em;
+        height: 1em; /* Altezza fissa per evitare cambiamenti di layout */
+    }
+    .success-icon {
+        display: none;
+        color: green;
+    }
+    .valid ~ .success-icon {
+        display: inline;
+    }
+</style>

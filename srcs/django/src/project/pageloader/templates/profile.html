@@ -1,0 +1,46 @@
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border rounded shadow my-4">
+            <div class="card-body">
+                <h2 class="card-title">Profile Information</h2>
+                <!-- User Image -->
+                <div class="text-center">
+                    <img src="/static/{{ userprofile.img_profile }}" class="rounded-circle" style="width: 150px; height: 150px;" alt="User Image">
+                </div>
+                <!-- User Nickname -->
+                <h2 class="card-title text-center mt-3 text-nowrap">{{ userprofile.nickname }}</h2>
+                <!-- Last Online -->
+                <p class="text-muted text-center text-nowrap">Last Online: {{ userprofile.user.last_login }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="card border rounded shadow m-3">
+            <div class="card-body">
+                <h4 class="card-title text-center">Friends</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card border rounded shadow m-3">
+            <div class="card-body">
+                <h4 class="card-title text-center">Match History</h4>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card border rounded shadow mb-3">
+            <div class="card-body">
+                <h4 class="card-title text-center">Tournament History</h4>
+                <!-- Here goes tournament history -->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center my-3">
+    <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
+</div>

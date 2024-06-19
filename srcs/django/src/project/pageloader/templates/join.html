@@ -1,0 +1,47 @@
+<div class="container mt-4">
+    {% if games %}
+        <h2>Join Lobby</h2>
+        <div class="row" style="height: 30vh; overflow-y: auto;">
+            {% for game in games %}
+            <div class="col-md-12 mb-3">
+                <div class="card" style="background-color: #f8f9fa;">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center w-100">
+                            <h5 class="card-title mb-2 mb-lg-0">{{ game.name }}</h5>
+                            <p class="card-text mb-2 mb-lg-0">Players: {{ game.player_inlobby }}/{{ game.player_limit }}</p>
+                            <p class="card-text mb-2 mb-lg-0">Mode: {{ game.mode }}</p>
+                            <button class="btn btn-primary join-btn" data-game-id="{{ game.id }}">Join</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if tournaments %}
+        <h2>Join Tournament</h2>
+        <div class="row" style="height: 70%; overflow-y: auto;">
+            {% for tournament in tournaments %}
+            <div class="col-md-12 mb-3">
+                <div class="card" style="background-color: #f8f9fa;">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column flex-lg-row justify-content-lg-between align-items-lg-center w-100">
+                            <h5 class="card-title mb-2 mb-lg-0">{{ tournament.name }}</h5>
+                            <p class="card-text mb-2 mb-lg-0">Players: {{ tournament.nb_players }}</p>
+                            <p class="card-text mb-2 mb-lg-0">Mode: {{ tournament.mode }}</p>
+                            <button class="btn btn-primary join-btn" data-tournament-id="{{ tournament.id }}">Join</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div class="row justify-content-center">
+        <button id="refresh-btn" class="btn btn-secondary mt-3">Refresh</button>
+    </div>
+   
+    <div class="row justify-content-center">
+        <button type="button" id="go-back-btn" class="btn btn-warning my-3">Back</button>
+    </div>
+</div>

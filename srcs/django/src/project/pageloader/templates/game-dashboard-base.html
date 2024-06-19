@@ -1,0 +1,82 @@
+{% load static %}
+
+<div class="row fixed-bottom bg-light p-3 shadow" id="dashbase" style="height: 25vh; background-color: rgb(198, 213, 230) !important; border-top: 3px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
+    <div class="col-2 text-center">
+        <img src="/static/{{ userprofile.img_profile }}" alt="profile-pic" class="img-fluid rounded-circle" style="max-width: 10vh; border: 3px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
+        <div id="username" class="dash_username"><h4>{{ userprofile.nickname }}</h4></div>
+        <button id="profile" class="btn btn-info btn-sm mb-1">Profile</button>
+        <button id="settings" class="btn btn-info btn-sm mb-1">Settings</button>
+        <button id="logout" class="btn btn-danger btn-sm mb-1">Log Out</button>
+    </div>
+    <div class="col-8 text-center">
+        <h6>Players score:</h6>
+        <div class="row justify-content-center">
+            {% if game_info.mode == '2v2' %}
+                <div class="col-4 text-center">
+                    <div>Team 1: <strong id="team1score" style="font-size: 1.5em;">0</strong></div>
+                    <div class="row">
+                        <div class="col-6">
+                            <img src="/static/{{ players.0.img_profile }}" alt="player1-pic" class="img-fluid rounded-circle" style="max-width: 6vh;">
+                            <div>{{ players.0.name }}</div>
+                        </div>
+                        <div class="col-6">
+                            <img src="/static/{{ players.1.img_profile }}" alt="player2-pic" class="img-fluid rounded-circle" style="max-width: 6vh;">
+                            <div>{{ players.1.name }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 text-center">
+                    <div>Team 2: <strong id="team2score" style="font-size: 1.5em;">0</strong></div>
+                    <div class="row">
+                        <div class="col-6">
+                            <img src="/static/{{ players.2.img_profile }}" alt="player3-pic" class="img-fluid rounded-circle" style="max-width: 6vh;">
+                            <div>{{ players.2.name }}</div>
+                        </div>
+                        <div class="col-6">
+                            <img src="/static/{{ players.3.img_profile }}" alt="player4-pic" class="img-fluid rounded-circle" style="max-width: 6vh;">
+                            <div>{{ players.3.name }}</div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                {% for player in players %}
+                {% with forloop.counter0 as counter %}
+                <div id="player{{ counter }}" class="col-2 text-center player m-2" 
+                     data-right="{{ player.controls.right|default:'' }}" 
+                     data-left="{{ player.controls.left|default:'' }}" 
+                     data-shoot="{{ player.controls.shoot|default:'' }}" 
+                     data-boost="{{ player.controls.boost|default:'' }}">
+                    <div><strong id="player{{ counter }}score" style="font-size: 1.5em;">{{ player.score }}</strong> </div>
+                    {% if player.name == 'Bot 1' or player.name == 'Bot 2' or player.name == 'Bot 3' %}
+                    <img src="{% static 'media/profiles/bot.png' %}" alt="player-pic" class="img-fluid rounded-circle" style="max-width: 8vh; border: 2px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                    {% else %}
+                    <img src="/static/{{ player.img_profile }}" alt="player-pic" class="img-fluid rounded-circle" style="max-width: 8vh; border: 2px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                    {% endif %}
+                    <div class="dash_username"><h5>{{ player.name }}</h5></div>
+                </div>
+                {% endwith %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-2 text-left">
+        <button id="leavegame" class="btn btn-danger btn-sm mb-3 mt-2">Leave Game</button>
+        <h6>Game Details</h6>
+        <div class="row">
+            <div class="col">
+                <div class="small">Game: <strong>{{ game_info.name }}</strong></div>
+                <div class="small">Type: <strong id="gametype">{{ game_info.type }}</strong> </div>
+                <div class="small">Mode: <strong id="gamemode">{{ game_info.mode }}</strong> </div>
+            </div>
+            <div class="col">
+                <div class="small">Rules:<strong id="gamerules">{{ game_info.rules }}</strong> </div>
+                <div class="small">Time Limit: <strong id="gametime">{{ game_info.timelimit }}</strong>  min</div>
+                <div class="small">Score Limit: <strong id="gamescore">{{ game_info.scorelimit }}</strong> </div>
+                <div class="small">Balls: <strong id="gameballs">{{ game_info.balls }}</strong> </div>
+                <div class="small">Boost: <strong id="gameboost">{{ game_info.boost }}</strong> </div>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<script src="{% static 'js/game.js' %}"></script>

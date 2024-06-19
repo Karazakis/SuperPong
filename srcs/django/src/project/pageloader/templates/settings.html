@@ -1,0 +1,148 @@
+<div class="p-4">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#profile-settings">Profile Settings</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#game-settings">Game Settings</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="profile-settings">
+            <h5>Profile Settings</h5>
+            <form method="POST" action="{% url 'settings' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nickname">Nickname:</label>
+                    <input type="text" class="form-control" id="nickname" name="nickname" value="{{ user.userprofile.nickname }}">
+                </div>
+                <div class="form-group">
+                    <label for="img_profile">Profile Image:</label>
+                    <input type="file" class="form-control-file" id="img_profile" name="img_profile">
+                </div>
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter new password">
+                </div>
+                <div class="row justify-content-center">
+                    <button id="profile-settings-btn" type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="game-settings">
+            <h6>Game Settings</h6>
+            <form method="POST" action="{% url 'settings' %}">
+                {% csrf_token %}
+                <div class="form-group mt-3">
+                    <div>
+                        <h6 class="text-center mt-3"><strong>Player 1</strong></h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput11">Right:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput11" name="right1" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p1Right }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput12">Left:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput12" name="left1" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p1Left }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput13">Shoot:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput13" name="shoot1" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p1Shoot }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput14">Boost:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput14" name="boost1" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p1Boost }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="text-center mt-3"><strong>Player 2</strong></h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput21">Right:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput21" name="right2" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p2Right }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput22">Left:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput22" name="left2" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p2Left }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput23">Shoot:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput23" name="shoot2" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p2Shoot }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput24">Boost:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput24" name="boost2" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p2Boost }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="text-center mt-3"><strong>Player 3</strong></h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput31">Right:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput31" name="right3" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p3Right }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput32">Left:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput32" name="left3" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p3Left }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput33">Shoot:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput33" name="shoot3" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p3Shoot }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput34">Boost:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput34" name="boost3" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p3Boost }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="text-center mt-3"><strong>Player 4</strong></h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput41">Right:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput41" name="right4" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p4Right }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput42">Left:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput42" name="left4" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p4Left }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="keyInput43">Shoot:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput43" name="shoot4" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p4Shoot }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="keyInput44">Boost:</label>
+                                <input type="text" class="key-capture form-control" id="keyInput44" name="boost4" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p4Boost }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <button id="game-settings-btn" type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <button type="button" id="go-back-btn" class="btn btn-warning mt-3">Back</button>
+    </div>
+</div>
