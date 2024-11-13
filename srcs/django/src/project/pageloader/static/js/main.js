@@ -1,5 +1,71 @@
 var chatSocket;
 
+
+function disableJoinGameButton(){
+    let joinGameBtn = document.getElementsByClassName("join-btn");
+    for (let i = 0; i < joinGameBtn.length; i++) {
+        joinGameBtn[i].disabled = true;
+        joinGameBtn[i].style.backgroundColor = "grey";
+    }
+}
+
+function checkCurrentLobbyandDisable(){
+    let userId = localStorage.getItem("userId");
+    let baseUrl = window.location.origin;
+    let url = baseUrl + "/api/request_status/" + userId + "/";
+
+    fetch(url).catch(error => console.error('Errore durante il recupero della pagina:', error))
+    .then(response => response.json())
+    .then(data => {
+        if(data.game !== null)
+        {
+            disableJoinGameButton();
+
+            document.getElementById("rejoin-lobby-btn-join").onclick = function() {
+                let game_id_lobby = document.getElementById("rejoin-lobby-btn-join").dataset.id;
+                document.getElementById("rejoin-lobby").style.display = "none";        
+                loadPage(`/api/lobby/${game_id_lobby}/`);
+            };
+            document.getElementById("rejoin-lobby-btn-join").dataset.type = "game";
+            document.getElementById("rejoin-lobby-btn-join").dataset.id = data.game.game;
+            document.getElementById("rejoin-lobby-btn-leave").onclick = function() {
+                let game_id_lobby = document.getElementById("rejoin-lobby-btn-join").dataset.id;
+                let accessToken = localStorage.getItem("accessToken");
+                fetch(`/api/lobby/${game_id_lobby}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "Authorization": `Bearer ${accessToken}`,
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ action: 'leave' })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById("rejoin-lobby").style.display = "none";
+                    } else {
+                        return response.json().then(data => { throw new Error(data.error); });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            };
+            document.getElementById("rejoin-lobby-btn-leave").dataset.type = "game";
+            document.getElementById("rejoin-lobby-btn-leave").dataset.id = data.game.game;
+            document.getElementById("rejoin-lobby").style.display = "block";
+
+        } else if(data.game === null && data.tournament === null) {
+            document.getElementById("rejoin-lobby").style.display = "none";
+        }/* else if(data.tournament !== null) {
+            disableJoinGameButton();
+            document.getElementById("rejoin-lobby-btn-join").dataset.type = "tournament";
+            document.getElementById("rejoin-lobby-btn-join").dataset.id = data.tournament.tournament.id;
+            document.getElementById("rejoin-lobby-btn-leave").dataset.type = "tournament";
+            document.getElementById("rejoin-lobby-btn-leave").dataset.id = data.tournament.tournament.id;
+            document.getElementById("rejoin-lobby").style.display = "block";
+        }  */
+    }).catch(error => console.error('Errore durante il recupero della pagina:', error));
+}
+
 function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
     
     const container_main = document.getElementById('main-container');
@@ -13,7 +79,7 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
         // Aggiunta del contenuto della dashboard base se non esiste già e se la modalità è corretta
         if (document.getElementById('dashboard-base-content') !== null) {
             const dashboardBase = document.getElementById('dashboard-base-content');
-            dashboardBase.style.display = 'none';
+            dashboardBase.remove();
         }
         let gameDashboardBase = document.createElement('div');
         gameDashboardBase.id = 'game-dashboard-base-content';
@@ -21,16 +87,28 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
         container_app.appendChild(gameDashboardBase);
         callback();
     } else {
+        if(window.inGame)
+        {
+            window.inGame = false;
+        }
         let gameDash = document.getElementById('game-dashboard-base-content');
         let genDash = document.getElementById('dashboard-base-content');
         if(gameDash !== null)
         {
+            //TODO chiudere il socket se esiste e togliere i listener
+            if(window.GameSocket !== undefined && window.GameSocket !== null)
+            {
+                window.GameSocket.close();
+            }
             gameDash.remove();
         }
         if (url.includes('login') || url.includes('signup') || url.includes('home')) {
             if (genDash !== null) {
                 genDash.remove();
             }
+        }
+        if (genDash !== null) {
+            genDash.style.display = 'block'; // Mostra la dashboard quando si esce dal gioco
         }
 
         if (container_main !== null) {
@@ -44,7 +122,7 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
         }
 
         // Aggiunta del contenuto della dashboard base se non esiste già e se la modalità è corretta
-        if (document.getElementById('dashboard-base-content') === null && (mode === 'logged_nav' || mode === 'dashboard')) {
+        if (genDash === null && (mode === 'logged_nav' || mode === 'dashboard')) {
             const dashboardBase = document.createElement('div');
             dashboardBase.id = 'dashboard-base-content';
             dashboardBase.innerHTML = dash_base;
@@ -65,13 +143,17 @@ function clearScripts(url) {
     scriptArray.forEach(script => {
         if ((url.includes('login') || url.includes('signup') || url.includes('home') || url.includes('game')) || script.id !== 'dashboard-base') {
             try {
-                container.removeChild(script);
+                // Controlla se lo script ha ancora un parent node prima di tentare la rimozione
+                if (script.parentNode === container) {
+                    container.removeChild(script);
+                }
             } catch (e) {
-                console.warn('Failed to remove script:', script, e);
+                console.warn('Errore durante la rimozione dello script:', script, e);
             }
         }
     });
 }
+
 
 
 
@@ -85,7 +167,7 @@ function insertScript(url, src, mode = 'not_logged') {
             if(document.getElementById('game-dashboard-base') === null)
             {
                 const script = document.createElement('script');
-                script.src = window.location.origin + "/static/js/game-dashboard-base.js";
+                script.src = window.location.origin + "/static/js/game-dashboard-base.js?v=" + Math.random();
                 script.type = 'text/javascript';
                 script.id = 'game-dashboard-base';
                 script.async = true;
@@ -110,7 +192,8 @@ function insertScript(url, src, mode = 'not_logged') {
     script.src = window.location.origin + "/static/js/" + src;
     if(src === "game.js")
     {
-      script.type = 'module';
+        script.src += "?v=" + Math.random();
+        script.type = 'module';
     }
     else
     {
@@ -118,6 +201,20 @@ function insertScript(url, src, mode = 'not_logged') {
     }
     script.async = 'true';
     document.getElementById('body').appendChild(script);
+
+    if(url.includes('game') || url.includes('lobby'))
+    {
+        if (url.includes('join'))
+        {   
+            checkCurrentLobbyandDisable();
+        }
+    } else {
+        if (url.includes('login') || url.includes('signup') || url.includes('home')) {
+        } else {
+            checkCurrentLobbyandDisable();
+        }
+    }
+
 }
 
 function refreshAccessToken() {
@@ -141,83 +238,154 @@ function refreshAccessToken() {
     });
 }
 
+// function isAuthenticated() {
+//     const accessToken = localStorage.getItem("accessToken");
+//     return accessToken !== null;
+// }
+
 function loadPage(url) {
     let accessToken = localStorage.getItem("accessToken");
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
-    if(url !== "api/home/" && url !== "api/login/" && url !== "api/signup/")
+    const refreshUrl = `${window.location.origin}/api/token/refresh/`; // URL per verificare e refreshare il token
+    // Funzione per eseguire la richiesta effettiva di caricamento della pagina
+    if(window.LobbySocket !== undefined)
     {
-        fetch(baseUrl, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
+        window.LobbySocket.close();
+    }
+    if(window.GameSocket !== undefined && window.GameSocket !== null)
+    {
+        window.GameSocket.close();
+    }
+
+    if(!url.includes("game")){
+        if (window.starSky == null) {
+            window.initStarSky();
+            window.animateStarSky();
+        }
+    }
+    const performRequest = (token, url) => {
+        if (url === "api/home/" || url == "api/login/" || url === "api/signup/") {   
+            fetch(baseUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                renderHtml(url, data.html, data.nav_stat, function() {
+                    // Questa callback viene eseguita dopo che l'HTML è stato inserito
+                    insertScript(url, data.scripts, data.nav_stat);  // Ora puoi inserire gli script
+                }, data.nav_stat);
+                newUrl = data.url.startsWith("/") ? data.url : "/" + data.url;
+                if (newUrl !== window.location.pathname) {
+                    history.pushState({page: newUrl}, newUrl, newUrl);
+                }
+            })
+            .catch(error => console.error('Errore durante il recupero della pagina:', error));
+        } else {
+            headers = {
+                "Authorization": `Bearer ${token}`
+            };
+            fetch(baseUrl, {
+                method: "GET",
+                headers: headers
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else if (response.status === 401) {
+                    return { 'status': 'not_logged' };
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            })
+            .then(data => {
+                if (data.status === 'not_logged') {
+                    loadPage("api/login/");
+                    return;
+                }
+                renderHtml(url, data.html, data.dash_base, function() {
+                    insertScript(url, data.scripts, data.nav_stat);
+                }, data.nav_stat);
+                let newUrl = data.url.startsWith("/") ? data.url : "/" + data.url;
+                newUrl = newUrl.endsWith("/") ? newUrl : newUrl + "/";
+                if (newUrl !== window.location.pathname) {
+                    history.pushState({ page: newUrl }, newUrl, newUrl);
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante il recupero della pagina:', error);
+            });
+        }
+    };
+
+    // Funzione per eseguire la verifica e il refresh del token
+    function checkTokenValidity(url) {
+        // Rimuovi l'intestazione Authorization per la richiesta GET di verifica del token
+        fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
+            method: "GET"
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json(); // Gestione del successo
-            } else if (response.status === 401) { // Token di accesso potenzialmente scaduto
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Token valido') {
+                // Token valido, procedi con la richiesta effettiva
+                performRequest(accessToken, url);
+            } else if (data.message === 'Token non valido') {
+                // Token non valido, prova a rinfrescare
                 return refreshAccessToken().then(newAccessToken => {
-                    accessToken = newAccessToken; // Aggiorna il token di accesso per le richieste future
-                    return fetch(baseUrl, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${newAccessToken}`
-                        }
-                    });
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else if (response.status === 401) {
-                        data = {'status': 'not_logged'};
-                        return data
+                    if (newAccessToken) {
+                        accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+                        localStorage.setItem("accessToken", newAccessToken);
+                        // Richiesta effettiva con nuovo token
+                        performRequest(newAccessToken, url);
                     } else {
-                        throw new Error('Network response was not ok');
+                        loadPage("api/login/");
                     }
                 });
             } else {
                 throw new Error('Network response was not ok');
             }
         })
-        .then(data => {
-            if(data.status === 'not_logged')
-            {
-                loadPage("api/login/");
-                return;
-            }
-            renderHtml(url, data.html, data.dash_base, function() {
-                insertScript(url, data.scripts, data.nav_stat);
-            }, data.nav_stat);
-            newUrl = data.url.startsWith("/") ? data.url : "/" + data.url;
-            newUrl = newUrl.endsWith("/") ? newUrl : newUrl + "/";
-            if (newUrl !== window.location.pathname) {
-                history.pushState({page: newUrl}, newUrl, newUrl);
-            }
-        })
-        .catch(error => console.error('Errore durante il recupero della pagina:', error));
+        .catch(error => {
+            console.error('Errore durante la verifica del token:', error);
+        });
     }
-    else
-    {
-        fetch(baseUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            renderHtml(url, data.html, data.nav_stat, function() {
-                // Questa callback viene eseguita dopo che l'HTML è stato inserito
-                insertScript(url, data.scripts, data.nav_stat);  // Ora puoi inserire gli script
-            }, data.nav_stat);
-            newUrl = data.url.startsWith("/") ? data.url : "/" + data.url;
-            if (newUrl !== window.location.pathname) {
-                history.pushState({page: newUrl}, newUrl, newUrl);
-            }
-        })
-        .catch(error => console.error('Errore durante il recupero della pagina:', error));
+    
+
+    // Controllo URL per decidere se fare la richiesta pilota
+    if (url !== "api/home/" && url !== "api/login/" && url !== "api/signup/") {
+        checkTokenValidity(url);
+    } else {
+        performRequest(accessToken, url); // Carica direttamente se è una delle pagine libere
     }
 }
+
+// Funzione per rinfrescare il token di accesso
+function refreshAccessToken() {
+    const refreshToken = localStorage.getItem("refreshToken"); // Supponendo che tu abbia memorizzato il refresh token
+    return fetch(`${window.location.origin}/api/token/refresh/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ refresh: refreshToken })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.access) {
+            localStorage.setItem("accessToken", data.access);
+            return data.access;
+        } else {
+            return null; // Token non valido
+        }
+    })
+    .catch(error => {
+        console.error('Errore durante il refresh del token:', error);
+        return null;
+    });
+}
+
 
 document.addEventListener("DOMContentLoaded", function() {
     if (window.location.pathname == "/")
@@ -226,12 +394,33 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     else
     {
-        loadPage("api" + window.location.pathname);
+        let page = window.location.pathname;
+    
+        if (page.includes("create")) {
+            let parts = page.split("_");
+            let apiUrl = `api${parts[0]}/?source=${parts[1]}`;
+            loadPage(apiUrl);
+        } else {
+            loadPage("api" + window.location.pathname);
+        }
     }
     
     window.onpopstate = function(event) {
         event.preventDefault();
-        loadPage("api" + event.state.page);
+        let page = event.state.page;
+    
+        if (page.includes("create")) {
+            const parts = page.split("_");
+    
+            // Rimuovi eventuali slash finali da parts[1]
+            const sourcePart = parts[1].replace(/\/$/, "");
+    
+            const apiUrl = `api${parts[0]}/?source=${sourcePart}`;
+            loadPage(apiUrl);
+        } else {
+            // Se la stringa non contiene "create", carica la pagina con l'URL standard
+            loadPage("api" + page);
+        }
     };
     
 });

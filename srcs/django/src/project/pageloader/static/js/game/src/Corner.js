@@ -1,10 +1,13 @@
 
+import {Mesh, MeshNormalMaterial, SphereGeometry} from "/static/js/game/module/three.module.js";
 
+//const MATERIAL = new MeshNormalMaterial();
 
-import {Mesh, MeshNormalMaterial, SphereGeometry, Vector3} from "/static/js/game/module/three.module.js";
-
-
-const MATERIAL = new MeshNormalMaterial({ color: 0xff0000ff });
+const MATERIAL = new THREE.MeshStandardMaterial({
+    color: 0x999999,
+    metalness: 0.6,//0.75,
+    roughness: 0.5,//0.2
+});
 
 export class Corner{
     
@@ -13,13 +16,11 @@ export class Corner{
         this.mesh = new Mesh(new SphereGeometry(r), MATERIAL);
         this.mesh.position.set(x, y, z);
         this.r = r;
-        this.mesh.velocity = new Vector3(0, 0, 0);
-        //this.speed = 10;
-        //this.mesh.velocity.multiplyScalar(this.speed);
-        
-        
+        this.mesh.renderOrder = 9999;
         this.scene.add(this.mesh);
     }
 
-    
+    destroy(){
+        this.scene.remove(this.mesh);    
+    }
 };

@@ -18,10 +18,14 @@ from .views import UserInfoAPIView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import re_path
+from .views import UserStatusAPIView
 from .views import UserRequestAPIView
 from .views import GameAPIView
 from .views import UserResponseAPIView
 from .views import GLTFserverAPIView
+from .views import BlockUserAPIView
+from .views import InviteGameAPIView
+from .views import InviteTournamentAPIView
 
 urlpatterns = [
     path('', index, name='index'),
@@ -44,13 +48,20 @@ urlpatterns = [
     path('api/tournaments/', TournamentsAPIView.as_view(), name='tournaments'),
     path('api/token/refresh/', RefreshTokenAPIView.as_view(), name='token_refresh'),
     path('api/request_user/<int:user_id>/', UserInfoAPIView.as_view(), name='request_user'),
+    path('api/request_status/<int:user_id>/', UserStatusAPIView.as_view(), name='request_status'),
     path('api/request/<str:request_type>/<int:id>/', UserRequestAPIView.as_view(), name='request_api'),
     path('api/response/<str:request_type>/', UserResponseAPIView.as_view(), name='response_api'),
     path('api/game/<int:pk>/', GameAPIView.as_view(), name='game_remote'),
     path('api/game/local/', GameAPIView.as_view(), name='game_local'),
-    path('api/game/single/', GameAPIView.as_view(), name='game_single'), 
-    re_path(r'^.*$', index, name='spa'),
+    path('api/game/single/', GameAPIView.as_view(), name='game_single'),
+    path('api/userinfo/<int:user_id>/', UserInfoAPIView.as_view(), name='user_info'),
+    path('api/block_user/<int:user_id>/', BlockUserAPIView.as_view(), name='block_user'),
+    path('api/join_tournament/<int:tournament_id>/', JoinAPIView.as_view(), name='join_tournament_detail'),
+    path('api/invite_game/<int:user_id>/', InviteGameAPIView.as_view(), name='invite_game'),
+    path('api/invite_tournament/<int:user_id>/', InviteTournamentAPIView.as_view(), name='invite_tournament'),
+
     # Altre configurazioni URL...
+    re_path(r'^.*$', index),  # Questo catturerà tutte le altre richieste
 ]
 
 

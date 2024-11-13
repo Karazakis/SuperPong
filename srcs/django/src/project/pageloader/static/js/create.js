@@ -1,3 +1,31 @@
+// Funzione per aggiornare le opzioni del numero di giocatori in base alla modalità selezionata
+function updatePlayerOptions() {
+    const modeSelect = document.getElementById('mode');
+    const nbPlayersSelect = document.getElementById('nb_players');
+
+    // Rimuovi tutte le opzioni attuali
+    nbPlayersSelect.innerHTML = '';
+
+    // Aggiungi opzioni basate sulla modalità selezionata
+    if (modeSelect.value === '1v1') {
+        nbPlayersSelect.innerHTML = `
+            <option value="4">4</option>
+            <option value="8">8</option>
+        `;
+    } else if (modeSelect.value === '2v2') {
+        nbPlayersSelect.innerHTML = `
+            <option value="8">8 (4 teams)</option>
+            <option value="16">16 (8 teams)</option>
+        `;
+    } else if (modeSelect.value === '4dm') {
+        nbPlayersSelect.innerHTML = `
+            <option value="16">16</option>
+        `;
+    }
+}
+
+document.getElementById('mode').addEventListener('change', updatePlayerOptions);
+
 function toggleRuleInput() {
     const ruleSelect = document.getElementById('rule');
     const timeOptions = document.getElementById('timeOptions');
@@ -16,8 +44,17 @@ document.getElementById('rule').addEventListener('change', toggleRuleInput);
 var goBackBtn = document.getElementById('go-back-btn');
 if (goBackBtn) {
     goBackBtn.addEventListener('click', function() {
-        loadPage("api/remote/");
-    });
+    const actual_url = window.location.href;
+    if (actual_url.includes('create_single')) {
+         loadPage("api/dashboard/");
+    } else if (actual_url.includes('create_remote')) {
+         loadPage("api/remote/");
+    } else if (actual_url.includes('create_tournament')) {
+        loadPage("api/tournaments/");
+    } else {
+        loadPage("api/multiplayer/");
+    }
+});
 }
 
 document.getElementById('create').addEventListener('click', function(event) {
@@ -33,14 +70,19 @@ document.getElementById('create').addEventListener('click', function(event) {
     } else if (actual_url.includes('single')) {
         Type = 'single-game';
     }
+    let limit;
+    if (document.getElementById('rule').value === 'time') {
+        limit = parseInt(document.getElementById('timelimit').value, 10);
+    } else {
+        limit = parseInt(document.getElementById('scorelimit').value, 10);
+    }
 
     const data = {
         name: document.getElementById('name').value,
         type: Type,
         mode: document.getElementById('mode').value,
         rules: document.getElementById('rule').value,
-        timelimit: parseInt(document.getElementById('timelimit').value, 10) || 0,
-        scorelimit: parseInt(document.getElementById('scorelimit').value, 10) || 0,
+        limit: limit,
         balls: parseInt(document.getElementById('balls').value, 10) || 1,
         boost: document.getElementById('boost').checked
     };
@@ -67,39 +109,111 @@ document.getElementById('create').addEventListener('click', function(event) {
 
     const url = `/api/create/?source=${source}`;
     if (source === 'remote' || source === 'tournament') {
-        console.log('data:', data);
-        console.log('url:', url);
         let accessToken = localStorage.getItem("accessToken");
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${accessToken}`,
-                'X-CSRFToken': getCookie('csrftoken')
-
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                console.log('data:', source);
-                if (source === 'tournament') {
-                    console.log('dataquiz:', data.success);
-                    loadPage("api/tournament_lobby/" + data.success + "/");
+    
+        // Funzione per verificare la validità del token e, se necessario, rinnovarlo
+        const checkAndRefreshToken = async () => {
+            try {
+                const response = await fetch(`/api/token/refresh/?token=${accessToken}`, {
+                    method: 'GET',
+                });
+    
+                const data = await response.json();
+    
+                if (data.message === 'Token valido') {
+                    // Il token è valido, procedi con la richiesta
+                    return accessToken;
+                } else if (data.message === 'Token non valido') {
+                    // Il token non è valido, tentiamo di rinnovarlo
+                    const newAccessToken = await refreshAccessToken();
+                    if (newAccessToken) {
+                        localStorage.setItem('accessToken', newAccessToken);
+                        return newAccessToken;
+                    } else {
+                        console.error('Impossibile rinnovare il token');
+                        return null;
+                    }
                 } else {
-                    loadPage("api/lobby/" + data.success + "/");
+                    console.error('Errore durante il controllo del token:', data.error);
+                    return null;
                 }
-            } else {
-                alert(data.message);
+            } catch (error) {
+                console.error('Errore durante la verifica o il rinnovo del token:', error);
+                return null;
             }
-        })
-        .catch(error => console.error('Errore durante la creazione:', error));
+        };
+    
+        // Funzione per il rinnovo del token
+        async function refreshAccessToken() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) {
+                console.error('Token di refresh mancante');
+                return null;
+            }
+    
+            try {
+                const response = await fetch('/api/token/refresh/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.access;
+                } else {
+                    console.error('Errore durante il rinnovo del token di accesso');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Errore durante il rinnovo del token di accesso:', error);
+                return null;
+            }
+        }
+    
+        // Funzione principale per eseguire la richiesta
+        const executeRequest = async () => {
+            accessToken = await checkAndRefreshToken();
+            if (!accessToken) {
+                alert('Token di accesso non valido o scaduto. Effettua nuovamente il login.');
+                loadPage('api/login/');
+                return;
+            }
+    
+            // Effettua la richiesta POST
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`,
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    if (source === 'tournament') {
+                        loadPage("api/tournament_lobby/" + data.success + "/");
+                    } else {
+                        loadPage("api/lobby/" + data.success + "/");
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Errore durante la creazione:', error));
+        };
+    
+        // Esegui la richiesta con il controllo del token
+        executeRequest();
     } else if (source === 'local' || source === 'single') {
 
         let UserId = localStorage.getItem('userId');
@@ -112,3 +226,5 @@ document.getElementById('create').addEventListener('click', function(event) {
         loadPage(targetUrl);
     }
 });
+
+toggleRuleInput();

@@ -12,7 +12,7 @@
                 <h3>Player 1</h3>
                 <span id="player1_label">Empty</span>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 text-center">
                 <h3>Game Details</h3>
                 <ul class="list-unstyled">
                     <li>Mode: <span id="game_mode">{{ game.mode }}</span></li>
@@ -98,11 +98,11 @@
         <div class="col-md-4 text-center">
             <h3>Users in Lobby</h3>
             <ul id="users_in_lobby" class="list-unstyled">
-                <li id="user1_lobby" data-status="not_ready" style="color: rgb(66, 66, 161);">Empty</li>
-                <li id="user2_lobby" data-status="not_ready">Empty</li>
+                <li id="user1_lobby" data-status="{{ game.player1_status }}" style="color: rgb(66, 66, 161);">Empty</li>
+                <li id="user2_lobby" data-status="{{ game.player2_status }}">Empty</li>
                 {% if game.mode != "1v1" %}
-                    <li id="user3_lobby" data-status="not_ready">Empty</li>
-                    <li id="user4_lobby" data-status="not_ready">Empty</li>
+                    <li id="user3_lobby" data-status="{{ game.player3_status }}">Empty</li>
+                    <li id="user4_lobby" data-status="{{ game.player4_status }}">Empty</li>
                 {% endif %}
             </ul>
         </div>

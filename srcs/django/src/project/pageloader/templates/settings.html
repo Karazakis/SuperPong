@@ -16,6 +16,7 @@
                 <div class="form-group">
                     <label for="nickname">Nickname:</label>
                     <input type="text" class="form-control" id="nickname" name="nickname" value="{{ user.userprofile.nickname }}">
+                    <div id="nickname-error" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="img_profile">Profile Image:</label>
@@ -24,14 +25,17 @@
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+                    <div id="username-error" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                    <div id="email-error" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="password">Password:</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter new password">
+                    <div id="password-error" class="error-message"></div>
                 </div>
                 <div class="row justify-content-center">
                     <button id="profile-settings-btn" type="submit" class="btn btn-primary">Save Changes</button>

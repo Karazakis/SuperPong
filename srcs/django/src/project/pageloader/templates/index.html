@@ -16,21 +16,7 @@
     
     <!-- Includi Three.js -->
     <script src="/static/js/game/module/three.min.js"></script>    
-    <script src="/static/js/game/module/three.min.js" type="module"></script>
-    <script src="/static/js/game/module/three.module.js" type="module"></script>
-    <script src="/static/js/game/module/GLTFLoader.js" type="module" ></script> 
-    <!-- <script src="/static/js/game/module/OrbitControls.js" type="module"></script> -->
-    
 
-
-    
-
-    <script src="{% static '/js/game/src/Ball.js' %}" type="module"></script>
-    <script src="{% static '/js/game/src/Paddle.js' %}" type="module"></script>
-    <script src="{% static '/js/game/src/Corner.js' %}" type="module"></script>
-    <script src="{% static '/js/game/src/Ball2.js' %}" type="module"></script>
-    <script src="{% static '/js/game/src/Bot.js' %}" type="module"></script>
-    <script src="{% static '/js/game/src/Bot2.js' %}" type="module"></script>
     <style>
         body {
             margin: 0;
@@ -55,56 +41,97 @@
             height: 100%;
             z-index: 0;
         }
-    </style>
-    
+    </style>    
 </head>
 <body id="body">
     <div id="app">
     </div>
     <script>
-        // Inizializza la scena, la camera e il renderer di Three.js
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        const url = window.location.href;
+        if (url.includes("game") || url.includes("lobby")) {
+            console.log("URL contiene 'game' o 'lobby'. Esecuzione comportamento specifico...");
+            if (url.includes("game")) {
+                if (url.includes("local")){
 
-        // Crea le particelle del cielo stellato
-        const particlesGeometry = new THREE.BufferGeometry();
-        const counts = 5000;
-        const positionsStars = new Float32Array(counts * 3);
-
-        for (let i = 0; i < counts * 3; i++) {
-            positionsStars[i] = (Math.random() * 160) - 80;
+                } else {
+                    console.log("URL contiene 'online'. Esecuzione comportamento specifico...");
+                }
+            } else if (url.includes("lobby")) {
+                console.log("URL contiene 'lobby'. Esecuzione comportamento specifico...");
+            }
         }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positionsStars, 3));
-        const particlesMaterial = new THREE.PointsMaterial();
-        particlesMaterial.size = 0.2;
-        particlesMaterial.sizeAttenuation = true;
-
-        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-        particles.position.set(0, 0, -80);
-        scene.add(particles);
-
-        // Aggiungi luce alla scena
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0xffffff, 1);
-        pointLight.position.set(10, 10, 10);
-        scene.add(pointLight);
-
-        // Imposta la posizione della camera
-        camera.position.z = 10;
+        window.initStarSky = function () {
+            window.starScene = new THREE.Scene();
+            window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            window.renderer = new THREE.WebGLRenderer();
+    
+            const particlesGeometry = new THREE.BufferGeometry();
+            const counts = 3000;
+            const positionsStars = new Float32Array(counts * 3);
+            const range = 420;
+    
+            for (let i = 0; i < counts * 3; i++) {
+                positionsStars[i] = (Math.random() * range) - (range / 2);
+            }
+    
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positionsStars, 3));
+            const particlesMaterial = new THREE.PointsMaterial();
+            particlesMaterial.size = 0.2;
+            particlesMaterial.sizeAttenuation = true;
+    
+            window.particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            window.renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(window.renderer.domElement);
+    
+            // Crea le particelle del cielo stellato
+            window.particles.position.set(0, 100, -100);
+            window.starScene.add(particles);
+    
+            // Aggiungi luce alla scena
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            window.starScene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0xffffff, 1);
+            pointLight.position.set(10, 10, 10);
+            window.starScene.add(pointLight);
+    
+            // Imposta la posizione della camera
+            //camera.position.z = 100;
+            window.camera.position.set(0, -40, 25);
+            window.camera.rotation.set(0.75, 0, 0);
+        }
 
         // Funzione di animazione
-        function animate() {
-            requestAnimationFrame(animate);
-            particles.rotation.y += 0.001; // Aggiunge una rotazione lenta alle stelle
-            renderer.render(scene, camera);
+        window.animateStarSky = function ( ) {
+            requestAnimationFrame(animateStarSky);
+            window.particles.rotation.x = 0.75;
+            window.particles.rotation.y += 0.001; // Aggiunge una rotazione lenta alle stelle
+            window.renderer.render(starScene, camera);
+        }
+        window.singleSkyScene = function () {
+            window.particles.rotation.x = 0.75;
+            window.particles.rotation.y += 0.001; // Aggiunge una rotazione lenta alle stelle
+            window.renderer.render(starScene, camera);
+        }
+        window.initStarSky(window.renderer, window.starScene, window.camera, window.particles, window.starScene);
+        window.animateStarSky( window.renderer, window.starScene, window.camera, window.particles);
+
+        window.clearScene = function (scene) {
+            if(scene != null) {
+                while (scene.children.length > 0) {
+                    const object = scene.children[0];
+                    if (object.geometry) object.geometry.dispose();
+                    if (object.material) object.material.dispose();
+                    scene.remove(object);
+                }
+            }
         }
 
-        animate();
+        window.clearAllScene = function () {
+            window.clearScene(window.starScene);
+            window.clearScene(window.gameScene);
+            window.starScene = null;
+            window.gameScene = null;
+        }
 
         // Gestisci la ridimensionamento della finestra
         window.addEventListener('resize', () => {

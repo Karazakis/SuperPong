@@ -15,6 +15,7 @@ from datetime import timedelta
 import os
 from django.conf import settings
 from django.conf.urls.static import static
+import logging
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -153,7 +154,8 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'pageloader/static/media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -171,6 +173,50 @@ SECURE_SSL_REDIRECT = True
 # Cookie settings per sicurezza
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+
+class IgnoreStaticFilesFilter(logging.Filter):
+    def filter(self, record):
+        return not record.getMessage().startswith('GET /static/')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'ignore_static': {
+            '()': IgnoreStaticFilesFilter,
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'WARNING',  # Modifica il livello a 'WARNING'
+            'class': 'logging.StreamHandler',
+            'filters': ['ignore_static'],  # Applica il filtro personalizzato
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'daphne': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}
+
+
 
 """ # Imposta i valori di sicurezza per il browser
 SECURE_BROWSER_XSS_FILTER = True

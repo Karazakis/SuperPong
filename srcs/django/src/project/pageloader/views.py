@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.http import HttpResponse
 from rest_framework.views import APIView
@@ -14,13 +12,25 @@ from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from .models import UserProfile
 from .models import Game
-from .models import Tournament
+from .models import Tournament, Round
+from .models import Round
+from .models import PendingRequest
 from .forms import SignUpForm
 from urllib.parse import parse_qs
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.middleware.csrf import get_token
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.exceptions import TokenError
+from django.core.exceptions import ValidationError
+from rest_framework.permissions import AllowAny
+import re
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
+
 
 import logging
 import os
@@ -42,6 +52,7 @@ class GLTFserverAPIView(APIView):
             return HttpResponse(status=404)
 
 class HomePageAPIView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request, format=None):
         # Controlla se l'utente è autenticato
         if request.user.is_authenticated:
@@ -70,6 +81,7 @@ class HomePageAPIView(APIView):
                 }
         print(data)
         return Response(data)
+
 class CreateUserAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
@@ -130,6 +142,9 @@ class CreateUserAPIView(APIView):
 
 
 class LoginUserAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    @csrf_exempt
     def get(self, request):
         if request.user.is_authenticated:
             html = render_to_string('dashboard.html')
@@ -189,6 +204,7 @@ class LoginUserAPIView(APIView):
 
 
 class RefreshTokenAPIView(APIView):
+    permission_classes = [AllowAny]  # Permetti l'accesso a chiunque
     def post(self, request):
         try:
             refresh = RefreshToken(request.data['refresh'])
@@ -197,12 +213,31 @@ class RefreshTokenAPIView(APIView):
             }, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):
+        # Ottiene il token di accesso dai parametri di query
+        token = request.GET.get('token')
+        if not token:
+            return Response({'message': 'Token non fornito'}, status=status.HTTP_200_OK)
+
+        try:
+            # Verifica il token di accesso
+            access_token = AccessToken(token)
+            access_token.verify()  # Metodo che verifica se il token è valido
+
+            return Response({'message': 'Token valido'}, status=status.HTTP_200_OK)
+        except TokenError as e:
+            # Gestione del caso in cui il token non è valido
+            return Response({'message': 'Token non valido', 'error': str(e)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_200_OK)
+
 
 class DashboardAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             nav_stat = 'logged_nav'
             html = render_to_string('dashboard.html')
+            logging.debug(f"Utente autenticato: {request.user.id}")
             user = User.objects.get(pk=request.user.id)
             user_profile = UserProfile.objects.get(user=user)
             context = {
@@ -227,6 +262,7 @@ class DashboardAPIView(APIView):
                 'nav_stat': 'not_logged',
             }
             return Response(data)
+    
 
 class ProfileAPIView(APIView):
 
@@ -235,9 +271,40 @@ class ProfileAPIView(APIView):
             print(' diahane ')
             user = User.objects.get(pk=pk)
             user_profile = UserProfile.objects.get(user=user)
+
+            # Friends
+            friends = user_profile.user_friend_list.all()
+
+            # Match history (games played)
+            match_history = user_profile.game_played.all()
+
+            # Tournament history
+            tournament_history = user_profile.tournament_played.all()
+
+            # Additional statistics
+            game_wins = user_profile.game_win
+            game_losses = user_profile.game_lose
+            game_draws = user_profile.game_draw
+            game_abandons = user_profile.game_abandon
+            tournament_wins = user_profile.tournament_win
+            tournament_losses = user_profile.tournament_lose
+            tournament_draws = user_profile.tournament_draw
+            tournament_abandons = user_profile.tournament_abandon
+
             context = {
                 'user': user,
                 'userprofile': user_profile,
+                'friends': friends,
+                'match_history': match_history,
+                'tournament_history': tournament_history,
+                'game_wins': game_wins,
+                'game_losses': game_losses,
+                'game_draws': game_draws,
+                'game_abandons': game_abandons,
+                'tournament_wins': tournament_wins,
+                'tournament_losses': tournament_losses,
+                'tournament_draws': tournament_draws,
+                'tournament_abandons': tournament_abandons,
             }
             html = render_to_string('profile.html', context)
             dash_base = render_to_string('dashboard-base.html', context)
@@ -255,7 +322,7 @@ class ProfileAPIView(APIView):
             return Response({"error": "Profilo utente non trovato."}, status=404)
 
 
-        
+      
 class SettingsAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
@@ -264,6 +331,7 @@ class SettingsAPIView(APIView):
             context = {
                 'user': user,
                 'userprofile': user_profile,
+                'MEDIA_URL': settings.MEDIA_URL,
             }
             html = render_to_string('settings.html', context)
             dash_base = render_to_string('dashboard-base.html', context)
@@ -290,23 +358,62 @@ class SettingsAPIView(APIView):
             user = User.objects.get(pk=request.POST.get('id'))
             user_profile = UserProfile.objects.get(user=user)
             img_profile = request.FILES.get('img_profile')
-            if img_profile:
-                if(user_profile.img_profile != 'profiles/default.png'):
-                    # Cancella l'immagine precedente
-                    os.remove(f'{settings.BASE_DIR}/static/media/{user_profile.img_profile}')
+            if img_profile:                    
                 # Crea il percorso della cartella in base all'ID dell'utente
-                user_folder = f'{settings.BASE_DIR}/static/media/profiles/{user.id}/'
+                user_folder = os.path.join(settings.MEDIA_ROOT, f'profiles/{user.id}/')
                 if not os.path.exists(user_folder):
                     os.makedirs(user_folder)
                 # Salva l'immagine nel percorso specificato
                 fs = FileSystemStorage(location=user_folder)
                 filename = fs.save(img_profile.name, img_profile)
                 user_profile.img_profile = f'profiles/{user.id}/{filename}'
+            else:
+                # Se non viene caricata una nuova immagine, utilizza l'immagine di default se necessario
+                if not user_profile.img_profile:
+                    user_profile.img_profile = 'profiles/default.png'
+            
+            
+            errors = {}
             username = request.POST.get('username')
             email = request.POST.get('email')
             password = request.POST.get('password')
             nickname = request.POST.get('nickname')
-            img_profile = request.FILES.get('img_profile')
+
+            if username:
+                username = re.sub(r'[<>]', '', username)
+                if len(username) < 3:
+                    errors['username'] = "Il nome utente deve essere lungo almeno 3 caratteri."
+                elif User.objects.filter(username=username).exclude(pk=user.pk).exists():
+                    errors['username'] = "Il nome utente è già in uso."
+
+            if email:
+                email = re.sub(r'[<>]', '', email)
+                email_pattern = r'^[a-zA-Z0-9._%+]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$'
+                if not re.match(email_pattern, email):
+                    errors['email'] = "Inserisci un indirizzo email valido."
+                elif User.objects.filter(email=email).exclude(pk=user.pk).exists():
+                    errors['email'] = "L'email è già in uso."
+
+            if password:
+                password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$'
+                if not re.match(password_pattern, password):
+                    errors['password'] = "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola e un carattere speciale."
+
+            if errors:
+                return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
+
+            if password:
+                user.set_password(password)
+            if username:
+                user.username = username
+            if email:
+                user.email = email
+            if nickname:
+                user_profile.nickname = nickname
+            user.save()
+
+
+            
             p1Right = request.POST.get('right1')
             p1Left = request.POST.get('left1')
             p1Shoot = request.POST.get('shoot1')
@@ -324,15 +431,6 @@ class SettingsAPIView(APIView):
             p4Shoot = request.POST.get('shoot4')
             p4Boost = request.POST.get('boost4')
 
-
-            if username:
-                user.username = username
-            if email:
-                user.email = email
-            if password:
-                user.set_password(password)
-            if nickname:
-                user_profile.nickname = nickname
             if p1Right:
                 user_profile.p1Right = p1Right
             if p1Left:
@@ -365,11 +463,13 @@ class SettingsAPIView(APIView):
                 user_profile.p4Shoot = p4Shoot
             if p4Boost:
                 user_profile.p4Boost = p4Boost
+
+
             user_profile.save()
-            user.save()
             return Response({'success': 'Profilo aggiornato con successo.'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class LogoutAPIView(APIView):
     def get(self, request):
@@ -453,21 +553,24 @@ class JoinAPIView(APIView):
 
             games = None
             tournaments = None
+            active_tournaments = None
 
             if 'join_lobby' in current_url:
                 games = Game.objects.filter(status='not_started', tournament__isnull=True)
             elif 'join_tournament' in current_url:
                 tournaments = Tournament.objects.filter(status='not_started')
+                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'in_progress'], players__in=[user])
 
             context = {
                 'user': user,
                 'userprofile': user_profile,
                 'games': games,
                 'tournaments': tournaments,
+                'active_tournaments': active_tournaments,
             }
 
-            html = render_to_string('join.html', context)
-            dash_base = render_to_string('dashboard-base.html', context)
+            html = render_to_string('join.html', context, request=request)
+            dash_base = render_to_string('dashboard-base.html', context, request=request)
             data = {
                 'url': current_url.replace('/api', ''),
                 'html': html,
@@ -486,19 +589,64 @@ class JoinAPIView(APIView):
             }
             return Response(data)
 
+    # def post(self, request):
+    #     if request.user.is_authenticated:
+    #         user = get_object_or_404(User, pk=request.user.id)
+    #         user_profile = get_object_or_404(UserProfile, user=user)
+    #         data = request.data
+    #         current_url = request.path
+
+    #         if 'join_lobby' in current_url:
+    #             game_id = data.get('game_id')
+    #             if game_id:
+    #                 game = get_object_or_404(Game, pk=game_id, status='not_started', tournament__isnull=True)
+    #                 if game.player_inlobby < game.player_limit:
+    #                     game.player_inlobby += 1 
+    #                     game.save()
+    #                     user_profile.in_game_lobby = game
+    #                     user_profile.save()
+    #                     return Response({'success': True}, status=status.HTTP_200_OK)
+    #                 else:
+    #                     return Response({'success': False, 'message': 'Game is full'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         elif 'join_tournament' in current_url:
+    #             tournament_id = data.get('tournament_id')
+    #             if tournament_id:
+    #                 tournament = get_object_or_404(Tournament, pk=tournament_id, status='not_started')
+    #                 tournament.players_in_lobby += 1
+    #                 tournament.save()
+    #                 user_profile.in_tournament_lobby = tournament
+    #                 user_profile.save()
+    #                 return Response({'success': True}, status=status.HTTP_200_OK)
+
+    #         return Response({'success': False, 'message': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
+    #     else:
+    #         return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
     def post(self, request):
+        """
+        Aggiunge il giocatore a un gioco o torneo.
+        """
         if request.user.is_authenticated:
             user = get_object_or_404(User, pk=request.user.id)
+            user_profile = get_object_or_404(UserProfile, user=user)
             data = request.data
             current_url = request.path
 
             if 'join_lobby' in current_url:
+                # Logica per unire l'utente a un gioco
                 game_id = data.get('game_id')
                 if game_id:
                     game = get_object_or_404(Game, pk=game_id, status='not_started', tournament__isnull=True)
                     if game.player_inlobby < game.player_limit:
-                        game.player_inlobby += 1
+                        game.players.add(user)  # Aggiungi il giocatore al gioco
+                        game.player_inlobby += 1  # Incrementa il numero di giocatori in lobby
                         game.save()
+
+                        # Aggiorna il profilo dell'utente
+                        user_profile.in_game_lobby = game
+                        user_profile.save()
+
                         return Response({'success': True}, status=status.HTTP_200_OK)
                     else:
                         return Response({'success': False, 'message': 'Game is full'}, status=status.HTTP_400_BAD_REQUEST)
@@ -506,14 +654,65 @@ class JoinAPIView(APIView):
             elif 'join_tournament' in current_url:
                 tournament_id = data.get('tournament_id')
                 if tournament_id:
-                    tournament = get_object_or_404(Tournament, pk=tournament_id, status='not_started')
-                    tournament.nb_players += 1
-                    tournament.save()
-                    return Response({'success': True}, status=status.HTTP_200_OK)
+                    tournament = get_object_or_404(Tournament, pk=tournament_id)
+
+                    if tournament.status == 'not_started':
+                        # Tornei non iniziati: esegui il normale join
+                        if user not in tournament.players.all():
+                            tournament.players.add(user)  # Aggiungi il giocatore al torneo
+                            tournament.players_in_lobby += 1  # Incrementa il numero di giocatori
+                            tournament.save()
+
+                            # Aggiorna il profilo dell'utente
+                            user_profile.in_tournament_lobby = tournament
+                            user_profile.save()
+
+                            return Response({'success': True}, status=status.HTTP_200_OK)
+                        else:
+                            return Response({'success': False, 'message': 'User is already in the tournament'}, status=status.HTTP_400_BAD_REQUEST)
+
+                    elif tournament.status in ['waiting_for_matches', 'in_progress']:
+                        # Tornei in corso: logica di re-join
+                        if user in tournament.players.all():
+                            # L'utente è già nel torneo, esegui il re-join
+                            return Response({'success': True, 'message': 'Rejoined the tournament'}, status=status.HTTP_200_OK)
+                        else:
+                            return Response({'success': False, 'message': 'Cannot join, tournament already started'}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response({'success': False, 'message': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    def delete(self, request, tournament_id=None):
+        if request.user.is_authenticated:
+            if tournament_id is not None:
+                try:
+                    tournament = Tournament.objects.get(id=tournament_id)
+                    if tournament.owner == request.user:
+                        tournament.delete()
+                    return Response({'success': True})
+                except Tournament.DoesNotExist:
+                    return Response({'success': False, 'error': 'Tournament not found'}, status=404)
+            return Response({'success': False, 'error': 'Tournament ID not provided'}, status=400)
         else:
             return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+    def leave(self, request, tournament_id=None):
+        if request.user.is_authenticated:
+            if tournament_id is not None:
+                try:
+                    tournament = Tournament.objects.get(id=tournament_id)
+                    user = get_object_or_404(User, pk=request.user.id)
+                    if tournament.players.filter(id=user.id).exists():
+                        tournament.players.remove(user)
+                        tournament.save()
+                    return Response({'success': True})
+                except Tournament.DoesNotExist:
+                    return Response({'success': False, 'error': 'Tournament not found'}, status=404)
+            return Response({'success': False, 'error': 'Tournament ID not provided'}, status=400)
+        else:
+            return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+        
 
         
 class CreateAPIView(APIView):
@@ -569,32 +768,36 @@ class CreateAPIView(APIView):
         try:
             source = request.query_params.get('source', 'default')
             user = User.objects.get(pk=request.user.id)
+            user_profile = UserProfile.objects.get(user=user)
 
             if source == 'tournament':
                 tournament = Tournament.objects.create(
                     name=request.data.get('name', ''),
                     mode=request.data.get('mode', ''),
-                    limit=int(request.data.get('timelimit', 0)),
+                    limit=int(request.data.get('limit', 0)),
                     balls=int(request.data.get('balls', 1)),
                     boost=request.data.get('boost', False),
                     nb_players=int(request.data.get('nb_players', 0)),
-                    status='not_started'
+                    status='not_started',
+                    rules=request.data.get('rules', ''), 
+                    owner=user
                 )
                 tournament.players.add(user)  # Aggiungi l'utente all'elenco dei giocatori
+                tournament.players_in_lobby += 1
                 tournament.save()
+
+                user_profile.in_tournament_lobby = tournament
+                user_profile.save()
                 logging.debug(f'Torneo creato: {tournament.id}')
+                tournament.generate_initial_rounds()
                 return Response({'success': tournament.id}, status=status.HTTP_201_CREATED)
             else:
-                if request.data.get('rules', '') == 'time':
-                    rules_limit = int(request.data.get('timelimit', 0))
-                else:
-                    rules_limit = int(request.data.get('scorelimit', 0))
-
+                
                 game = Game.objects.create(
                     name=request.data.get('name', ''),
                     mode=request.data.get('mode', ''),
                     rules=request.data.get('rules', ''),
-                    limit=rules_limit,
+                    limit=int(request.data.get('limit', 0)),
                     balls=int(request.data.get('balls', 1)),
                     boost=request.data.get('boost', False)
                 )
@@ -606,6 +809,8 @@ class CreateAPIView(APIView):
                 game.player1 = user
                 game.player_inlobby += 1
                 game.save()
+                user_profile.in_game_lobby = game
+                user_profile.save()
                 logging.debug(f'Gioco creato: {game.id}')
                 return Response({'success': game.id}, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -644,18 +849,26 @@ class TournamentsAPIView(APIView):
             }
             return Response(data)
 
+
+
 class LobbyAPIView(APIView):
     def get(self, request, pk):
         if request.user.is_authenticated:
             user = User.objects.get(pk=request.user.id)
             user_profile = UserProfile.objects.get(user=user)
             current_url = request.path
+            
             if 'tournament_lobby' in current_url:
                 tournament = Tournament.objects.get(pk=pk)
+
+
+                rounds = Round.objects.filter(tournament=tournament)
+                rounds_list = list(rounds.values()) 
                 context = {
                     'user': user,
                     'userprofile': user_profile,
                     'tournament': tournament,
+                    'rounds': json.dumps(rounds_list, cls=DjangoJSONEncoder)
                 }
                 html = render_to_string('tournament-lobby.html', context)
                 url = f'tournament_lobby/{pk}'
@@ -690,46 +903,156 @@ class LobbyAPIView(APIView):
             }
             return Response(data)
 
+
+
     def delete(self, request, pk):
         if request.user.is_authenticated:
+            current_url = request.path
             try:
-                game = Game.objects.get(pk=pk)
-                if game.player1 == request.user:
-                    game.delete()
-                    return Response({'success': True}, status=status.HTTP_200_OK)
+                if 'tournament_lobby' in current_url:
+                    tournament = Tournament.objects.get(pk=pk)
+                    if tournament.owner == request.user:  # Assume che ci sia un campo `owner` in `Tournament`
+                        tournament.delete()
+                        logger.info(f"Tournament {pk} deleted")  # Log di debug
+                        return Response({'success': True}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
                 else:
-                    return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
-            except Game.DoesNotExist:
-                return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+                    game = Game.objects.get(pk=pk)
+                    if game.player1 == request.user:
+                        game.delete()
+                        return Response({'success': True}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+            except (Game.DoesNotExist, Tournament.DoesNotExist) as e:
+                logger.error(f"Error: {str(e)}")
+                return Response({'error': 'Game or Tournament not found'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, pk):
         if request.user.is_authenticated:
+            current_url = request.path
+            user = User.objects.get(pk=request.user.id)
+            user_profile = UserProfile.objects.get(user=user)
             try:
-                game = Game.objects.get(pk=pk)
-                if game.player1 == request.user:
-                    game.player1 = None
-                elif game.player2 == request.user:
-                    game.player2 = None
-                elif game.player3 == request.user:
-                    game.player3 = None
-                elif game.player4 == request.user:
-                    game.player4 = None
-                game.player_inlobby -= 1
-                game.save()
-                return Response({'success': True}, status=status.HTTP_200_OK)
-            except Game.DoesNotExist:
-                return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+                if 'tournament_lobby' in current_url:
+                    tournament = Tournament.objects.get(pk=pk)
+                    return Response({'success': True}, status=status.HTTP_200_OK)
+                else:
+                    game = Game.objects.get(pk=pk)
+                    game.players.remove(request.user)
+                    game.player_inlobby -= 1
+                    game.save()
+                    user_profile.in_game_lobby = None
+                    user_profile.save()
+                    return Response({'success': True}, status=status.HTTP_200_OK)
+            except (Game.DoesNotExist, Tournament.DoesNotExist):
+                return Response({'error': 'Game or Tournament not found'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
-        
+
+class UserStatusAPIView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            user_profile = UserProfile.objects.get(user=user)
+            if(user_profile.in_game_lobby):
+                game = {
+                    'game': user_profile.in_game_lobby.id,
+                }
+            else:
+                game = None
+
+            if(user_profile.in_tournament_lobby):
+                tournament = {
+                    'tournament': user_profile.in_tournament_lobby.id,
+                }
+            else:
+                tournament = None
+
+            data = {
+                'game': game,
+                'tournament': tournament,
+            }
+            return Response(data)
+        except User.DoesNotExist:
+            return Response({"error": "Utente non trovato."}, status=404)
+        except UserProfile.DoesNotExist:
+            return Response({"error": "Profilo utente non trovato."}, status=404)
+
+
+logger = logging.getLogger(__name__)
 class UserInfoAPIView(APIView):
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
             user_profile = UserProfile.objects.get(user=user)
+            game_played = user_profile.game_played.all()
+            logger.debug(f"User profile: {user_profile.game_played}")
+            logger.debug(f"Game history: {game_played}")
+
+            game_history = [
+                {
+                    'id': game.id,
+                    'name': game.name,
+                    'mode': game.mode,
+                    'rules': game.rules,
+                    'limit': game.limit,
+                    'balls': game.balls,
+                    'boost': game.boost,
+                    'status': game.status,
+                }
+                for game in user_profile.game_played.all()
+            ]
+            tournament_history = [
+                {
+                    'id': tournament.id,
+                    'name': tournament.name,
+                    'mode': tournament.mode,
+                    'rules': tournament.rules,
+                    'limit': tournament.limit,
+                    'balls': tournament.balls,
+                    'boost': tournament.boost,
+                    'status': tournament.status,
+                    'creation_date': tournament.creation_date.isoformat(),
+                }
+                for tournament in user_profile.tournament_played.all()
+            ]
+            # Serializzare le richieste pendenti
+            pending_requests = [
+                {
+                    'id': req.id,
+                    'request_type': req.request_type,
+                    'target_user': req.target_user.username,
+                    'requesting_user': req.requesting_user.username,
+                    'status': req.status,
+                    'creation_date': req.creation_date.isoformat()
+                }
+                for req in user_profile.pending_requests.all()
+            ]
+
+            # Serializzare la lista di amici
+            user_friend_list = [
+                {
+                    'id': friend.user.id,
+                    'username': friend.user.username,
+                    'nickname': friend.nickname
+                }
+                for friend in user_profile.user_friend_list.all()
+            ]
+
+            # Serializzare la lista degli utenti bloccati
+            blocked_userslist = [
+                {
+                    'id': blocked_user.id,
+                    'username': blocked_user.user.username,
+                    'nickname': blocked_user.nickname
+                }
+                for blocked_user in user_profile.blocked_users.all()
+            ]
+
             data = {
                 'id': user.id,
                 'username': user.username,
@@ -751,42 +1074,219 @@ class UserInfoAPIView(APIView):
                 'p4Right': user_profile.p4Right,
                 'p4Left': user_profile.p4Left,
                 'p4Shoot': user_profile.p4Shoot,
-                'p4Boost': user_profile.p4Boost
+                'p4Boost': user_profile.p4Boost,
+                'pending_requests': pending_requests,
+                'user_friend_list': user_friend_list,
+                'blocked_userslist': blocked_userslist,
+                'game_history': game_history,
+                'tournament_history': tournament_history,
             }
             return Response(data)
+        
         except User.DoesNotExist:
-            return Response({"error": "Utente non trovato."}, status=404)
+            logger.error(f"User with ID {user_id} does not exist.")
+            return Response({"error": "Utente non trovato."}, status=status.HTTP_404_NOT_FOUND)
+        
         except UserProfile.DoesNotExist:
-            return Response({"error": "Profilo utente non trovato."}, status=404)
+            logger.error(f"UserProfile for user ID {user_id} does not exist.")
+            return Response({"error": "Profilo utente non trovato."}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            logger.error(f"Error occurred: {e}", exc_info=True)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
         
-class UserRequestAPIView(APIView):
-    def post(self, request, request_type, id):  # Modifica la firma del metodo post per accettare request_type
-        try:
-            # Trova l'utente associato all'ID
-            user = User.objects.get(pk=id)
-            # Estrai i dati dalla richiesta POST
-            request_data = request.data
-            request_data['request_type'] = request_type  # Includi il tipo di richiesta nei dati della richiesta
+logger = logging.getLogger(__name__)
 
-            # Verifica se la richiesta esiste già nell'elenco delle richieste dell'utente
-            user_profile = UserProfile.objects.get(user=user)
-            requests = user_profile.requests
-            if request_data not in requests:
-                # Aggiungi la richiesta all'attributo requests dell'utente solo se non esiste già
-                requests.append(request_data)
-                user_profile.requests = requests
-                user_profile.save()
-                return Response({'success': 'Richiesta inviata con successo.'}, status=status.HTTP_200_OK)
+class UserRequestAPIView(APIView):
+    def post(self, request, request_type, id):
+        try:
+            request_data = request.data
+            user = request.user
+
+           
+
+            if request_type not in ['friend', 'game', 'tournament']:
+                return Response({'error': 'Tipo di richiesta non valido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Controlla se l'utente di destinazione esiste
+            try:
+                user = User.objects.get(pk=id)
+            except User.DoesNotExist:
+                logger.error(f"L'utente con ID {id} non esiste.")
+                return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Ottieni l'oggetto User per il requesting_user
+            if request_data.get('request') == "remove":
+                username = User.objects.get(username=request_data.get('target_user'))
+            elif request_data.get('request') == "accept" or request_data.get('request') == "decline":
+                if request_data.get('true') == "yes":
+                    logger.debug(f"Requesting user: {request_data.get('requesting_user')}")
+                    requesting_user = User.objects.get(username=request_data.get('requesting_user'))
+                elif request_data.get('true') == "no":
+                    logger.debug(f"Requesting user no: {request_data.get('requesting_user')}")
+                    requesting_user = User.objects.get(pk=request_data.get('requesting_user'))
             else:
-                #PER DIEGO se è tutto identico
-                return Response({'error': 'La richiesta è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
-                #PER DIEGO altrimenti modifichi il campo della richiesta esistente diverso, se modificabile, altrimenti se è una richiesta già risposta o altri motivi di incompatibilità, da errore.
+                requesting_user = User.objects.get(username=request_data.get('requesting_user'))
+
+            if request_type == 'friend':
+                # Controlla se l'utente è già un amico
+                user_profile = UserProfile.objects.get(user=user)
+                if user in user_profile.user_friend_list.all():
+                    return Response({'error': 'L\'utente è già un amico.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                if request_data.get('request') == 'accept':
+                    return self.accept_request(request, id, requesting_user)
+                elif request_data.get('request') == 'decline':
+                    return self.decline_request(id, requesting_user)
+                elif request_data.get('request') == 'remove':
+                    return self.remove_friend(request, id, username)
+
+                # Controlla se esiste già una richiesta pendente
+                if PendingRequest.objects.filter(
+                    target_user=user,
+                    requesting_user=requesting_user,
+                    request_type=request_type,
+                ).exists():
+                    return Response({'error': 'La richiesta è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Creazione di una nuova richiesta
+                new_request = PendingRequest.objects.create(
+                    request_type=request_type,
+                    target_user=user,
+                    requesting_user=requesting_user,
+                    request=request_data.get('request'),
+                )
+                # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
+                target_user_profile = UserProfile.objects.get(user=user)
+                target_user_profile.pending_requests.add(new_request)
+                return Response({'success': 'Richiesta inviata con successo.'}, status=status.HTTP_200_OK)
+
+            elif request_type == 'game':
+                try:
+                    # Controlla se esiste già una richiesta pendente di tipo 'game'
+                    if PendingRequest.objects.filter(
+                        target_user=user,
+                        requesting_user=requesting_user,
+                        request_type='game'
+                    ).exists():
+                        return Response({'error': 'L\'invito a giocare è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                    # Creazione di una nuova richiesta di invito a giocare
+                    new_request = PendingRequest.objects.create(
+                        request_type='game',
+                        target_user=user,
+                        requesting_user=requesting_user,
+                        request=request_data.get('request'),
+                    )
+
+                    # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
+                    target_user_profile = UserProfile.objects.get(user=user)
+                    target_user_profile.pending_requests.add(new_request)
+
+                    return Response({'success': 'Invito a giocare inviato con successo.'}, status=status.HTTP_200_OK)
+
+                except Exception as e:
+                    logger.error(f"Errore durante l\'invio dell\'invito a giocare: {e}", exc_info=True)
+                    return Response({'error': 'Errore durante l\'invio dell\'invito a giocare.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({'success': 'Richiesta inviata con successo.'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            logger.error(f"L'utente con username {request_data.get('requesting_user')} non esiste.")
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {user.id} non esiste.")
+            return Response({"error": "Profilo utente non trovato."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Errore durante la creazione della richiesta pendente: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la creazione della richiesta.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def accept_game_request(self, request, id, requesting_user):
+        try:
+            # Recupera l'utente target
+            target_user = User.objects.get(pk=id)
+            pending_requests = PendingRequest.objects.filter(
+                target_user=target_user,
+                requesting_user=requesting_user,
+                request_type='game'
+            )
+
+            if not pending_requests.exists():
+                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Elimina la richiesta pendente e gestisci l'accettazione del game
+            pending_requests.delete()
+
+            logger.info(f"Invito a giocare accettato da {requesting_user.username} per {target_user.username}")
+            return Response({'success': 'Invito a giocare accettato con successo.'}, status=status.HTTP_200_OK)
+
         except User.DoesNotExist:
             return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"Errore durante l\'accettazione dell\'invito: {e}", exc_info=True)
+            return Response({'error': 'Errore durante l\'accettazione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def decline_game_request(self, id, requesting_user):
+        try:
+            target_user = User.objects.get(pk=id)
+            pending_request = PendingRequest.objects.get(
+                target_user=target_user,
+                requesting_user=requesting_user,
+                request_type='game'
+            )
+            pending_request.delete()
+            return Response({'success': 'Invito a giocare rifiutato con successo.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+        except PendingRequest.DoesNotExist:
+            return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Errore durante il rifiuto dell\'invito: {e}", exc_info=True)
+            return Response({'error': 'Errore durante il rifiuto dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def accept_request(self, request, id, requesting_user):
+        try:
+            # Verifica se l'utente è autenticato
+            if not request.user.is_authenticated:
+                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Recupera l'utente target
+            target_user_base = User.objects.get(pk=id)
+            target_user = UserProfile.objects.get(user=target_user_base)
+
+            # Trova tutte le richieste pendenti
+            pending_requests = PendingRequest.objects.filter(
+                target_user=target_user.user,
+                requesting_user=requesting_user,
+                request_type='friend'
+            )
+
+            if not pending_requests.exists():
+                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Elimina tutte le richieste pendenti trovate
+            pending_requests.delete()
+            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
+
+            # Aggiungi il target_user alla lista amici di requesting_user_profile
+            requesting_user_profile.user_friend_list.add(target_user)
+
+            logger.info(f"Amicizia accettata tra {requesting_user_profile.user.username} e {target_user.user.username}")
+            return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            logger.error(f"L'utente con ID {id} non esiste.")
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except AttributeError as e:
+            logger.error
+
 
 class UserResponseAPIView(APIView):
     def post(self, request, response_type):
@@ -809,6 +1309,60 @@ class UserResponseAPIView(APIView):
             pass
             
 
+class BlockUserAPIView(APIView):
+    def post(self, request, user_id):
+        user_to_block = get_object_or_404(User, id=user_id)
+        user_profile_to_block = get_object_or_404(UserProfile, user=user_to_block)
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+        
+        if user_profile.blocked_users.filter(id=user_id).exists():
+            user_profile.unblock_user(user_profile_to_block)
+        else:
+            user_profile.block_user(user_profile_to_block)
+            
+        blocked_users = user_profile.blocked_users.all()
+        blocked_usernames = [user_profile_to_block.user.username for user in blocked_users]
+        logger.debug(f"Blocked users: {blocked_usernames}")
+
+        return Response({'detail': f"User {user_to_block.username} has been blocked."}, status=status.HTTP_200_OK)
+
+
+class InviteGameAPIView(APIView):
+    def post(self, request, pk):
+        if request.user.is_authenticated:
+            user = get_object_or_404(User, pk=request.user.id)
+            user_profile = get_object_or_404(UserProfile, user=user)
+            game = get_object_or_404(Game, pk=pk)
+            data = request.data
+            if game.player_inlobby < game.player_limit:
+                game.player_inlobby += 1
+                game.players.add(user)
+                game.save()
+                user_profile.in_game_lobby = game
+                user_profile.save()
+                return Response({'success': True}, status=status.HTTP_200_OK)
+            else:
+                return Response({'success': False, 'message': 'Game is full'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class InviteTournamentAPIView(APIView):
+    def post(self, request, pk):
+        if request.user.is_authenticated:
+            user = get_object_or_404(User, pk=request.user.id)
+            user_profile = get_object_or_404(UserProfile, user=user)
+            tournament = get_object_or_404(Tournament, pk=pk)
+            tournament.players_in_lobby += 1
+            tournament.save()
+            user_profile.in_tournament_lobby = tournament
+            user_profile.save()
+            return Response({'success': True}, status=status.HTTP_200_OK)
+        else:
+            return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
 class GameAPIView(APIView):
     def get(self, request, pk=None):
         if request.user.is_authenticated:
@@ -820,47 +1374,42 @@ class GameAPIView(APIView):
                 'user': user,
                 'userprofile': user_profile,
             }
-            
-            if 'remote' in current_url:
-                game = get_object_or_404(Game, pk=pk)
-                players = [
-                    {'name': game.player1, 'score': game.player1_score, 'img_profile': user_profile.img_profile},
-                    {'name': game.player2, 'score': game.player2_score, 'img_profile': user_profile.img_profile},
-                    {'name': game.player3, 'score': game.player3_score, 'img_profile': user_profile.img_profile},
-                    {'name': game.player4, 'score': game.player4_score, 'img_profile': user_profile.img_profile},
-                ]
-                game_info = {
-                    'type': game.mode,
-                    'rules': game.rules,
-                    'timelimit': game.limit,
-                    'scorelimit': game.score_limit,
-                    'balls': game.balls,
-                    'boost': game.boost,
-                }
-                context.update({
-                    'game': game,
-                    'players': players,
-                    'game_info': game_info,
-                })
-            elif 'single' in current_url or 'local' in current_url:
+            if 'single' in current_url or 'local' in current_url:
                 game_info = request.GET.dict()
+                
                 if 'single' in current_url:
-                    players = [
-                        {
-                            'name': user_profile.nickname, 
-                            'score': 0, 
-                            'img_profile': user_profile.img_profile,
-                            'controls': {
-                                'right': user_profile.p1Right,
-                                'left': user_profile.p1Left,
-                                'shoot': user_profile.p1Shoot,
-                                'boost': user_profile.p1Boost,
-                            }
-                        },
-                        {'name': 'Bot 1', 'score': 0, 'img_profile': 'media/profiles/bot.png'},
-                        {'name': 'Bot 2', 'score': 0, 'img_profile': 'media/profiles/bot.png'},
-                        {'name': 'Bot 3', 'score': 0, 'img_profile': 'media/profiles/bot.png'},
-                    ]
+                    if '1v1' in  game_info['mode']:
+                        players = [
+                            {
+                                'name': user_profile.nickname, 
+                                'score': 0, 
+                                'img_profile': user_profile.img_profile,
+                                'controls': {
+                                    'right': user_profile.p1Right,
+                                    'left': user_profile.p1Left,
+                                    'shoot': user_profile.p1Shoot,
+                                    'boost': user_profile.p1Boost,
+                                }
+                            },
+                            {'name': 'Bot 1', 'score': 0, 'img_profile': 'media/profiles/bot.png'},
+                        ]
+                    else:
+                        players = [
+                            {
+                                'name': user_profile.nickname, 
+                                'score': 0, 
+                                'img_profile': user_profile.img_profile,
+                                'controls': {
+                                    'right': user_profile.p1Right,
+                                    'left': user_profile.p1Left,
+                                    'shoot': user_profile.p1Shoot,
+                                    'boost': user_profile.p1Boost,
+                                }
+                            },
+                            {'name': 'Bot 1', 'score': 0, 'img_profile': 'media/profiles/bot.png'},
+                            {'name': 'Bot 2', 'score': 0, 'img_profile': 'media/profiles/bot.png'},
+                            {'name': 'Bot 3', 'score': 0, 'img_profile': 'media/profiles/bot.png'},
+                        ]
                 elif 'local' in current_url:
                     players = [
                         {
@@ -908,26 +1457,219 @@ class GameAPIView(APIView):
                             }
                         },
                     ]
+                
                 context.update({
                     'players': players,
                     'game_info': game_info,
                 })
             else:
-                game_info = request.GET.dict()
-                user_id = request.GET.get('userid')
-                if user_id:
-                    user = get_object_or_404(User, pk=user_id)
-                    user_profile = get_object_or_404(UserProfile, user=user)
-                
-                players = [
-                    {'name': user_profile.nickname, 'score': 0, 'img_profile': user_profile.img_profile},
-                ]
-                
-                context.update({
-                    'game_info': game_info,
-                    'players': players,
-                })
-                
+                game = get_object_or_404(Game, pk=pk)
+                if game.tournament:
+                    if game.mode == '1v1':
+                        if game.player1 == user:
+                            player_posit = "p1"
+                            posp1right = "p1Right"
+                            posp1left = "p1Left"
+                            posp1shoot = "p1Shoot"
+                            posp1boost = "p1Boost"
+                            posp2right = "p2Right"
+                            posp2left = "p2Left"
+                            posp2shoot = "p2Shoot"
+                            posp2boost = "p2Boost"
+                        elif game.player2 == user:
+                            player_posit = "p2"
+                            posp1left = "p2Left"
+                            posp1right = "p2Right"
+                            posp1shoot = "p2Shoot"
+                            posp1boost = "p2Boost"
+                            posp2right = "p1Right"
+                            posp2left = "p1Left"
+                            posp2shoot = "p1Shoot"
+                            posp2boost = "p1Boost"
+                        
+                        players = [
+                            {
+                                'name': game.player1, 
+                                'score': game.player1_score, 
+                                'img_profile': user_profile.img_profile,
+                                'controls': {
+                                    'right': posp1right,
+                                    'keyright': user_profile.p1Right,
+                                    'left': posp1left,
+                                    'keyleft': user_profile.p1Left,
+                                    'shoot': posp1shoot,
+                                    'keyshoot': user_profile.p1Shoot,
+                                    'boost': posp1boost,
+                                    'keyboost': user_profile.p1Boost,
+                                },
+                                'player_posit': player_posit,
+                            },
+                            {
+                                'name': game.player2, 
+                                'score': game.player2_score, 
+                                'img_profile': user_profile.img_profile,
+                                'controls': {
+                                    'right': posp2right,
+                                    'left': posp2left,
+                                    'shoot': posp2shoot,
+                                    'boost': posp2boost,
+                                }
+                            }
+                        ]
+                        game_info = {
+                            'name': game.name,
+                            'type': "tournament",
+                            'mode': game.mode,
+                            'rules': game.rules,
+                            'limit': game.limit,
+                            'balls': game.balls,
+                            'boost': game.boost,
+                            'tournament_id': game.tournament.id,
+                        }
+                        context.update({
+                            'players': players,
+                            'game_info': game_info,
+                        })
+                        
+                else:
+                    if game.player1 == user:
+                        player_posit = "p1"
+                        posp1right = "p1Right"
+                        posp1left = "p1Left"
+                        posp1shoot = "p1Shoot"
+                        posp1boost = "p1Boost"
+                        posp2right = "p2Right"
+                        posp2left = "p2Left"
+                        posp2shoot = "p2Shoot"
+                        posp2boost = "p2Boost"
+                        posp3right = "p3Right"
+                        posp3left = "p3Left"
+                        posp3shoot = "p3Shoot"
+                        posp3boost = "p3Boost"
+                        posp4right = "p4Right"
+                        posp4left = "p4Left"
+                        posp4shoot = "p4Shoot"
+                        posp4boost = "p4Boost"
+                    elif game.player2 == user:
+                        player_posit = "p2"
+                        posp1left = "p2Left"
+                        posp1right = "p2Right"
+                        posp1shoot = "p2Shoot"
+                        posp1boost = "p2Boost"
+                        posp2right = "p1Right"
+                        posp2left = "p1Left"
+                        posp2shoot = "p1Shoot"
+                        posp2boost = "p1Boost"
+                        posp3right = "p4Right"
+                        posp3left = "p4Left"
+                        posp3shoot = "p4Shoot"
+                        posp3boost = "p4Boost"
+                        posp4right = "p3Right"
+                        posp4left = "p3Left"
+                        posp4shoot = "p3Shoot"
+                        posp4boost = "p3Boost"
+                    elif game.player3 == user:
+                        player_posit = "p3"
+                        posp1left = "p3Left"
+                        posp1right = "p3Right"
+                        posp1shoot = "p3Shoot"
+                        posp1boost = "p3Boost"
+                        posp2right = "p4Right"
+                        posp2left = "p4Left"
+                        posp2shoot = "p4Shoot"
+                        posp2boost = "p4Boost"
+                        posp3right = "p1Right"
+                        posp3left = "p1Left"
+                        posp3shoot = "p1Shoot"
+                        posp3boost = "p1Boost"
+                        posp4right = "p2Right"
+                        posp4left = "p2Left"
+                        posp4shoot = "p2Shoot"
+                        posp4boost = "p2Boost"
+                    elif game.player4 == user:
+                        player_posit = "p4"
+                        posp1left = "p4Left"
+                        posp1right = "p4Right"
+                        posp1shoot = "p4Shoot"
+                        posp1boost = "p4Boost"
+                        posp2right = "p1Right"
+                        posp2left = "p1Left"
+                        posp2shoot = "p1Shoot"
+                        posp2boost = "p1Boost"
+                        posp3right = "p2Right"
+                        posp3left = "p2Left"
+                        posp3shoot = "p2Shoot"
+                        posp3boost = "p2Boost"
+                        posp4right = "p3Right"
+                        posp4left = "p3Left"
+                        posp4shoot = "p3Shoot"
+                        posp4boost = "p3Boost"
+                    
+                    players = [
+                        {
+                            'name': game.player1, 
+                            'score': game.player1_score, 
+                            'img_profile': user_profile.img_profile,
+                            'controls': {
+                                'right': posp1right,
+                                'keyright': user_profile.p1Right,
+                                'left': posp1left,
+                                'keyleft': user_profile.p1Left,
+                                'shoot': posp1shoot,
+                                'keyshoot': user_profile.p1Shoot,
+                                'boost': posp1boost,
+                                'keyboost': user_profile.p1Boost,
+                            },
+                            'player_posit': player_posit,
+                        },
+                        {
+                            'name': game.player2, 
+                            'score': game.player2_score, 
+                            'img_profile': user_profile.img_profile,
+                            'controls': {
+                                'right': posp2right,
+                                'left': posp2left,
+                                'shoot': posp2shoot,
+                                'boost': posp2boost,
+                            }
+                        },
+                        {
+                            'name': game.player3, 
+                            'score': game.player3_score, 
+                            'img_profile': user_profile.img_profile,
+                            'controls': {
+                                'right': posp3right,
+                                'left': posp3left,
+                                'shoot': posp3shoot,
+                                'boost': posp3boost,
+                            }
+                        },
+                        {
+                            'name': game.player4, 
+                            'score': game.player4_score, 
+                            'img_profile': user_profile.img_profile,
+                            'controls': {
+                                'right': posp4right,
+                                'left': posp4left,
+                                'shoot': posp4shoot,
+                                'boost': posp4boost,
+                            }
+                        },
+                    ]
+                    game_info = {
+                        'name': game.name,
+                        'type': "remote-game",
+                        'mode': game.mode,
+                        'rules': game.rules,
+                        'limit': game.limit,
+                        'balls': game.balls,
+                        'boost': game.boost,
+                    }
+                    context.update({
+                        'players': players,
+                        'game_info': game_info,
+                    })
+            
             url_without_api = current_url.replace('/api', '')
             
             html = render_to_string('game.html', context)
@@ -949,4 +1691,35 @@ class GameAPIView(APIView):
                 'nav_stat': 'not_logged',
             }
             return Response(data)
+    
+    def post(self, request, pk):
+        if request.user.is_authenticated:
+            data = request.data
 
+            try:
+                # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
+                game = Game.objects.get(id=pk)
+
+                # Aggiorna i campi solo se i dati sono presenti
+                game.player1_score = data.get('scorePlayer1', game.player1_score)
+                game.player2_score = data.get('scorePlayer2', game.player2_score)
+                if game.player1_score > game.player2_score:
+                    game.winner = game.player1
+                elif game.player2_score > game.player1_score:
+                    game.winner = game.player2
+                game.status = data.get('gameStatus')
+                logger.debug(f"NEL GAME status fa: {game.status}")
+                logger.debug(f"NEL GAME madonna fa: {game}")
+                # Salva le modifiche
+                game.save()
+                
+                return Response({'success': game.id}, status=status.HTTP_200_OK)
+            except Game.DoesNotExist:
+                return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    
+            

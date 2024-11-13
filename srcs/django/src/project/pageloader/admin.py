@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import UserProfile, PendingRequest, Tournament, Game
+
+admin.site.register(UserProfile)
+admin.site.register(PendingRequest)
+admin.site.register(Tournament)
+admin.site.register(Game)
+

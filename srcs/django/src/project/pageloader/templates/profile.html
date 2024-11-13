@@ -1,46 +1,163 @@
 <div class="row justify-content-center">
+    <!-- Profile Information Section -->
     <div class="col-md-8">
         <div class="card border rounded shadow my-4">
-            <div class="card-body">
+            <div class="card-body text-center">
                 <h2 class="card-title">Profile Information</h2>
                 <!-- User Image -->
-                <div class="text-center">
-                    <img src="/static/{{ userprofile.img_profile }}" class="rounded-circle" style="width: 150px; height: 150px;" alt="User Image">
+                <div class="text-center mb-3">
+                    <img src="/static/media/{{ userprofile.img_profile }}" class="rounded-circle profile-img" style="width: 150px; height: 150px;" alt="User Image">
                 </div>
-                <!-- User Nickname -->
-                <h2 class="card-title text-center mt-3 text-nowrap">{{ userprofile.nickname }}</h2>
-                <!-- Last Online -->
-                <p class="text-muted text-center text-nowrap">Last Online: {{ userprofile.user.last_login }}</p>
+                <!-- User Nickname and Last Online -->
+                <h3 class="card-title text-nowrap">{{ userprofile.nickname }}</h3>
+                <p class="text-muted text-nowrap">Last Online: {{ userprofile.user.last_login }}</p>
             </div>
         </div>
     </div>
 </div>
+
 <div class="row">
-    <div class="col-6">
+    <!-- Friends Section -->
+    <div class="col-md-6">
         <div class="card border rounded shadow m-3">
             <div class="card-body">
                 <h4 class="card-title text-center">Friends</h4>
+                <ul class="list-group list-group-flush">
+                    {% if friends %}
+                        {% for friend in friends %}
+                            <li class="list-group-item friend-item" data-id="{{ friend.user.id}}">
+                                {{ friend.nickname }}
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="list-group-item text-center">No friends found</li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </div>
-    <div class="col-6">
+
+    <!-- Game History Section -->
+    <div class="col-md-6">
         <div class="card border rounded shadow m-3">
             <div class="card-body">
-                <h4 class="card-title text-center">Match History</h4>
+                <h4 class="card-title text-center">Game History</h4>
+                <!-- Game Statistics -->
+                <div class="row text-center" id="game-stats">
+                    <div class="col-3">
+                        <strong>Wins</strong>
+                        <p id="game-wins">{{ game_wins }}</p>
+                    </div>
+                    <div class="col-3">
+                        <strong>Losses</strong>
+                        <p id="game-losses">{{ game_losses }}</p>
+                    </div>
+                    <div class="col-3">
+                        <strong>Draws</strong>
+                        <p id="game-draws">{{ game_draws }}</p>
+                    </div>
+                    <div class="col-3">
+                        <strong>Abandons</strong>
+                        <p id="game-abandons">{{ game_abandons }}</p>
+                    </div>
+                </div>
+                <!-- Game List -->
+                <table class="table table-striped mt-3" id="game-history-table">
+                    <thead>
+                        <tr>
+                            <th>Game Name</th>
+                            <th>Mode</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if game_history %}
+                            {% for game in game_history %}
+                                <tr>
+                                    <td>{{ game.name }}</td>
+                                    <td>{{ game.mode }}</td>
+                                    <td>
+                                        {% if game.winner == userprofile.user %}
+                                            Win
+                                        {% else %}
+                                            Loss
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center">No game history available</td>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</div>
-<div class="row justify-content-center mt-4">
-    <div class="col-md-8">
-        <div class="card border rounded shadow mb-3">
+
+    <!-- Tournament History Section -->
+    <div class="col-md-12">
+        <div class="card border rounded shadow m-3">
             <div class="card-body">
                 <h4 class="card-title text-center">Tournament History</h4>
-                <!-- Here goes tournament history -->
+                <!-- Tournament Statistics -->
+                <div class="row text-center" id="tournament-stats">
+                    <div class="col-3">
+                        <strong>Wins</strong>
+                        <p id="tournament-wins">{{ tournament_wins }}</p>
+                    </div>
+                    <div class="col-3">
+                        <strong>Losses</strong>
+                        <p id="tournament-losses">{{ tournament_losses }}</p>
+                    </div>
+                    <div class="col-3">
+                        <strong>Draws</strong>
+                        <p id="tournament-draws">{{ tournament_draws }}</p>
+                    </div>
+                    <div class="col-3">
+                        <strong>Abandons</strong>
+                        <p id="tournament-abandons">{{ tournament_abandons }}</p>
+                    </div>
+                </div>
+                <!-- Tournament List -->
+                <table class="table table-striped mt-3" id="tournament-history-table">
+                    <thead>
+                        <tr>
+                            <th>Tournament Name</th>
+                            <th>Mode</th>
+                            <th>Status</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if tournament_history %}
+                            {% for tournament in tournament_history %}
+                                <tr>
+                                    <td>{{ tournament.name }}</td>
+                                    <td>{{ tournament.mode }}</td>
+                                    <td>{{ tournament.status }}</td>
+                                    <td>
+                                        {% if tournament.winner == userprofile.user %}
+                                            Winner
+                                        {% else %}
+                                            Loss
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No tournament history available</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Go back button -->
 <div class="row justify-content-center my-3">
     <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
 </div>

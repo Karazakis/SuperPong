@@ -56,3 +56,117 @@ font-weight: 700;
     overflow: hidden;
     text-overflow: ellipsis; /* Aggiunge i puntini di sospensione se il testo è troppo lungo */
 }
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
+    border-radius: 50%;
+}
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/*      SEZIONE TORNEI                */
+
+.round {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.match {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    width: 150px;
+}
+
+.player-slot {
+    padding: 6px;
+    margin: 6px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    cursor: pointer;
+    background-color: #fff; /* Sfondo bianco per contrastare con i bordi */
+}
+
+.player-slot.occupied {
+    background-color: #0eb108;
+    cursor: not-allowed;
+}
+
+/* Testo per la descrizione delle semifinali e della finale */
+.round-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+
+/*    FINE SEZIONE TORNEI                */
+.rejoin-section {
+    position: absolute;
+    top: 63vh;
+    right: 61vh;
+    z-index: 9999;
+    text-align: center;
+    background-color: rgb(198, 213, 230) !important;
+    border: 3px ridge rgb(107, 107, 168);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1%;
+    display: none;
+}
+
+.disconnect {
+    color: gray;
+}
+
+.ready {
+    color: green;
+}
+
+.user-blocked {
+	color: red !important;
+}

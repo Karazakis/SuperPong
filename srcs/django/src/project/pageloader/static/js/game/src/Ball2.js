@@ -1,21 +1,16 @@
-import { Vector3 } from "/static/js/game/module/three.module.js";
-import { Mesh, MeshNormalMaterial, SphereGeometry } from "/static/js/game/module/three.module.js";
+/* 
+import { Mesh, SphereGeometry } from "/static/js/game/module/three.module.js";
+import { getBallsUpdate,ballsUpdate, posit } from "/static/js/game.js";
 
-let bot = true;
-const keyboardState = {};
-// Aggiungi un gestore degli eventi per la pressione dei tasti
-window.addEventListener('keydown', (event) => {
-    // Salva lo stato del tasto premuto
-    keyboardState[event.key] = true;
-});
 
-window.addEventListener('keyup', (event) => {
-    // Rimuovi lo stato del tasto rilasciato
-    keyboardState[event.key] = false;
+const MATERIAL = new THREE.MeshStandardMaterial({
+    color: 0x999999,
+    metalness: 0.75,
+    roughness: 0.2
 });
 export class Ball2 {
     
-    constructor(scene, x, y, z, boundaries, velocity, r) {
+    constructor(scene, x, y, z, boundaries, velocity, r, GameSocket = null, ballId = null) {
         this.scene = scene;
         this.x = x;
         this.y = y;
@@ -23,55 +18,127 @@ export class Ball2 {
         this.boundaries = boundaries;
         this.r = r;
         this.speed = 10;
-        this.mesh = new Mesh(
-            new SphereGeometry(this.r),
-            new MeshNormalMaterial());
-            this.mesh.position.set(this.x, this.y, this.z);
+        this.mesh = new Mesh(new SphereGeometry(this.r), MATERIAL);
+        this.mesh.position.set(this.x, this.y, this.z);
         this.mesh.velocity = velocity;
         this.mesh.velocity.multiplyScalar(this.speed);
+        this.mesh.isAttached = false;
         this.scene.add(this.mesh);
+        this.GameSocket = GameSocket;
+        this.ballId = ballId;
+        this.debounceTimer = 0;
     }
 
     destroy(){
-        this.scene.remove(this.mesh);        
+        this.scene.remove(this.mesh);
     }
-     
-    update(dt, paddle1, walls, gameSettings) {
-               
+    
+    updateOnline(dt, walls, isHost = false, isOnlineGame = false)
+    {
+        export function getBallsUpdate() {
+        
+        this.debounceTimer += dt;
+        console.log("debounceTimer", this.debounceTimer, ballsUpdate);
+        if (this.debounceTimer < 0.01) return;
+        this.debounceTimer = 0;
+        if (isHost === true || isOnlineGame === false) 
+        {
+                const s = this.mesh.velocity.clone().multiplyScalar(dt);
+                const tPos = this.mesh.position.clone().add(s);
+                this.mesh.position.copy(tPos);                
+    
+                if(walls[0] && this.mesh.position.y < -this.boundaries.y)
+                {
+                    this.mesh.position.y = -this.boundaries.y;
+                    this.mesh.velocity.y *= -1;
+                }
+                else if(walls[1] && this.mesh.position.x < -this.boundaries.x){
+                    this.mesh.position.x = -this.boundaries.x;
+                    this.mesh.velocity.x *= -1;
+                }
+                else if(walls[2] && this.mesh.position.y > this.boundaries.y){
+                    this.mesh.position.y = this.boundaries.y;
+                    this.mesh.velocity.y *= -1;            
+                }
+                else if(walls[3] && this.mesh.position.x > this.boundaries.x){
+                    this.mesh.position.x = this.boundaries.x;
+                    this.mesh.velocity.x *= -1;
+                }
+                if (isHost == true)
+                {
+                    GameSocket.send(JSON.stringify({ action: "ball_update", ballId: this.ballId, position: this.mesh.position, velocity: this.mesh.velocity }));
+                }
+        }
+        else if(isHost === false && isOnlineGame === true)
+        {
+            function getCoefficients(posit) {
+                let coefficients = { x: 1, y: 1, z: 1 };
+        
+                switch (posit) {
+                    case "p2": 
+                        coefficients = { x: -1, y: -1, z: 1 };
+                        break;
+                    case "p3": 
+                        coefficients = { x: -1, y: 1, z: 1 };  
+                        break;
+                    case "p4": 
+                        coefficients = { x: 1, y: -1, z: 1 };  
+                        break;
+                }
+        
+                return coefficients;
+            }
+        
+            const coeffs = getCoefficients(posit);
+            console.log("ball id nel update ball", this.ballId);
+            console.log("ballsUpdate nel ball", ballsUpdate);
+
+            try {
+                if(ballsUpdate[this.ballId] !== undefined)
+                {
+                    this.mesh.position.set(
+                        ballsUpdate[this.ballId].position.x * coeffs.x,
+                        ballsUpdate[this.ballId].position.y * coeffs.y,
+                        ballsUpdate[this.ballId].position.z * coeffs.z
+                    );
+            
+                    this.mesh.velocity.set(
+                        ballsUpdate[this.ballId].velocity.x * coeffs.x,
+                        ballsUpdate[this.ballId].velocity.y * coeffs.y,
+                        ballsUpdate[this.ballId].velocity.z * coeffs.z
+                    );
+                }
+            }
+            catch (e) {
+                console.log(e);
+            }
+
+            /*for (let ball in ballsUpdate) {
+                if (ballsUpdate[ball].ballId == this.ballId) {
+                    console.log("nel log di ball", ballsUpdate[ball]);
+        
+                    this.mesh.position.set(
+                        ballsUpdate[ball].position.x * coeffs.x,
+                        ballsUpdate[ball].position.y * coeffs.y,
+                        ballsUpdate[ball].position.z * coeffs.z
+                    );
+        
+                    this.mesh.velocity.set(
+                        ballsUpdate[ball].velocity.x * coeffs.x,
+                        ballsUpdate[ball].velocity.y * coeffs.y,
+                        ballsUpdate[ball].velocity.z * coeffs.z
+                    );
+                }
+            }
+        }
+
+    }
+
+    update(dt, walls)
+    {
         const s = this.mesh.velocity.clone().multiplyScalar(dt);
         const tPos = this.mesh.position.clone().add(s);
-        this.mesh.position.copy(tPos);
-        
-        
-        this.paddle1X = paddle1.mesh.position.x;
-        this.paddle1Y = paddle1.mesh.position.y;
-        // this.paddle2X = paddle2.mesh.position.x;
-        // this.paddle2Y = paddle2.mesh.position.y;
-
-        this.paddle1TurboCD = paddle1.countdownTurbo; 
-        // if(bot == true){ // script bot
-        //     if (this.mesh.position.x > this.paddle2X) {
-        //        paddle2.mesh.position.x = this.mesh.position.x; 
-        //     } else if (this.mesh.position.x < this.paddle2X) {
-        //        paddle2.mesh.position.x = this.mesh.position.x;
-        //     }            
-        // }
-        // controllo muri
-        // if(this.mesh.position.x > this.boundaries.x)
-        // {
-        //     this.mesh.position.x = this.boundaries.x;
-        //     this.mesh.velocity.x *= -1;            
-        // }
-        // else if(this.mesh.position.x < -this.boundaries.x)
-        // {
-        //     this.mesh.position.x = -this.boundaries.x;
-        //     this.mesh.velocity.x *= -1;
-        // }
-        // if(this.mesh.position.y > this.boundaries.y)
-        // {
-        //     this.mesh.position.y = this.boundaries.y;
-        //     this.mesh.velocity.y *= -1;
-        // }
+        this.mesh.position.copy(tPos);                
         if(walls[0] && this.mesh.position.y < -this.boundaries.y)
         {
             this.mesh.position.y = -this.boundaries.y;
@@ -85,56 +152,9 @@ export class Ball2 {
             this.mesh.position.y = this.boundaries.y;
             this.mesh.velocity.y *= -1;            
         }
-        else if(walls[3] && this.mesh.position.x > this.boundaries.x){
+        else if(walls[3]  && this.mesh.position.x > this.boundaries.x){
             this.mesh.position.x = this.boundaries.x;
             this.mesh.velocity.x *= -1;
         }
-        if(this.mesh.position.y <= this.paddle1Y + 0.5 &&
-            this.mesh.position.y >= this.paddle1Y - 0.5 &&
-            this.mesh.position.x + this.r>= this.paddle1X - 5 &&
-            this.mesh.position.x + this.r<= this.paddle1X + 5)
-        {   
-            if(this.mesh.position.x + this.r >= this.paddle1X - 5 &&
-                this.mesh.position.x + this.r <= this.paddle1X + 5)
-            {
-                this.mesh.velocity.y *= -1;
-            }
-            else if(this.mesh.position.y + this.r < this.paddle1Y + 0.5 && 
-                this.mesh.position.y + this.r > this.paddle1Y - 0.5)
-            {
-                this.mesh.velocity.x *= -1;
-            }
-            if (keyboardState[this.mesh.shoot]) {
-                // Il tasto 'm' è premuto
-                if (!this.mesh.previousMState) {
-                    this.mesh.position.x = this.paddle1X;
-                    this.mesh.position.y = this.paddle1Y + 0.5;
-                    this.mesh.hasBall = true;
-                    // Il tasto 'm' era rilasciato nell'aggiornamento precedente, quindi ora lo stai tenendo premuto
-                    this.mesh.velocity.set(0, 0, 0); // Imposta la velocità della palla a 0
-                }
-            }
-            else {
-                // Il tasto 'm' è rilasciato
-                if (this.mesh.previousMState) {
-                    // Il tasto 'm' era premuto nell'aggiornamento precedente, quindi ora lo hai rilasciato
-                    this.mesh.velocity.set(5, 50, 0); // Imposta la velocità della palla per farla muovere verso l'alto
-                    this.mesh.hasBall = false;
-                }
-            }            
-            this.mesh.previousMState = keyboardState[this.mesh.shoot];
-        }
-        if(this.mesh.hasBall == true){ // tiene la palla attaccata alla
-            this.mesh.position.x = this.paddle1X;
-            this.mesh.position.y = this.paddle1Y + 0.5;
-        }       
-        //collisioni paddle 2 ***DA FINIRE****
-        // if(this.mesh.position.y <= this.paddle2Y + 0.5 &&
-        //     this.mesh.position.y >= this.paddle2Y - 0.5 &&
-        //     this.mesh.position.x >= this.paddle2X - 5 &&
-        //     this.mesh.position.x <= this.paddle2X + 5)
-        // {               
-        //     this.mesh.velocity.y *= -1;          
-        // }
     }
-}
+} */
