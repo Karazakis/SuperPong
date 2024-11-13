@@ -112,8 +112,10 @@ export class Model3D {
             gltf.scene.scale.set(0.01 ,0.01 ,0.01);   
             gltf.scene.rotateX(Math.PI / 2);
             gltf.scene.rotateY(Math.PI);
+            //gltf.scene.rotateZ(Math.PI);
             scene.add( gltf.scene );
             ufo[0] = gltf.scene; // creo variabile per spostare modello
+            console.log('modelli 1v1 caricati');
         }, undefined, function ( error ) {
             console.error( error );
         } );
@@ -127,13 +129,16 @@ export class Model3D {
             //gltf.scene.rotateZ(Math.PI);
             scene.add( gltf.scene );
             ufo[1] = gltf.scene; // creo variabile per spostare modello
+            console.log('modelli 2v2 caricati');
         }, undefined, function ( error ) {
             console.error( error );
         } );
     }   
 
     loadModel2v2(scene, ufo, gameMode){
+        console.log("la gamemode e " + gameMode);
         if(gameMode == '1v1'){
+            console.log("non carico il 2v2 perché 1v1")
             return;
         }
         const ufo2 = new GLTFLoader();

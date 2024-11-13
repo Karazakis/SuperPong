@@ -60,25 +60,63 @@ class Tournament(models.Model):
         self.save()
 
     def generate_next_round(self):
-        """Genera il round successivo solo se il corrente è completato e non è la finale."""
-        current_round = self.rounds
+        """
+        Genera il round successivo se esiste uno stato di round 'not_started' e restituisce messaggi di stato.
+        """
+        # Numero massimo di round calcolato una volta in fase di creazione torneo
+        max_rounds = self.rounds
 
-        if current_round < self.calculate_rounds():
-            next_round_number = current_round + 1
+        # Recupera il primo round con stato 'not_started'
+        current_round = Round.objects.filter(tournament=self, status='not_started').first()
 
-            next_round = Round.objects.create(
-                tournament=self,
-                round_number=next_round_number,
-                status='not_started'
-            )
-            next_round.generate_games(self.calculate_games_per_round(), self.mode, self.rules, self.limit, self.balls, self.boost)
-            self.rounds = next_round_number  # Aggiorna il conteggio dei round generati
-            self.save()
+        # Se non ci sono round 'not_started', il torneo è finito
+        if not current_round:
+            return "No 'not_started' rounds found. The tournament may be complete."
 
-        else:
-            # Se il round corrente è la finale
-            self.status = 'finished'
-            self.save()
+        current_round_number = current_round.round_number
+        next_round_number = current_round_number + 1
+
+        # Controlla se il prossimo round supera il numero totale di round del torneo
+        if next_round_number > max_rounds:
+            return f"Reached the final round: current round number: {current_round_number}; next_round_number: {next_round_number}, max_rounds: {max_rounds}"
+
+        # Verifica se il prossimo round esiste già
+        if Round.objects.filter(tournament=self, round_number=next_round_number).exists():
+            return f"Round {next_round_number} already exists."
+
+        # Calcola il numero di giocatori rimanenti in base alla modalità e al round corrente
+        players_remaining = self.calculate_remaining_players(current_round_number)
+        games_per_round = players_remaining // (2 if self.mode == '1v1' else 4)
+
+        # Genera il prossimo round
+        next_round = Round.objects.create(
+            tournament=self,
+            round_number=next_round_number,
+            status='not_started'
+        )
+
+        # Inizializza gli slot solo per i giocatori rimanenti
+        next_round.generate_slot_status_for_remaining_players(players_remaining)
+
+        # Genera i giochi per il round
+        next_round.generate_games(games_per_round, self.mode, self.rules, self.limit, self.balls, self.boost)
+
+        self.save()
+
+        return f"Generated new round {next_round_number} with {games_per_round} games."
+
+
+    def calculate_remaining_players(self, current_round_number):
+        """
+        Calcola il numero di giocatori rimanenti in base al round attuale e alla modalità.
+        """
+        if self.mode == '1v1':
+            return self.nb_players // (2 ** current_round_number)  # Dimezza ogni round
+        elif self.mode == '2v2':
+            return self.nb_players // (4 ** current_round_number)  # Dimezza ogni due round
+        elif self.mode == '4dm':
+            return max(4, self.nb_players // (4 ** current_round_number))  # Mantiene almeno 4 giocatori
+        return 1
 
     def __str__(self):
         return f"Tournament: {self.name}"
@@ -118,6 +156,18 @@ class Round(models.Model):
             }
         if not self.ready_status:  # Assicurati di non sovrascrivere se lo stato 'ready' è già presente
             self.ready_status = {i: False for i in range(1, tournament.nb_players + 1)}
+        
+        self.save()
+
+    def generate_slot_status_for_remaining_players(self, remaining_players):
+        """
+        Genera lo stato degli slot solo per i giocatori rimanenti in gara, usando valori placeholder.
+        """
+        self.slots = {
+            i: {'player_id': None, 'username': f'winner match #{i}'}
+            for i in range(1, remaining_players + 1)
+        }
+        self.ready_status = {i: False for i in range(1, remaining_players + 1)}
         
         self.save()
 

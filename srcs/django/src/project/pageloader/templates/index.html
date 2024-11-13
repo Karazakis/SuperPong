@@ -47,19 +47,7 @@
     <div id="app">
     </div>
     <script>
-        const url = window.location.href;
-        if (url.includes("game") || url.includes("lobby")) {
-            console.log("URL contiene 'game' o 'lobby'. Esecuzione comportamento specifico...");
-            if (url.includes("game")) {
-                if (url.includes("local")){
-
-                } else {
-                    console.log("URL contiene 'online'. Esecuzione comportamento specifico...");
-                }
-            } else if (url.includes("lobby")) {
-                console.log("URL contiene 'lobby'. Esecuzione comportamento specifico...");
-            }
-        }
+        // Inizializza la scena, la camera e il renderer di Three.js
         window.initStarSky = function () {
             window.starScene = new THREE.Scene();
             window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -98,6 +86,7 @@
             //camera.position.z = 100;
             window.camera.position.set(0, -40, 25);
             window.camera.rotation.set(0.75, 0, 0);
+            console.log("particles nell'init", particles);
         }
 
         // Funzione di animazione
@@ -113,6 +102,8 @@
             window.renderer.render(starScene, camera);
         }
         window.initStarSky(window.renderer, window.starScene, window.camera, window.particles, window.starScene);
+        console.log('window.particles', window.particles);
+        //window.singleSkyScene(window.renderer, window.starScene, window.camera, window.particles);
         window.animateStarSky( window.renderer, window.starScene, window.camera, window.particles);
 
         window.clearScene = function (scene) {

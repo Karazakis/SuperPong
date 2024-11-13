@@ -1,0 +1,11 @@
+Model Information:
+* title:	Colonization Ship - UEI OPPORTUNITY
+* source:	https://sketchfab.com/3d-models/colonization-ship-uei-opportunity-9fd1f31d74c941538d11d1e98d8866bf
+* author:	Renham - Camilo Rojas (https://sketchfab.com/renham)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Colonization Ship - UEI OPPORTUNITY" (https://sketchfab.com/3d-models/colonization-ship-uei-opportunity-9fd1f31d74c941538d11d1e98d8866bf) by Renham - Camilo Rojas (https://sketchfab.com/renham) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

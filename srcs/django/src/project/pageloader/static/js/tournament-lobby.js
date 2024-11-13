@@ -46,6 +46,10 @@ LobbySocket.onmessage = function(e) {
             console.log("Join game notification received");
             showJoinGamePopup(data.game_link);
             break;
+        case 'update_next_round_slots':
+            // Nuova gestione per aggiornare il tabellone
+            updateNextRoundSlot(data.round_number, data.slot, data.winner);
+            break;
         default:
             console.log("Unrecognized action:", data.type);
             break;
@@ -310,6 +314,22 @@ function updateSlot(slot, slotData) {
         }
     } else {
         console.error("Slot element not found for slot:", slot);
+    }
+}
+
+function updateNextRoundSlot(roundNumber, slot, winner) {
+    // Seleziona lo slot nel round specifico utilizzando gli attributi di dataset
+    const slotElement = document.querySelector(`.round[data-round="${roundNumber}"] .player-slot[data-slot="${slot}"]`);
+    
+    if (slotElement) {
+        // Aggiorna il contenuto dello slot con il nome del vincitore e segna come occupato
+        slotElement.textContent = winner;
+        slotElement.classList.add('occupied');
+        slotElement.classList.add('locked'); // Blocca ulteriori interazioni
+        slotElement.style.pointerEvents = 'none'; // Disabilita ulteriori clic
+        console.log(`Updated slot ${slot} in round ${roundNumber} with winner: ${winner}`);
+    } else {
+        console.error(`Slot element not found for round ${roundNumber}, slot ${slot}`);
     }
 }
 
