@@ -3126,3 +3126,252 @@ INFO 2024-11-16 14:22:32,823 runserver HTTP GET /api/token/refresh/?token=eyJhbG
 DEBUG 2024-11-16 14:22:32,833 views User profile: pageloader.Game.None
 DEBUG 2024-11-16 14:22:32,834 views Game history: <QuerySet []>
 INFO 2024-11-16 14:22:32,839 runserver HTTP GET /api/request_user/1/ 200 [0.01, 172.18.0.4:57470]
+INFO 2024-11-16 16:29:12,971 autoreload Watching for file changes with StatReloader
+INFO 2024-11-16 16:33:44,478 runserver HTTP GET / 200 [0.01, 172.18.0.4:43932]
+INFO 2024-11-16 16:33:44,611 runserver HTTP GET /api/home/ 200 [0.00, 172.18.0.4:43948]
+INFO 2024-11-16 16:33:46,042 runserver HTTP GET /api/login/ 200 [0.00, 172.18.0.4:43970]
+ERROR 2024-11-16 16:33:48,520 log Internal Server Error: /api/login/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UndefinedTable: relation "auth_user" does not exist
+LINE 1: ...user"."is_active", "auth_user"."date_joined" FROM "auth_user...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/django/pageloader/views.py", line 183, in post
+    user = User.objects.get(username=username)
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 633, in get
+    num = len(clone)
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 1881, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: relation "auth_user" does not exist
+LINE 1: ...user"."is_active", "auth_user"."date_joined" FROM "auth_user...
+                                                             ^
+
+ERROR 2024-11-16 16:33:48,522 runserver HTTP POST /api/login/ 500 [0.04, 172.18.0.4:52570]
+INFO 2024-11-16 16:34:09,385 runserver HTTP GET /api/home/ 200 [0.00, 172.18.0.4:36410]
+INFO 2024-11-16 16:34:09,441 runserver HTTP GET /static/js/home.js 200 [0.00, 172.18.0.4:36426]
+INFO 2024-11-16 16:34:14,033 runserver HTTP GET /api/signup/ 200 [0.00, 172.18.0.4:36436]
+INFO 2024-11-16 16:34:14,064 runserver HTTP GET /static/js/signup.js 200 [0.00, 172.18.0.4:36442]
+ERROR 2024-11-16 16:34:21,589 log Internal Server Error: /api/signup/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UndefinedTable: relation "auth_user" does not exist
+LINE 1: SELECT 1 AS "a" FROM "auth_user" WHERE "auth_user"."email" =...
+                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/django/pageloader/views.py", line 115, in post
+    if form.is_valid():
+  File "/usr/local/lib/python3.9/site-packages/django/forms/forms.py", line 201, in is_valid
+    return self.is_bound and not self.errors
+  File "/usr/local/lib/python3.9/site-packages/django/forms/forms.py", line 196, in errors
+    self.full_clean()
+  File "/usr/local/lib/python3.9/site-packages/django/forms/forms.py", line 433, in full_clean
+    self._clean_fields()
+  File "/usr/local/lib/python3.9/site-packages/django/forms/forms.py", line 448, in _clean_fields
+    value = getattr(self, "clean_%s" % name)()
+  File "/django/pageloader/forms.py", line 30, in clean_email
+    if User.objects.filter(email=email).exists():
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 1241, in exists
+    return self.query.has_results(using=self.db)
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/sql/query.py", line 598, in has_results
+    return compiler.has_results()
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/sql/compiler.py", line 1530, in has_results
+    return bool(self.execute_sql(SINGLE))
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: relation "auth_user" does not exist
+LINE 1: SELECT 1 AS "a" FROM "auth_user" WHERE "auth_user"."email" =...
+                             ^
+
+ERROR 2024-11-16 16:34:21,591 runserver HTTP POST /api/signup/ 500 [0.03, 172.18.0.4:52256]
+INFO 2024-11-16 16:35:01,657 runserver HTTP GET /signup/ 200 [0.00, 172.18.0.4:46188]
+INFO 2024-11-16 16:35:01,686 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.4:46200]
+INFO 2024-11-16 16:35:01,689 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.4:46210]
+INFO 2024-11-16 16:35:01,691 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.4:46218]
+INFO 2024-11-16 16:35:01,900 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.4:46222]
+INFO 2024-11-16 16:35:01,943 runserver HTTP GET /api/signup/ 200 [0.00, 172.18.0.4:46234]
+INFO 2024-11-16 16:35:01,973 runserver HTTP GET /static/js/signup.js 200 [0.00, 172.18.0.4:46240]
+INFO 2024-11-16 16:35:06,084 runserver HTTP GET /api/home/ 200 [0.00, 172.18.0.4:46254]
+INFO 2024-11-16 16:35:06,096 runserver HTTP GET /static/js/home.js 200 [0.00, 172.18.0.4:46256]
+INFO 2024-11-16 16:35:06,597 runserver HTTP GET /api/login/ 200 [0.00, 172.18.0.4:46270]
+INFO 2024-11-16 16:35:06,618 runserver HTTP GET /static/js/login.js 200 [0.00, 172.18.0.4:46284]
+ERROR 2024-11-16 16:35:08,580 log Internal Server Error: /api/login/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UndefinedTable: relation "auth_user" does not exist
+LINE 1: ...user"."is_active", "auth_user"."date_joined" FROM "auth_user...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/base.py", line 253, in _get_response_async
+    response = await wrapped_callback(
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.9/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/django/pageloader/views.py", line 183, in post
+    user = User.objects.get(username=username)
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 633, in get
+    num = len(clone)
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 380, in __len__
+    self._fetch_all()
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 1881, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/usr/local/lib/python3.9/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+  File "/usr/local/lib/python3.9/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.9/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: relation "auth_user" does not exist
+LINE 1: ...user"."is_active", "auth_user"."date_joined" FROM "auth_user...
+                                                             ^
+
+ERROR 2024-11-16 16:35:08,582 runserver HTTP POST /api/login/ 500 [0.03, 172.18.0.4:55120]
+INFO 2024-11-16 16:35:54,011 runserver HTTP GET /login/ 200 [0.00, 172.18.0.4:47460]
+INFO 2024-11-16 16:35:54,040 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.4:47474]
+INFO 2024-11-16 16:35:54,043 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.4:47506]
+INFO 2024-11-16 16:35:54,044 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.4:47490]
+INFO 2024-11-16 16:35:54,239 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.4:47508]
+INFO 2024-11-16 16:35:54,265 runserver HTTP GET /api/login/ 200 [0.00, 172.18.0.4:47522]
+INFO 2024-11-16 16:35:54,293 runserver HTTP GET /static/js/login.js 200 [0.00, 172.18.0.4:47526]
+WARNING 2024-11-16 16:35:56,060 log Bad Request: /api/login/
+WARNING 2024-11-16 16:35:56,061 runserver HTTP POST /api/login/ 400 [0.01, 172.18.0.4:47534]
+INFO 2024-11-16 16:35:58,766 runserver HTTP GET /api/home/ 200 [0.00, 172.18.0.4:46608]
+INFO 2024-11-16 16:35:58,781 runserver HTTP GET /static/js/home.js 200 [0.00, 172.18.0.4:46614]
+INFO 2024-11-16 16:35:59,471 runserver HTTP GET /api/signup/ 200 [0.00, 172.18.0.4:46630]
+INFO 2024-11-16 16:35:59,497 runserver HTTP GET /static/js/signup.js 200 [0.00, 172.18.0.4:46646]
+INFO 2024-11-16 16:36:07,594 runserver HTTP POST /api/signup/ 201 [0.15, 172.18.0.4:46662]
+INFO 2024-11-16 16:36:07,648 runserver HTTP GET /api/login/ 200 [0.00, 172.18.0.4:54560]
+INFO 2024-11-16 16:36:07,681 runserver HTTP GET /static/js/login.js 200 [0.00, 172.18.0.4:54574]
+INFO 2024-11-16 16:36:10,471 runserver HTTP POST /api/login/ 200 [0.13, 172.18.0.4:54580]
+INFO 2024-11-16 16:36:10,522 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxNzc1MjcwLCJpYXQiOjE3MzE3NzQ5NzAsImp0aSI6IjY5MThiMjQ3N2NiOTQyMjVhYjFjM2YxM2M4Mzg4MGU3IiwidXNlcl9pZCI6MX0.fGiloAlOxNKUUTHzR_cFschL6FJUpMJ2Okdq0z_Cx-k 200 [0.00, 172.18.0.4:54582]
+INFO 2024-11-16 16:36:10,545 runserver HTTP GET /api/dashboard/ 200 [0.01, 172.18.0.4:54592]
+INFO 2024-11-16 16:36:10,560 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.4:54602]
+INFO 2024-11-16 16:36:10,561 runserver HTTP GET /static/js/dashboard.js 200 [0.00, 172.18.0.4:54612]
+INFO 2024-11-16 16:36:10,565 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.4:54624]
+INFO 2024-11-16 16:36:10,570 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.4:54618]
