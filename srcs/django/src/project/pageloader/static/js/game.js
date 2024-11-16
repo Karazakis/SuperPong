@@ -360,10 +360,10 @@ export class Pad {
 }
 
 export function endgameOnline() {
-    const accessToken = localStorage.getItem("accessToken");
+    let accessToken = localStorage.getItem("accessToken");
 	const csrfToken = getCookie('csrftoken');
     let gameId = window.location.pathname.split("/");
-    console.log("Il gioco è finito!", gameId);
+    console.log("ENDAGAMEONLINE: Il gioco è finito!", gameId);
     let url = "/api/game/" + gameId[2]  + "/";
     async function checkTokenValidity(url) {
 		try {
@@ -1439,7 +1439,9 @@ if(gametype == 'remote-game')
             const timer = data.time;
             countdownElement.innerText = timer;
         } else if (data.action === "game_over") {
+            console.log("CHIAMATA A ENDGAMEONLINE GENERALE")
             if (isHost === true) {
+                console.log("CHIAMATA A ENDGAMEONLINE")
                 endgameOnline();
             }
             gameover();
@@ -1460,7 +1462,7 @@ if(gametype == 'remote-game')
     window.handleKeyDown = function(event) {
         if (!keyboardState[event.code]) {
             keyboardState[event.code] = true;
-            console.log(`Tasto premuto: ${event.code}`);
+            //console.log(`Tasto premuto: ${event.code}`);
         }
     }
     window.removeEventListener('keydown', window.handleKeyDown);
@@ -1468,7 +1470,7 @@ if(gametype == 'remote-game')
     
     window.handleKeyUp = function (event) {
         keyboardState[event.code] = false;
-        console.log(`Tasto rilasciato: ${event.code}`);
+        //console.log(`Tasto rilasciato: ${event.code}`);
     }
     window.removeEventListener('keyup', window.handleKeyUp);
     window.addEventListener('keyup', window.handleKeyUp);

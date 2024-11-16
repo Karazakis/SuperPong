@@ -1717,6 +1717,7 @@ class GameAPIView(APIView):
                 game.status = data.get('gameStatus')
                 logger.debug(f"NEL GAME status fa: {game.status}")
                 logger.debug(f"NEL GAME madonna fa: {game}")
+                logger.debug(f"NEL GAME winner e': {game.winner}")
                 # Salva le modifiche
                 game.save()
                 
