@@ -10,11 +10,9 @@ import {Mesh} from "/static/js/game/module/three.module.js";
 
 import { cornerCollision, penetrationDepthCorner2, ballCollision, penetrationDepth, collisionResponse, ballPadCollisionResponse } from "/static/js/game/src/Collision.js";
 
-console.log("game.js puttana madonna loaded");
 
 document.addEventListener('cleanupGameEvent', function() {
     cleanupGame();
-    console.log('Cleaning up game...');
 });
 
 window.inGame = true;
@@ -92,13 +90,9 @@ function cleanupGame() {
     if (renderer) {
         renderer.dispose();
     }
-    console.log("Game cleaned up");
 }
 
-console.log("game.js loaded");
 export const gameSettings = init();
-console.log(gameSettings);
-
 function isInKeyPlayer(key)
 {
     const playerDiv = document.getElementById('player0');
@@ -225,7 +219,7 @@ export class Pad {
 
     shoot(balls) {
         const releaseBalls = () => {
-            console.log("Rilascia le palline automaticamente");
+
             for (let j = 0; j < this.mesh.attachedBalls.length; j++) {
                 if (this.mesh.attachedBalls[j] != null) {
                     // const originalVelocity = this.mesh.attachedBalls[j].mesh.velocity.clone();
@@ -239,7 +233,6 @@ export class Pad {
                         this.mesh.attachedBalls[j].mesh.velocity.set(25, 15, 0);
                     }
                     this.mesh.hasBall[j] = false;
-                    console.log(`Rilasciata la palla ${this.mesh.attachedBalls[j].mesh.id} dallo slot ${j}`);
                     this.mesh.attachedBalls[j].mesh.isAttached = false;
                     this.mesh.attachedBalls[j] = null;
                 }
@@ -252,9 +245,7 @@ export class Pad {
         for (let i = 0; i < balls.length; i++) {
             if (this.collision(balls[i], this)) {
                 if (keyboardState[this.mesh.shoot]) { // Il tasto 'm' è premuto
-                    console.log("hasBall = " + this.mesh.hasBall, "stato m = " + this.mesh.previousMState);
                     if (!this.mesh.previousMState && !balls[i].mesh.isAttached) {
-                        console.log("il tasto 'm' è premuto");
                         let closestSlot = -1;
                         let minDistance = Infinity;
                         for (let j = 0; j < this.ballSlots.length; j++) {
@@ -279,13 +270,11 @@ export class Pad {
                             this.mesh.hasBall[closestSlot] = true;
                             this.mesh.attachedBalls[closestSlot] = balls[i];
                             balls[i].mesh.isAttached = true;
-                            console.log(`Attacco la palla ${balls[i].mesh.id} allo slot ${closestSlot}`);
                             balls[i].mesh.velocity.set(0, 0, 0);
                         }
                     }
                     
                     else if (this.mesh.previousMState && balls[i].mesh.isAttached == false ) {
-                        console.log("attacco un altra pallina " + balls[i].mesh.id);
                         let closestSlot = -1;
                         let minDistance = Infinity;
                         for (let j = 0; j < this.ballSlots.length; j++) {
@@ -307,7 +296,6 @@ export class Pad {
                             this.mesh.hasBall[closestSlot] = true;
                             this.mesh.attachedBalls[closestSlot] = balls[i];
                             balls[i].mesh.isAttached = true;
-                            console.log(`Attacco un altra palla ${balls[i].mesh.id} allo slot ${closestSlot}`);
                             balls[i].mesh.velocity.set(0, 0, 0);
                         }
                     }
@@ -317,7 +305,6 @@ export class Pad {
                     }
                 } else {
                     if (this.mesh.previousMState) {
-                        console.log("il tasto 'm' è rilasciato e le balls sono: " + this.mesh.hasBall.length);
                         for (let j = 0; j < this.mesh.attachedBalls.length; j++) {
                             if (this.mesh.attachedBalls[j] != null) {
                                 if (this.mesh.hasBall[0]) {
@@ -328,7 +315,6 @@ export class Pad {
                                     this.mesh.attachedBalls[j].mesh.velocity.set(25, 40, 0);
                                 }
                                 this.mesh.hasBall[j] = false;
-                                console.log(`Rilasciata la palla ${this.mesh.attachedBalls[j].mesh.id} dallo slot ${j}`);
                                 this.mesh.attachedBalls[j] = null;
                                 balls[i].mesh.isAttached = false;
                             }
@@ -344,7 +330,6 @@ export class Pad {
     
     turbo(){
         if(this.mesh.countdownTurbo == 0 && keyboardState[this.mesh.turbo]){
-            console.log("turbo");
             this.mesh.speed = this.turboSpeed;
             this.mesh.countdownTurbo = 1;
             this.mesh.material = this.turboMaterial;
@@ -359,11 +344,12 @@ export class Pad {
     }
 }
 
-export function endgameOnline() {
-    let accessToken = localStorage.getItem("accessToken");
+export function 
+
+endgameOnline() {
+    const accessToken = localStorage.getItem("accessToken");
 	const csrfToken = getCookie('csrftoken');
     let gameId = window.location.pathname.split("/");
-    console.log("ENDAGAMEONLINE: Il gioco è finito!", gameId);
     let url = "/api/game/" + gameId[2]  + "/";
     async function checkTokenValidity(url) {
 		try {
@@ -414,7 +400,6 @@ export function endgameOnline() {
                 if (!response.ok) {
                     throw new Error('Errore durante il blocco dell\'utente');
                 }
-                console.log('game finito con successo');
             } catch (error) {
                 console.error('Errore durante la richiesta:', error);
             }
@@ -423,7 +408,6 @@ export function endgameOnline() {
 }
 function startTimer() {
     // Inizializza il timer del gioco
-    console.log("Inizializzazione del timer del gioco...");
     const timerElement = document.getElementById('game-timer');
     const countdownElement = document.getElementById('countdown');
     const timerValue = parseInt(timerElement.getAttribute('data-timer'), 10);
@@ -452,7 +436,6 @@ function startTimer() {
 }
 
 function startTimerOnline() {
-    console.log("Inizializzazione del timer del gioco online...");
     const timerElement = document.getElementById('game-timer');
     const countdownElement = document.getElementById('countdown');
     const timerValue = parseInt(timerElement.getAttribute('data-timer'), 10);
@@ -479,7 +462,7 @@ function startTimerOnline() {
             if (timeRemaining <= 0) {
                 clearInterval(countdownInterval);
                 if (isHost) {
-                    GameSocket.send(JSON.stringify({ action: 'game_over' }));
+                    GameSocket.send(JSON.stringify({ action: 'game_over' , p1: score[0], p2: score[1] }));
                 }
             }
         }, 1000);
@@ -488,7 +471,6 @@ function startTimerOnline() {
     }
 }
 
-console.log("sporcodeldioddieodoieodied", gameSettings.gameRules);
 
 window.gameScene = new THREE.Scene();
 const ambientLight = new THREE.AmbientLight(0xffffff);
@@ -539,10 +521,8 @@ const isOnlineGame = gameSettings.gameType === "remote-game" || gameSettings.gam
 export const isHost = posit === "p1";
 
 if (gameSettings.gameType == "single-game") {
-    console.log("entro in single e la gamemode é: " + gameSettings.gameMode);
     bot = new BotTop(window.gameScene, new THREE.Vector3(0, 20, 0), new THREE.Vector2(20, 20));
     if (gameSettings.gameMode == "2v2" || gameSettings.gameMode == "4dm") {
-        console.log("2v2 o DM loaded");
         walls[1] = false; 
         walls[3] = false;
         bot2 = new BotSide(window.gameScene, new THREE.Vector3(20, 0, 0), new THREE.Vector2(20, 20));
@@ -550,13 +530,10 @@ if (gameSettings.gameType == "single-game") {
     }
 } else if (gameSettings.gameType == "local-game") {
     p2Controls = getPlayerControls("player1");
-    console.log("p2Controls: ", p2Controls);
     paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.left, p2Controls.right, p2Controls.shoot, p2Controls.boost);
     if(gameSettings.gameMode == "1v1") {
-        console.log("1v1 loaded");
     }
     else if (gameSettings.gameMode == "2v2" || gameSettings.gameMode == "4dm") {
-        console.log("2v2 o DM loaded");
         p3Controls = getPlayerControls("player2");
         p4Controls = getPlayerControls("player3");
         if (p3Controls) {
@@ -570,14 +547,11 @@ if (gameSettings.gameType == "single-game") {
     }
 } else if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament-game") {
     p2Controls = getPlayerControls("player1");
-    console.log("p2Controls: ", p2Controls);
-    console.log("p2c    ontrols: ", p2Controls);
+    console.log("controllo p2", p2Controls);
     paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.right, p2Controls.left, p2Controls.shoot, p2Controls.boost);
     if(gameSettings.gameMode == "1v1") {
-        console.log("1v1 loaded");
     }
     else if (gameSettings.gameMode == "2v2" || gameSettings.gameMode == "4dm") {
-        console.log("2v2 o DM loaded");
         p3Controls = getPlayerControls("player2");
         p4Controls = getPlayerControls("player3");
         if (p3Controls) {
@@ -603,7 +577,7 @@ window.gameScene.add(pointLight);
 
 let BALLS = [];
 let corners = [cornerBotLeft, cornerBotRight, cornerTopRight, cornerTotLeft];
-let interval = 4;
+let interval = 2;
 let timer = 0;
 let timer2 = 0;
 
@@ -757,16 +731,35 @@ function bestOfFour(score) {
     return best;
 }
 
-export function gameover(){
-
+export function gameover(p1 = -1, p2 = -1) {
+    if (p1 !== -1 && p2 !== -1) {
+        score[0] = p1;
+        score[1] = p2;
+        scoreP1.innerHTML = p1;
+        scoreP2.innerHTML = p2;
+    }
+    
     if(gameSettings.gameRules == "time") {
+        gameEnded = true;
+        populateMatchDetails();
+        console.log("il posit e il game mode", posit, gameSettings.gameMode);
         if(gameSettings.gameMode == "1v1") {
-
-            if (score[0]  < score[1]) {
-                populateMatchDetails();
-                showModal("You Win!", "Congratulations, Player 1!");
-            } else {
-                showModal("Game Over", "The game has ended.");
+            if (posit == "p1") {
+                if (score[0]  < score[1]) {
+                    showModal("You Win!", "Congratulations, Player 1!");
+                } else if (score[0] == score[1]) {
+                    showModal("You DRAW!", "You suck! Go suck dick!");
+                } else {
+                    showModal("You lose!", "You suck! Go kill yourself!");
+                }
+            } else if (posit == "p2"){
+                if (score[1] < score[0]) {
+                    showModal("You Win!", "Congratulations, Player 2!");
+                } else if (score[0] == score[1]){
+                    showModal("You DRAW!", "You suck! Go suck dick!");
+                } else{
+                    showModal("You lose!", "You suck! Go kill yourself!");
+                }
             }
         } else if (gameSettings.gameMode == "2v2") {
             if (scoreTeam[0] < scoreTeam[1]) {
@@ -790,44 +783,56 @@ export function gameover(){
             if (walls[i] === true)
                 counter++;
         }
-
-        if (counter === 2 && document.getElementById("detail-game-mode").textContent !== "1v1") { 
+        console.log("il game detail",document.getElementById("gamemode").textContent, counter)
+        if (counter === 2 && document.getElementById("gamemode").textContent !== "1v1") { 
+            populateMatchDetails();
             if (score[0] > 0 && walls[0] === false) {
-                populateMatchDetails();
                 showModal("You Win!", "Congratulations, Player 1!");
             } else {
                 showModal("Game Over", "The game has ended.");
             }
         }
-        else if (counter === 4 && document.getElementById("detail-game-mode").textContent === "1v1") {
-            if (score[0] > 0 && walls[0] === false) {
-                populateMatchDetails();
-                showModal("You Win!", "Congratulations, Player 1!");
-            } else {
-                showModal("Game Over", "The game has ended.");
+        else if (counter === 2 && document.getElementById("gamemode").textContent === "1v1") {
+            console.log("il posit e lo score", score , posit);
+            gameEnded = true;
+            populateMatchDetails();
+            if (posit == "p1") {
+                if (score[0] > 0 && score[0] > score[1]) {
+                    showModal("You Win!", "Congratulations, Player 1!");
+                }else if (score[0] == score[1]){
+                    showModal("You DRAW!", "You suck! Go suck dick!");
+                } else {
+                    showModal("Game Over", "The game has ended.");
+                }
+            } else if (posit == "p2") {
+                if (score[1] > 0 && score[1] > score[0]){
+                    showModal("You Win!", "Congratulations, Player 1!");
+                }else if (score[0] == score[1]){
+                    showModal("You DRAW!", "You suck! Go suck dick!");
+                } else {
+                    showModal("Game Over", "The game has ended.");
+                }
             }
+            walls[0] = true;
+            walls[1] = true;
         }
 
         if(score[0] <= 0 && walls [0] == false){
-            console.log("game over PLAYER1");
             paddle1.destroy();
             model3D.removeUfo(window.gameScene, ufo, 0);
             walls[0] = true;
         }
         else if(score[1] <= 0 && walls [1] == false){
-            console.log("game over BOT3");
             bot3.destroy();
             model3D.removeUfo(window.gameScene, ufo, 3);
             walls[1] = true;
         }
         else if(score[2] <= 0 && walls [2] == false){
-            console.log("game over BOT");
             bot.destroy();
             model3D.removeUfo(window.gameScene, ufo, 1);
             walls[2] = true;
         }
         else if(score[3] <= 0 && walls [3] == false){
-            console.log("game over BOT2");
             bot2.destroy();
             model3D.removeUfo(window.gameScene, ufo, 2);
             walls[3] = true;
@@ -904,14 +909,7 @@ export let scoreTeam2 = document.getElementById("team2score");
 
 
 function checkScore(ball){
-    // if(oneTime == true)
-    // {
-    //     oneTime = false;
-    //     let scoreP1 = document.getElementById("player0score");
-    //     let scoreP2 = document.getElementById("player1score");
-    //     let scoreP3 = document.getElementById("player2score");
-    //     let scoreP4 = document.getElementById("player3score");
-    // }
+
     let usernameP1 = document.getElementById("player0");
     let usernameP2 = document.getElementById("player1");
     let usernameP3 = document.getElementById("player2");
@@ -1028,7 +1026,9 @@ function checkScore(ball){
 
 
 function checkScoreHost(ball){
-
+    if (gameEnded === true) {
+        return 0;
+    }
     let scoreTeam1 = document.getElementById("team1score");
     let scoreTeam2 = document.getElementById("team2score");
     if(scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null && scoreTeam1 === null && scoreTeam2 === null){
@@ -1060,7 +1060,7 @@ function checkScoreHost(ball){
         }
 
         if(score[1] == 0 && gameSettings.gameRules == "score")
-            GameSocket.send(JSON.stringify({ action: 'game_over' }));
+            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);     
     }
     else if(ball.mesh.position.y < -21 && ballToRemoveHost.get(ball.ballId) != true){
@@ -1075,7 +1075,7 @@ function checkScoreHost(ball){
         }
    
         if(score[0] == 0 && gameSettings.gameRules == "score")
-            GameSocket.send(JSON.stringify({ action: 'game_over' }));
+            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);
     }
     else if(ball.mesh.position.x > 21 && ((scoreP3 && scoreP4) || scoreTeam2)){
@@ -1088,7 +1088,7 @@ function checkScoreHost(ball){
             scoreTeam[1]--;
         }
         if(score[2] == 0 && gameSettings.gameRules == "score")
-            GameSocket.send(JSON.stringify({ action: 'game_over' }));
+            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);
     }
     else if(ball.mesh.position.x < -21 && ((scoreP3 && scoreP4) || scoreTeam2)){
@@ -1101,7 +1101,7 @@ function checkScoreHost(ball){
             scoreTeam[1]--;
         }
         if(score[3] == 0 && gameSettings.gameRules == "score")
-            GameSocket.send(JSON.stringify({ action: 'game_over' }));
+            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);
     }
 }
@@ -1110,11 +1110,9 @@ function checkScoreHost(ball){
 function pauseGame(){
     if(!isPaused) {
         isPaused = true;
-        console.log("Gioco in pausa");
     }  
     else {
         isPaused = false;
-        console.log("Gioco non in pausa");
         animate();
     }
 }
@@ -1137,6 +1135,7 @@ let ballPosition = 0;
 let ballToRemove = new Map();
 let ballToRemoveHost = new Map();
 
+let gameEnded = false;
 
 import { SphereGeometry } from "/static/js/game/module/three.module.js";
 
@@ -1249,23 +1248,7 @@ export class Ball2 {
                 console.log(e);
             }
 
-            /*for (let ball in ballsUpdate) {
-                if (ballsUpdate[ball].ballId == this.ballId) {
-                    console.log("nel log di ball", ballsUpdate[ball]);
-        
-                    this.mesh.position.set(
-                        ballsUpdate[ball].position.x * coeffs.x,
-                        ballsUpdate[ball].position.y * coeffs.y,
-                        ballsUpdate[ball].position.z * coeffs.z
-                    );
-        
-                    this.mesh.velocity.set(
-                        ballsUpdate[ball].velocity.x * coeffs.x,
-                        ballsUpdate[ball].velocity.y * coeffs.y,
-                        ballsUpdate[ball].velocity.z * coeffs.z
-                    );
-                }
-            }*/
+           
         }
 
     }
@@ -1390,7 +1373,6 @@ let flagTimer = true;
 
 
 let gametype = document.getElementById('gametype').innerText;
-console.log("vediamo gametype ",gametype);
 
 if(gametype == 'remote-game')
 {
@@ -1400,7 +1382,6 @@ if(gametype == 'remote-game')
             keyboardState[event.code] = true;
             const key = getPlayerControl(event.code);
             GameSocket.send(JSON.stringify({ action: "move", game_id_game: game_id_game, username: username_game, key: key, state: "down" }));
-            console.log("down ",event.code);
         }
     }
     window.addEventListener('keydown', window.handleKeyDownOnline);   
@@ -1411,7 +1392,6 @@ if(gametype == 'remote-game')
             keyboardState[event.code] = false;
             const key = getPlayerControl(event.code);
             GameSocket.send(JSON.stringify({ action: "move", game_id_game: game_id_game, username: username_game, key: key, state: "up" }));
-            console.log("up ",event.code);
         }
     }
     window.addEventListener('keyup', window.handleKeyUpOnline);
@@ -1419,6 +1399,7 @@ if(gametype == 'remote-game')
     GameSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         if (data.action === "move") {
+            console.log("move", data);
             if (data.state === 'down') {
                 keyboardState[data.key] = true;
             } else if (data.state === 'up') {
@@ -1426,9 +1407,11 @@ if(gametype == 'remote-game')
             }
         }
         else if (data.action === "ball_launch") {
-            setBallPosition(data.position);
-            setBallId(data.ballId);
-            setBallIsReady(true);
+            if (gameEnded !== true) {
+                setBallPosition(data.position);
+                setBallId(data.ballId);
+                setBallIsReady(true);
+            }
         } else if (data.action === "ball_update") {
             updateBall(data.ballId, data.position, data.velocity);
         } else if (data.action === "ball_destroy") {
@@ -1439,15 +1422,15 @@ if(gametype == 'remote-game')
             const timer = data.time;
             countdownElement.innerText = timer;
         } else if (data.action === "game_over") {
-            console.log("CHIAMATA A ENDGAMEONLINE GENERALE")
             if (isHost === true) {
-                console.log("CHIAMATA A ENDGAMEONLINE")
                 endgameOnline();
             }
-            gameover();
+            gameEnded = true;
+            console.log("game over", data);
+            gameover(data.p1, data.p2);
         } else if (data.action === "score_update") {
-            console.log("score update", data);
-            console.log("scoreP1", scoreP1 , data.p1);
+            score[0] = parseInt( data.score.p1, 10);
+            score[1] = parseInt( data.score.p2, 10);
             scoreP1.innerText = data.score.p1;
             scoreP2.innerText = data.score.p2;
             if (gameSettings.gameMode == "2v2" || gameSettings.gameMode == "4dm") {
@@ -1462,7 +1445,6 @@ if(gametype == 'remote-game')
     window.handleKeyDown = function(event) {
         if (!keyboardState[event.code]) {
             keyboardState[event.code] = true;
-            //console.log(`Tasto premuto: ${event.code}`);
         }
     }
     window.removeEventListener('keydown', window.handleKeyDown);
@@ -1470,7 +1452,6 @@ if(gametype == 'remote-game')
     
     window.handleKeyUp = function (event) {
         keyboardState[event.code] = false;
-        //console.log(`Tasto rilasciato: ${event.code}`);
     }
     window.removeEventListener('keyup', window.handleKeyUp);
     window.addEventListener('keyup', window.handleKeyUp);
@@ -1486,10 +1467,10 @@ function animateonline(){
     const deltaTime = clock.getDelta();
     timer += deltaTime;
     timer2 += deltaTime;
-    if (ball_is_ready) {
+    if (ball_is_ready && gameEnded === false) {
         launchBall(ballPosition, ballId);
         ball_is_ready = false;
-    } else if (isHost && !ball_is_ready && timer >= interval && 0 < maxBalls) {
+    } else if (isHost && !ball_is_ready && timer >= interval && 0 < maxBalls && gameEnded === false) {
         setTimeout(() => {
             GameSocket.send(JSON.stringify({ action: "ball_launch", position: Math.floor(Math.random() * 4), ballId: "ball_" + ballCounter }));          
         }, 500);
@@ -1546,13 +1527,10 @@ function animateonline(){
                 BALLS[i].destroy();
                 removeBallToRemove(toRemove);
                 BALLS.splice(i, 1);
-                //console.log("ball destroyed", toRemove);
             }else{
                 if(isHost == true) {
-                    //console.log("---------------");
                     BALLS[i].updateOnline(deltaTime, walls, isHost, true);
                 } else {
-                    //console.log("+++++++");
                     BALLS[i].updateOnline(deltaTime, walls, false, true);
                 }
             } 
@@ -1565,8 +1543,7 @@ function animateonline(){
             if (BALLS[i]) {
                
                 if (checkScoreHost(BALLS[i]) == 1) {
-                    //console.log("ball destroyed", BALLS[i].ballId);
-                    console.log("score dopo checkscore host", score);
+
                     GameSocket.send(JSON.stringify({ action: "score_update", score: { p1: score[0], p2: score[1], p3: score[2], p4: score[3], team1: scoreTeam[0], team2: scoreTeam[1] } }));
                     GameSocket.send(JSON.stringify({ action: "ball_destroy", ballId: BALLS[i].ballId }));
                 }
@@ -1782,13 +1759,11 @@ function animate() {
 }
 //animate();
 function start() {
-    console.log('Inizio caricamento modelli...');
     Promise.all([
         model3D.loadModel1v1(window.gameScene, ufo),
         model3D.loadModel2v2(window.gameScene, ufo, gameSettings.gameMode)
         
     ]).then(() => {
-        console.log('Tutti i modelli sono stati caricati teoricamente');
         if (isOnlineGame === true) {
 
             animateonline();

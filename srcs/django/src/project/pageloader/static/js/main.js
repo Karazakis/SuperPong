@@ -13,12 +13,10 @@ function checkCurrentLobbyandDisable(){
     let userId = localStorage.getItem("userId");
     let baseUrl = window.location.origin;
     let url = baseUrl + "/api/request_status/" + userId + "/";
-    console.log("url nel:",url);
 
     fetch(url).catch(error => console.error('Errore durante il recupero della pagina:', error))
     .then(response => response.json())
     .then(data => {
-        console.log("nel check",data);
         if(data.game !== null)
         {
             disableJoinGameButton();
@@ -208,14 +206,11 @@ function insertScript(url, src, mode = 'not_logged') {
     {
         if (url.includes('join'))
         {   
-            console.log("checkCurrentLobbyandDisable");
             checkCurrentLobbyandDisable();
         }
     } else {
         if (url.includes('login') || url.includes('signup') || url.includes('home')) {
-            console.log("niente");
         } else {
-            console.log("checkCurrentLobbyandDisable");
             checkCurrentLobbyandDisable();
         }
     }
@@ -252,11 +247,9 @@ function loadPage(url) {
     let accessToken = localStorage.getItem("accessToken");
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
     const refreshUrl = `${window.location.origin}/api/token/refresh/`; // URL per verificare e refreshare il token
-    console.log("baseUrl:", baseUrl);
     // Funzione per eseguire la richiesta effettiva di caricamento della pagina
     if(window.LobbySocket !== undefined)
     {
-        console.log("chiudo lobby socket");
         window.LobbySocket.close();
     }
     if(window.GameSocket !== undefined && window.GameSocket !== null)
@@ -271,7 +264,6 @@ function loadPage(url) {
         }
     }
     const performRequest = (token, url) => {
-        console.log("url:", url);  
         if (url === "api/home/" || url == "api/login/" || url === "api/signup/") {   
             fetch(baseUrl)
             .then(response => {
@@ -407,7 +399,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (page.includes("create")) {
             let parts = page.split("_");
             let apiUrl = `api${parts[0]}/?source=${parts[1]}`;
-            console.log("apiUrl:", apiUrl);
             loadPage(apiUrl);
         } else {
             loadPage("api" + window.location.pathname);
@@ -415,7 +406,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     window.onpopstate = function(event) {
-        console.log("I tasti del browser sono stati premuti ", event.state.page);
         event.preventDefault();
         let page = event.state.page;
     
@@ -426,7 +416,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const sourcePart = parts[1].replace(/\/$/, "");
     
             const apiUrl = `api${parts[0]}/?source=${sourcePart}`;
-            console.log("apiUrl:", apiUrl);
             loadPage(apiUrl);
         } else {
             // Se la stringa non contiene "create", carica la pagina con l'URL standard

@@ -12,7 +12,6 @@ function getGameRules() {
 
 
 export function init(){
-    console.log('init.js loaded');
     
     const gameType = document.getElementById("gametype");
     const gameMode = document.getElementById("gamemode");

@@ -639,7 +639,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif action == 'ball_destroy':
             await self.ball_destroy(data)
         elif action == 'game_over':
-            await self.game_over(data)
+            p1 = data.get('p1')
+            p2 = data.get('p2')
+            await self.game_over(p1, p2)
         elif action == 'game_start':
             await self.game_start()
         elif action == 'time_update':
@@ -737,11 +739,14 @@ class GameConsumer(AsyncWebsocketConsumer):
             'ballId': data['ballId']
         }))
 
-    async def game_over(self, winner):
+    async def game_over(self, p1, p2):
+        logger.info('Game over', p1, p2)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'send_game_over',
+                'p1': p1,
+                'p2': p2
             }
         )
 
@@ -761,6 +766,8 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def send_game_over(self, event):
         await self.send(text_data=json.dumps({
             'action': 'game_over',
+            'p1': event['p1'],
+            'p2': event['p2']
         }))
 
     async def time_update(self, time):
@@ -803,26 +810,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.tournament_id = self.scope['url_route']['kwargs']['game_id']
         self.room_group_name = f'tournament_{self.tournament_id}'
-        logger.info(f"CONNECT: Connecting to tournament room: {self.room_group_name} with tournament_id: {self.tournament_id}")
+        logger.info(f"Connecting to tournament room: {self.room_group_name} with tournament_id: {self.tournament_id}")
 
-        # Recupera l'utente e il torneo
+        # Recupera l'utente
         self.user = await self.get_user()
-        self.tournament = await self.get_tournament()
-        if not self.user or not self.tournament:
+        if not self.user:
             logger.warning("User not found. Closing connection.")
             await self.close()
             return
-        
-        self.tournament = await self.get_tournament()
 
-        logger.info(f"CONNECT: User {self.user.username} connected successfully.")
+        logger.info(f"User {self.user.username} connected successfully.")
 
         # Recupera il round corrente
         self.current_round = await self.get_current_round()
-        if self.current_round:
-            logger.info(f"Current round for tournament {self.tournament.name}: Round {self.current_round.round_number}, Status: {self.current_round.status}")
-        else:
-            logger.warning("No current round found for this tournament.")
 
         # Aggiungi il client al gruppo del torneo
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -831,108 +831,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(f"user_{self.user.username}", self.channel_name)
         # Accetta la connessione WebSocket
         await self.accept()
-
-        # Se il torneo è nello stato "waiting_for_matches", prepariamo il prossimo round
-        if self.tournament.status == 'waiting_for_matches':
-            await self.prepare_next_round_if_needed()
-        elif self.tournament.status == 'waiting_for_next_round':
-        # Se siamo in attesa del prossimo round, aggiorniamo solo gli slot senza generare nuovi round
-            await self.update_next_round_slots()
-
-        
-    async def prepare_next_round_if_needed(self):
-        """
-        Genera il round successivo una sola volta e aggiorna gli slot del round successivo con i vincitori del round attuale.
-        """
-        # Prova a generare il round successivo e ottieni il messaggio di stato
-        generation_message = await database_sync_to_async(self.tournament.generate_next_round)()
-        logger.debug(f"PREPARE NEXT ROUND: Generation message: {generation_message}")
-
-        # Se è stato generato un nuovo round, aggiorniamo lo stato del torneo e passiamo all'aggiornamento degli slot
-        if "Generated new round" in generation_message:
-            logger.debug("PREPARE NEXT ROUND: New round generated successfully, updating tournament status to 'waiting_for_next_round'.")
-            self.tournament.status = 'waiting_for_next_round'
-            await database_sync_to_async(self.tournament.save)()
-            await self.update_next_round_slots()
-
-        # Se non ci sono ulteriori round da generare, non facciamo nulla e ci fermiamo
-        else:
-            logger.debug("PREPARE NEXT ROUND: Tournament had problem generating next round.")
-
-    async def update_next_round_slots(self):
-        """
-        Aggiorna gli slot del round successivo con i vincitori del round corrente, se esiste un round successivo.
-        """
-        current_round = await self.get_current_round()
-        max_rounds = self.tournament.rounds
-        next_round_number = current_round.round_number + 1 if current_round else None
-
-        if next_round_number and next_round_number <= max_rounds:
-            next_round = await database_sync_to_async(Round.objects.filter(
-                tournament=self.tournament,
-                round_number=next_round_number
-            ).first)()
-        else:
-            next_round = None
-
-        if current_round and next_round:
-            logger.debug(f"UPDATE NEXT ROUND SLOTS: Current round {current_round.round_number}, Next round {next_round.round_number}")
-
-            all_games_finished = True
-
-            for game in current_round.games.all():
-                if game.status == 'finished' and game.winner:
-                    logger.debug(f"UPDATE NEXT ROUND SLOTS: Game {game.id} finished, winner: {game.winner.username}")
-                    await self.update_winner_slot_for_next_round(game, next_round)
-                else:
-                    logger.debug(f"UPDATE NEXT ROUND SLOTS: Game {game.id} not finished or missing winner.")
-                    all_games_finished = False
-
-            if all_games_finished:
-                logger.debug(f"UPDATE NEXT ROUND SLOTS: All games in round {current_round.round_number} finished, marking round as 'finished'.")
-                current_round.status = 'finished'
-                await database_sync_to_async(current_round.save)()
-
-                self.tournament.status = 'ready_for_next_match'
-                await database_sync_to_async(self.tournament.save)()
-        else:
-            logger.debug("UPDATE NEXT ROUND SLOTS: No next round or current round not found.")
-
-    async def update_winner_slot_for_next_round(self, game, next_round):
-        """
-        Aggiorna lo slot del round successivo con il vincitore del game specifico, se un round successivo è presente.
-        """
-        if game.winner and next_round:
-            game_index = list(game.round_games.all()).index(game)
-            slot_to_update = game_index + 1
-
-            logger.debug(f"UPDATE WINNER SLOT: Updating slot {slot_to_update} in round {next_round.round_number} with winner {game.winner.username} from game {game.id}")
-
-            next_round.slots[slot_to_update] = {
-                'player_id': game.winner.id,
-                'username': game.winner.username
-            }
-            await database_sync_to_async(next_round.save)()
-            await self.send_winner_update(game.winner, next_round.round_number, slot_to_update)
-
-    async def send_winner_update(self, winner, round_number, slot):
-        """
-        Invia i dati del vincitore al client per aggiornare il tabellone.
-        """
-        logger.debug(f"SEND WINNER UPDATE: Sending winner update for {winner.username} in round {round_number}, slot {slot} to clients.")
-        message = {
-            'type': 'update_next_round_slots',
-            'winner': winner.username,
-            'round_number': round_number,
-            'slot': slot
-        }
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'send_message_to_clients',
-                'message': message
-            }
-        )
+        logger.info("Connection accepted.")
 
 
     async def disconnect(self, close_code):
@@ -1463,7 +1362,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
             # Ordina gli slot per garantire un ordine consistente
             slots = round.slots
-            logger.debug(f"Slots : {slots}")
+            sorted_slots = sorted(slots.items(), key=lambda x: int(x[0]))  # Ordina per numero di slot
+
+            # Log per ispezionare gli slot e i loro contenuti
+            logger.debug(f"Slots content: {sorted_slots}")
 
             # Calcola il numero di giocatori per game in base al numero di slot e di game
             players_per_game = len(slots) // len(games) if games else 0
@@ -1477,7 +1379,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 # Calcola gli indici degli slot per questo game
                 start_idx = idx * players_per_game
                 end_idx = start_idx + players_per_game
-                game_slots = slots[start_idx:end_idx]
+                game_slots = sorted_slots[start_idx:end_idx]
 
                 logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
 

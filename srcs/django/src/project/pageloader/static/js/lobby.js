@@ -12,10 +12,8 @@ LobbySocket.onopen = function(e) {
 
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    console.log("nel socket", data);
     if (data.action === 'message') {
         let messages = document.getElementById('lobby_messages');
-        console.log("nel messaaaggio");
         messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2.2vh;"><strong>${data.player}:</strong><p>${data.message}</p></div>`);
         messages.scrollTop = messages.scrollHeight;
     } else if (data.action === 'assign_slot') {
@@ -38,7 +36,6 @@ LobbySocket.onmessage = function(e) {
     } else if (data.action === 'player_ready') {
         updateReadyStatus(data.username, data.status);
     } else if (data.action === 'leave') {
-        console.log("data nel leave", data);
         for(let i = 1; i <= 4; i++) {
             if(document.getElementById('player' + i + '_label')?.textContent.includes(data.username)) {
                 document.getElementById('player' + i + '_label').textContent = 'Empty';
@@ -48,7 +45,6 @@ LobbySocket.onmessage = function(e) {
             }
         }
     } else if (data.action === "disconnected") {
-        console.log("disconnected", data);
         for (let i = 1; i <= 4; i++) {
             let playerLabel = document.getElementById('player' + i + '_label');
             let userLobby = document.getElementById('user' + i + '_lobby');
@@ -56,7 +52,6 @@ LobbySocket.onmessage = function(e) {
             // Se l'elemento player esiste e il nome utente corrisponde
             if (playerLabel?.textContent.includes(data.username)) {
                 // Rimuovi le classi ready o not_ready
-                console.log("playerLabel", playerLabel);
                 playerLabel.classList.remove('ready', 'not_ready');
                 
                 // Aggiungi la classe disconnect
@@ -77,7 +72,6 @@ LobbySocket.onmessage = function(e) {
             }
         }
     } else if (data.action === "connected") {
-        console.log("connected", data);
         for (let i = 1; i <= 4; i++) {
             let playerLabel = document.getElementById('player' + i + '_label');
             let userLobby = document.getElementById('user' + i + '_lobby');
