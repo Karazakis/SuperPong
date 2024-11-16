@@ -2,7 +2,7 @@
 function updatePlayerOptions() {
     const modeSelect = document.getElementById('mode');
     const nbPlayersSelect = document.getElementById('nb_players');
-
+//asd
     // Rimuovi tutte le opzioni attuali
     nbPlayersSelect.innerHTML = '';
 
