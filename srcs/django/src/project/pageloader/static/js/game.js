@@ -1110,6 +1110,7 @@ function checkScoreHost(ball){
 function pauseGame(){
     if(!isPaused) {
         isPaused = true;
+        console.log("Gioco in pausa");
     }  
     else {
         isPaused = false;

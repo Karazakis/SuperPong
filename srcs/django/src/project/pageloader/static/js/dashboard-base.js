@@ -104,6 +104,7 @@ function initializeWebSocket() {
 				    console.error("L'elemento messages non esiste");
 				}
 			    } else {
+				console.log(`Messaggio da utente bloccato (${data.player}) non visualizzato`);
 			    }
 			} catch (error) {
 			    console.error('Errore nel recupero dell\'utente o degli utenti bloccati:', error);
@@ -114,29 +115,37 @@ function initializeWebSocket() {
 		    const listElement = document.getElementById(listElementId);
 	    
 		    if (listElement) {
+			console.log('Elemento listElement trovato:', listElement);
 			(async function() {
+			    //console.log('Inizio di aggiornamento della lista utenti');
 			    listElement.innerHTML = '';
 			    const itemList = data.list;
+			    //console.log('Lista degli ID utenti:', itemList);
 			    const elementsToAdd = [];
 			    const existingIds = new Set();
 			    const actualUserId = localStorage.getItem('userId');
 			    const actualUser = await recoverUser(actualUserId);
 			    const blockedUsers = actualUser.blocked_userslist || [];
+			    //console.log('Utente attuale (blocked_users):', blockedUsers);
 	    
 			    for (const id of itemList) {
 				const itemElementId = listElementId.slice(0, -1) + '_' + id;
+				//console.log(`Controllo esistenza elemento con ID: ${itemElementId}`);
 	    
 				// Controlla se l'elemento con l'ID specifico esiste già
 				if (!existingIds.has(itemElementId) && !document.getElementById(itemElementId)) {
+				    //console.log(`Elemento con ID ${itemElementId} non trovato, creazione di un nuovo elemento`);
 				    let itemElement = document.createElement('li');
 				    itemElement.id = itemElementId;
 	    
 				    try {
 					const item = await recoverUser(id);
+					//console.log(`Utente recuperato: ${item.username} (ID: ${id})`);
 					let isblocked = blockedUsers.some(blockedUser => blockedUser.id == id);
 	    
 					if (isblocked) {
 					    itemElement.classList.add('user-blocked');
+					    console.log(`Utente bloccato trovato: ${item.username}, classe user-blocked aggiunta`);
 					}
 	    
 					itemElement.textContent = item.username;
@@ -151,16 +160,19 @@ function initializeWebSocket() {
 					console.error(`Errore durante il recupero dell'utente con ID ${id}:`, error);
 				    }
 				} else {
+				    console.log(`Elemento con ID ${itemElementId} già esistente, salto la creazione`);
 				}
 			    }
 	    
 			    // Appendi tutti gli elementi alla fine
 			    elementsToAdd.forEach(element => {
+				//console.log(`Aggiunta dell'elemento con ID ${element.id} alla lista`);
 				listElement.appendChild(element);
 			    });
+			    //console.log('Aggiornamento della lista utenti completato');
 			})();
 		    } else {
-			//console.error("L'elemento users non esiste");
+			console.error("L'elemento users non esiste");
 		    }
 		} else if (data.type === 'invite_game') {
 		    // Gestione dell'invito a giocare
@@ -635,6 +647,8 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 		if (!response.ok) {
 		    throw new Error('Errore durante il blocco dell\'utente');
 		}
+		// Opzionalmente, puoi gestire la risposta positiva qui
+		console.log('Utente bloccato con successo');
 	    } catch (error) {
 		console.error('Errore durante la richiesta:', error);
 	    }
@@ -778,8 +792,10 @@ document.getElementById("invitetournamentcontext").addEventListener('click', asy
 			});
 	
 			if (!response.ok) {
-				throw new Error('Errore durante il blocco dell\'utente');
+			throw new Error('Errore durante il blocco dell\'utente');
 			}
+			// Opzionalmente, puoi gestire la risposta positiva qui
+			console.log('Invito accettato con successo');
 		} catch (error) {
 			console.error('Errore durante la richiesta:', error);
 			}
