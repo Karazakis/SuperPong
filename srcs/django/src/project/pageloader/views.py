@@ -1078,6 +1078,7 @@ class UserInfoAPIView(APIView):
                 'pending_requests': pending_requests,
                 'user_friend_list': user_friend_list,
                 'blocked_userslist': blocked_userslist,
+                'in_game_lobby': user_profile.in_game_lobby.id if user_profile.in_game_lobby else None,
                 'game_history': game_history,
                 'tournament_history': tournament_history,
             }
@@ -1721,5 +1722,30 @@ class GameAPIView(APIView):
         else:
             return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    
-            
+class ForbiddenAPIView(APIView):
+    def get(self, request, reason):
+
+        if request.user.is_authenticated:
+
+            if reason == 'game':
+                html = render_to_string('forbidden-game.html')
+            elif reason == 'tournament':
+                html = render_to_string('forbidden-tournament.html')
+            elif reason == 'lobby':
+                html = render_to_string('forbidden-lobby.html')
+        
+            user = User.objects.get(pk=request.user.id)
+            user_profile = UserProfile.objects.get(user=user)
+            context = {
+                'user': user,
+                'userprofile': user_profile,
+            }
+            dash_base = render_to_string('dashboard-base.html', context)
+            data = {
+               'url': 'forbidden/',
+                'html': html,
+                'dash_base': dash_base,
+                'scripts': 'forbidden.js',
+                'nav_stat': 'logged_nav',
+            }
+            return Response(data)

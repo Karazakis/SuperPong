@@ -37,8 +37,8 @@ document.getElementById('logout').addEventListener('click', function() {
 }
 );
 
-id = localStorage.getItem('userId');
-url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
+//id = localStorage.getItem('userId');
+//url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 var chatSocket;
 function initializeWebSocket() {
 	if (chatSocket) {
@@ -46,6 +46,7 @@ function initializeWebSocket() {
         chatSocket.close();
     }
 	let id = localStorage.getItem('userId');
+	console.log("la figa qui? ", id);
 	let url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 	chatSocket = new WebSocket(url);
 	chatSocket.onopen = async function(event) {
@@ -382,6 +383,7 @@ var form = document.getElementById('dashboard_chat_form');
 form.addEventListener('submit', (e)=> {
     e.preventDefault();
     let message = e.target.message.value;
+	
     username = localStorage.getItem('username');
     chatSocket.send(JSON.stringify({
         'message': message,

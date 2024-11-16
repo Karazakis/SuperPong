@@ -388,20 +388,32 @@ function refreshAccessToken() {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    if (window.location.pathname == "/")
-    {
+    let redirect = localStorage.getItem("redirect");
+    console.log("redirect ", redirect);
+    if (localStorage.getItem("accessToken") === null) {
         loadPage("api/home/");
-    }
-    else
-    {
-        let page = window.location.pathname;
-    
-        if (page.includes("create")) {
-            let parts = page.split("_");
-            let apiUrl = `api${parts[0]}/?source=${parts[1]}`;
-            loadPage(apiUrl);
-        } else {
-            loadPage("api" + window.location.pathname);
+    } else if (localStorage.getItem("redirect") !== null) {
+        const redirect = localStorage.getItem("redirect");
+        localStorage.removeItem("redirect");
+        let url = "api/forbidden/" + redirect + "/";
+        console.log("redirecting to", url);
+        loadPage(url);
+    } else {
+        if (window.location.pathname == "/")
+        {
+            loadPage("api/dashboard/");
+        }
+        else
+        {
+            let page = window.location.pathname;
+        
+            if (page.includes("create")) {
+                let parts = page.split("_");
+                let apiUrl = `api${parts[0]}/?source=${parts[1]}`;
+                loadPage(apiUrl);
+            } else {
+                loadPage("api" + window.location.pathname);
+            }
         }
     }
     
