@@ -559,7 +559,7 @@ class JoinAPIView(APIView):
                 games = Game.objects.filter(status='not_started', tournament__isnull=True)
             elif 'join_tournament' in current_url:
                 tournaments = Tournament.objects.filter(status='not_started')
-                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'in_progress'], players__in=[user])
+                active_tournaments = Tournament.objects.exclude(status='not_started').filter(players__in=[user])
 
             context = {
                 'user': user,

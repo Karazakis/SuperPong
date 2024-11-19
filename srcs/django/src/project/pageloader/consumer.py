@@ -1427,6 +1427,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 slot['locked'] = True
         round.slots = slots
         await database_sync_to_async(round.save)()
+        saved_round = await database_sync_to_async(Round.objects.get)(id=round.id)
+        logger.debug(f"Saved slots: {saved_round.slots}")
         logger.info(f"Slots updated and locked.")
 
         # Invia il messaggio di blocco degli slot a tutti i client
@@ -1445,10 +1447,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     async def notify_players_to_join(self):
-        """
-        Invia una notifica a ciascun giocatore per unirsi al game in base agli slot assegnati
-        e assegna i giocatori ai campi del game.
-        """
         try:
             round = self.current_round
             if not round:
@@ -1457,75 +1455,81 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
             logger.info(f"Notifying players for round {round.round_number}.")
 
-            # Recupera tutti i game associati al round in modo asincrono
+            # Recupera tutti i game associati al round
             games = await database_sync_to_async(list)(round.games.all())
             logger.debug(f"Games in round {round.round_number}: {[game.name for game in games]}")
 
-            # Ordina gli slot per garantire un ordine consistente
-            slots = round.slots
-            logger.debug(f"Slots : {slots}")
+            slots = round.slots  # Ottieni gli slot per i giocatori
+            logger.debug(f"Slots: {slots}")
 
-            # Calcola il numero di giocatori per game in base al numero di slot e di game
-            players_per_game = len(slots) // len(games) if games else 0
-
-            if players_per_game == 0:
-                logger.error("No players per game could be calculated. Check the number of slots and games.")
+            # Verifica che tutti gli slot siano popolati
+            if not slots or any(slot_data.get('player_id') is None for slot_data in slots.values()):
+                logger.error("One or more slots are empty. Aborting notification.")
                 return
 
-            # Assegna i giocatori ai game in base agli slot
+            sorted_slots = list(slots.items())  # Converte in lista per iterare in ordine
+            logger.debug(f"Sorted slots: {sorted_slots}")
+
+            # Numero di giocatori per match
+            total_slots = len(sorted_slots)
+            total_games = len(games)
+            players_per_game = total_slots // total_games
+
+            if players_per_game == 0:
+                logger.error("Not enough slots to distribute players to games. Aborting.")
+                return
+
+            logger.debug(f"Players per game: {players_per_game}")
+
+            # Assegna i giocatori ai match
             for idx, game in enumerate(games):
-                # Calcola gli indici degli slot per questo game
                 start_idx = idx * players_per_game
                 end_idx = start_idx + players_per_game
-                game_slots = slots[start_idx:end_idx]
-
+                game_slots = sorted_slots[start_idx:end_idx]
                 logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
 
-                # Assegna i giocatori ai campi del game in base agli slot
                 for player_idx, (slot, slot_data) in enumerate(game_slots):
                     player_id = slot_data.get('player_id')
                     username = slot_data.get('username')
 
-                    # Log per ispezionare ogni slot e i suoi contenuti
-                    logger.debug(f"Slot {slot}: player_id={player_id}, username={username}")
+                    if not player_id or not username:
+                        logger.error(f"Slot {slot} is missing player data. Skipping assignment.")
+                        continue
 
-                    if player_id:
-                        try:
-                            # Recupera il giocatore tramite il player_id
-                            player = await database_sync_to_async(User.objects.get)(id=player_id)
+                    try:
+                        player = await database_sync_to_async(User.objects.get)(id=player_id)
 
-                            # Assegna il giocatore al campo corretto del game
-                            if player_idx == 0:
-                                game.player1 = player
-                            elif player_idx == 1:
-                                game.player2 = player
-                            elif player_idx == 2 and game.mode != '1v1':
-                                game.player3 = player
-                            elif player_idx == 3 and game.mode != '1v1':
-                                game.player4 = player
+                        # Assegna il giocatore al campo corretto del game
+                        if player_idx == 0:
+                            game.player1 = player
+                        elif player_idx == 1:
+                            game.player2 = player
+                        elif player_idx == 2 and game.mode != '1v1':
+                            game.player3 = player
+                        elif player_idx == 3 and game.mode != '1v1':
+                            game.player4 = player
 
-                            logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
+                        logger.debug(f"Assigned {player.username} to game {game.name} as player{player_idx + 1}")
 
-                            # Invia il link per il game al giocatore
-                            message = {
-                                'type': 'join_game_notification',
-                                'slot': slot,
-                                'username': player.username,
-                                'game_link': f'/api/game/{game.id}/'  # Link per joinare il game
+                        # Invia il link per il game al giocatore
+                        message = {
+                            'type': 'join_game_notification',
+                            'slot': slot,
+                            'username': player.username,
+                            'game_link': f'/api/game/{game.id}/'
+                        }
+                        await self.channel_layer.group_send(
+                            f"user_{player.username}",
+                            {
+                                'type': 'send_message_to_client',
+                                'message': message
                             }
-                            await self.channel_layer.group_send(
-                                f"user_{player.username}",
-                                {
-                                    'type': 'send_message_to_client',
-                                    'message': message
-                                }
-                            )
-                        except User.DoesNotExist:
-                            logger.error(f"Player with ID {player_id} not found for slot {slot}.")
-                    else:
-                        logger.error(f"No player assigned to slot {slot}. Skipping this slot.")
+                        )
+                    except User.DoesNotExist:
+                        logger.error(f"Player with ID {player_id} not found for slot {slot}.")
+                        continue
 
-                # Salva il game dopo aver assegnato tutti i giocatori
+                # Salva il game dopo aver assegnato i giocatori
                 await database_sync_to_async(game.save)()
 
             logger.info("Notifications sent to all players to join the game.")

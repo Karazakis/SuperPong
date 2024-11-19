@@ -38,7 +38,7 @@ document.getElementById('logout').addEventListener('click', function() {
 );
 
 id = localStorage.getItem('userId');
-url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
+let url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 var chatSocket;
 function initializeWebSocket() {
 	if (chatSocket) {
