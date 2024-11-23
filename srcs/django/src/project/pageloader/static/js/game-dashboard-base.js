@@ -1,6 +1,5 @@
 
 function joinTournament(tournamentId) {
-    console.log('Joining tournament:', tournamentId);
     let accessToken = localStorage.getItem('accessToken');
     fetch(`/api/join_tournament/`, {
         method: 'POST',
@@ -23,7 +22,6 @@ function joinTournament(tournamentId) {
 
 document.getElementById('leavegame').addEventListener('click', function() {
     // Emissione dell'evento custom
-    console.log('Loading dashboard...');
     const event = new Event('cleanupGameEvent');
     document.dispatchEvent(event);
     let gameType = document.getElementById('gametype').textContent;
@@ -44,13 +42,11 @@ var userId_game = localStorage.getItem('userId'); // Assicurati che l'ID utente 
 var username_game = localStorage.getItem('username'); // Assicurati che il nome utente sia memorizzato in localStorage
 
 if (game_id_game !== 'single' && game_id_game !== 'local') {
-    console.log('game_id_game: ', game_id_game);
     var game = `wss://${window.location.host}/wss/game/${game_id_game}/?id=${userId_game}`;
     var GameSocket = new WebSocket(game);
     window.GameSocket = GameSocket;
 
     GameSocket.onopen = function(e) {
-        console.log('WebSocket connection established.');
         GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
     };
 }

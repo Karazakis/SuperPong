@@ -351,7 +351,6 @@ endgameOnline() {
 	const csrfToken = getCookie('csrftoken');
     let gameId = window.location.pathname.split("/");
     let url = "/api/game/" + gameId[2]  + "/";
-    console.log("ENDGAME ONLINE");
     async function checkTokenValidity(url) {
 		try {
 			const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
@@ -1111,7 +1110,6 @@ function checkScoreHost(ball){
 function pauseGame(){
     if(!isPaused) {
         isPaused = true;
-        console.log("Gioco in pausa");
     }  
     else {
         isPaused = false;
@@ -1376,7 +1374,7 @@ let flagTimer = true;
 
 let gametype = document.getElementById('gametype').innerText;
 
-if(gametype == 'remote-game' || gametype == 'tournament-game')
+if(gametype == 'remote-game')
 {
     window.handleKeyDownOnline = function(event) {
         if(isInKeyPlayer(event.code) && !keyboardState[event.code])
@@ -1425,7 +1423,6 @@ if(gametype == 'remote-game' || gametype == 'tournament-game')
             countdownElement.innerText = timer;
         } else if (data.action === "game_over") {
             if (isHost === true) {
-                console.log("ENDGAME");
                 endgameOnline();
             }
             gameEnded = true;

@@ -16,7 +16,7 @@ joinButtons.forEach(button => {
 
 var refreshButton = document.getElementById('refresh-btn');
 refreshButton.addEventListener('click', function() {
-    location.reload(); // Ricarica la pagina per ottenere la lista aggiornata
+    loadPage("api/join_lobby/");
 });
 
 

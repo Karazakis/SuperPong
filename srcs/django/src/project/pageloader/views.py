@@ -559,7 +559,7 @@ class JoinAPIView(APIView):
                 games = Game.objects.filter(status='not_started', tournament__isnull=True)
             elif 'join_tournament' in current_url:
                 tournaments = Tournament.objects.filter(status='not_started')
-                active_tournaments = Tournament.objects.exclude(status='not_started').filter(players__in=[user])
+                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'in_progress'], players__in=[user])
 
             context = {
                 'user': user,
@@ -782,19 +782,12 @@ class CreateAPIView(APIView):
                     rules=request.data.get('rules', ''), 
                     owner=user
                 )
-                # Calcola e imposta il numero totale di round per il torneo
-                tournament.rounds = tournament.calculate_rounds()
-
-                # Aggiungi l'utente come giocatore e aggiorna la lobby
-                tournament.players.add(user)
+                tournament.players.add(user)  # Aggiungi l'utente all'elenco dei giocatori
                 tournament.players_in_lobby += 1
                 tournament.save()
 
-                # Aggiorna il profilo utente per indicare che è nella lobby del torneo
                 user_profile.in_tournament_lobby = tournament
                 user_profile.save()
-
-                # Genera il round iniziale e i relativi game
                 logging.debug(f'Torneo creato: {tournament.id}')
                 tournament.generate_initial_rounds()
                 return Response({'success': tournament.id}, status=status.HTTP_201_CREATED)
@@ -1085,6 +1078,7 @@ class UserInfoAPIView(APIView):
                 'pending_requests': pending_requests,
                 'user_friend_list': user_friend_list,
                 'blocked_userslist': blocked_userslist,
+                'in_game_lobby': user_profile.in_game_lobby.id if user_profile.in_game_lobby else None,
                 'game_history': game_history,
                 'tournament_history': tournament_history,
             }
@@ -1563,18 +1557,18 @@ class GameAPIView(APIView):
                         posp1right = "p2Right"
                         posp1shoot = "p2Shoot"
                         posp1boost = "p2Boost"
-                        posp2right = "p3Right"
-                        posp2left = "p3Left"
-                        posp2shoot = "p3Shoot"
-                        posp2boost = "p3Boost"
+                        posp2right = "p1Right"
+                        posp2left = "p1Left"
+                        posp2shoot = "p1Shoot"
+                        posp2boost = "p1Boost"
                         posp3right = "p4Right"
                         posp3left = "p4Left"
                         posp3shoot = "p4Shoot"
                         posp3boost = "p4Boost"
-                        posp4right = "p1Right"
-                        posp4left = "p1Left"
-                        posp4shoot = "p1Shoot"
-                        posp4boost = "p1Boost"
+                        posp4right = "p3Right"
+                        posp4left = "p3Left"
+                        posp4shoot = "p3Shoot"
+                        posp4boost = "p3Boost"
                     elif game.player3 == user:
                         player_posit = "p3"
                         posp1left = "p3Left"
@@ -1728,5 +1722,30 @@ class GameAPIView(APIView):
         else:
             return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    
-            
+class ForbiddenAPIView(APIView):
+    def get(self, request, reason):
+
+        if request.user.is_authenticated:
+
+            if reason == 'game':
+                html = render_to_string('forbidden-game.html')
+            elif reason == 'tournament':
+                html = render_to_string('forbidden-tournament.html')
+            elif reason == 'lobby':
+                html = render_to_string('forbidden-lobby.html')
+        
+            user = User.objects.get(pk=request.user.id)
+            user_profile = UserProfile.objects.get(user=user)
+            context = {
+                'user': user,
+                'userprofile': user_profile,
+            }
+            dash_base = render_to_string('dashboard-base.html', context)
+            data = {
+               'url': 'forbidden/',
+                'html': html,
+                'dash_base': dash_base,
+                'scripts': 'forbidden.js',
+                'nav_stat': 'logged_nav',
+            }
+            return Response(data)
