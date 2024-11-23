@@ -1447,6 +1447,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     async def notify_players_to_join(self):
+        """
+        Invia una notifica a ciascun giocatore per unirsi al game in base agli slot assegnati
+        e assegna i giocatori ai campi del game.
+        """
         try:
             round = self.current_round
             if not round:

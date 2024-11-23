@@ -689,3 +689,72 @@ INFO 2024-11-19 14:34:28,640 runserver HTTP GET /api/token/refresh/?token=eyJhbG
 INFO 2024-11-19 14:34:28,660 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.3:32906]
 INFO 2024-11-19 14:34:28,673 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.3:32920]
 INFO 2024-11-19 14:34:28,680 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:32922]
+INFO 2024-11-19 14:36:27,241 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-19 14:36:27,664 autoreload Watching for file changes with StatReloader
+INFO 2024-11-19 14:38:40,095 runserver HTTP GET /tournaments/ 200 [0.01, 172.18.0.3:51616]
+INFO 2024-11-19 14:38:40,129 runserver HTTP GET /static/css/style.css 200 [0.01, 172.18.0.3:51630]
+INFO 2024-11-19 14:38:40,131 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:51644]
+INFO 2024-11-19 14:38:40,132 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:51636]
+INFO 2024-11-20 09:14:53,451 autoreload Watching for file changes with StatReloader
+INFO 2024-11-20 14:49:57,374 autoreload Watching for file changes with StatReloader
+INFO 2024-11-21 09:46:42,397 autoreload Watching for file changes with StatReloader
+INFO 2024-11-21 14:50:07,529 autoreload Watching for file changes with StatReloader
+INFO 2024-11-21 14:10:14,124 autoreload Watching for file changes with StatReloader
+ERROR 2024-11-21 14:32:16,962 exception Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/usr/local/lib/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
+WARNING 2024-11-21 14:32:16,981 log Bad Request: /
+WARNING 2024-11-21 14:32:16,981 runserver HTTP GET / 400 [0.02, 172.18.0.2:51432]
+ERROR 2024-11-21 14:32:17,001 exception Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/usr/local/lib/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
+WARNING 2024-11-21 14:32:17,014 log Bad Request: /favicon.ico
+WARNING 2024-11-21 14:32:17,015 runserver HTTP GET /favicon.ico 400 [0.02, 172.18.0.2:51442]
+INFO 2024-11-23 11:26:31,546 autoreload Watching for file changes with StatReloader
+INFO 2024-11-23 10:33:53,604 runserver HTTP GET / 200 [0.01, 172.18.0.3:50536]
+INFO 2024-11-23 10:33:53,623 runserver HTTP GET /static/js/game/module/three.min.js 304 [0.00, 172.18.0.3:50544]
+INFO 2024-11-23 10:33:53,628 runserver HTTP GET /static/js/main.js 304 [0.00, 172.18.0.3:50558]
+INFO 2024-11-23 10:33:53,628 runserver HTTP GET /static/css/style.css 200 [0.01, 172.18.0.3:50540]
+INFO 2024-11-23 10:33:53,906 runserver HTTP GET /api/home/ 200 [0.00, 172.18.0.3:50576]
+INFO 2024-11-23 10:33:53,976 runserver HTTP GET /static/js/home.js 304 [0.00, 172.18.0.3:50588]
+INFO 2024-11-23 10:34:00,216 runserver HTTP GET /api/login/ 200 [0.00, 172.18.0.3:50596]
+INFO 2024-11-23 10:34:00,272 runserver HTTP GET /static/js/login.js 200 [0.00, 172.18.0.3:50604]
+INFO 2024-11-23 10:34:03,702 runserver HTTP POST /api/login/ 200 [0.15, 172.18.0.3:55136]
+INFO 2024-11-23 10:34:03,736 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzU4MzQzLCJpYXQiOjE3MzIzNTgwNDMsImp0aSI6IjE1Njc2ZjQwYmFiYTQwZTk5NWIwODFjNmM0OTI0NmFkIiwidXNlcl9pZCI6MX0.ZhAd08y_xgrVs7Ali22vHk64YP5Z3SfahLyju6GP29s 200 [0.00, 172.18.0.3:55142]
+INFO 2024-11-23 10:34:03,753 runserver HTTP GET /api/dashboard/ 200 [0.01, 172.18.0.3:55150]
+INFO 2024-11-23 10:34:03,766 runserver HTTP GET /static/js/dashboard.js 200 [0.00, 172.18.0.3:55156]
+INFO 2024-11-23 10:34:03,766 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:55154]
+INFO 2024-11-23 10:34:03,769 runserver HTTP GET /static/media/profiles/default.png 304 [0.00, 172.18.0.3:55178]
+INFO 2024-11-23 10:34:03,776 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:55170]
