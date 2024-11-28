@@ -1,170 +1,1183 @@
-INFO 2024-11-23 11:03:59,693 consumer Received message: {'action': 'start_tournament_preparation'}
-INFO 2024-11-23 11:03:59,693 consumer Starting tournament flow...
-INFO 2024-11-23 11:03:59,697 consumer Tournament q found with status waiting_for_matches.
-INFO 2024-11-23 11:03:59,706 consumer Tournament status updated to 'waiting_for_matches'.
-INFO 2024-11-23 11:03:59,718 consumer Slots updated and locked.
-INFO 2024-11-23 11:03:59,718 consumer Waiting for countdown to complete on client side...
-INFO 2024-11-23 11:04:00,693 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 9 seconds...'}
-INFO 2024-11-23 11:04:00,693 consumer Chat message sent by SYSTEM: Round starting in 9 seconds...
-INFO 2024-11-23 11:04:01,693 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 8 seconds...'}
-INFO 2024-11-23 11:04:01,693 consumer Chat message sent by SYSTEM: Round starting in 8 seconds...
-INFO 2024-11-23 11:04:02,693 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 7 seconds...'}
-INFO 2024-11-23 11:04:02,693 consumer Chat message sent by SYSTEM: Round starting in 7 seconds...
-INFO 2024-11-23 11:04:03,761 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 6 seconds...'}
-INFO 2024-11-23 11:04:03,761 consumer Chat message sent by SYSTEM: Round starting in 6 seconds...
-INFO 2024-11-23 11:04:04,767 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 5 seconds...'}
-INFO 2024-11-23 11:04:04,767 consumer Chat message sent by SYSTEM: Round starting in 5 seconds...
-INFO 2024-11-23 11:04:05,773 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 4 seconds...'}
-INFO 2024-11-23 11:04:05,773 consumer Chat message sent by SYSTEM: Round starting in 4 seconds...
-INFO 2024-11-23 11:04:06,777 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 3 seconds...'}
-INFO 2024-11-23 11:04:06,778 consumer Chat message sent by SYSTEM: Round starting in 3 seconds...
-INFO 2024-11-23 11:04:07,783 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 2 seconds...'}
-INFO 2024-11-23 11:04:07,783 consumer Chat message sent by SYSTEM: Round starting in 2 seconds...
-INFO 2024-11-23 11:04:08,793 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 1 seconds...'}
-INFO 2024-11-23 11:04:08,794 consumer Chat message sent by SYSTEM: Round starting in 1 seconds...
-INFO 2024-11-23 11:04:09,800 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 0 seconds...'}
-INFO 2024-11-23 11:04:09,800 consumer Chat message sent by SYSTEM: Round starting in 0 seconds...
-INFO 2024-11-23 11:04:09,802 consumer Received message: {'action': 'countdown_complete'}
-INFO 2024-11-23 11:04:09,802 consumer Notifying players for round 1.
-DEBUG 2024-11-23 11:04:09,808 consumer Games in round 1: ['q - Round 1 - Game 1', 'q - Round 1 - Game 2']
-DEBUG 2024-11-23 11:04:09,808 consumer Slots content: [('1', {'locked': True, 'username': 'luca', 'player_id': 1}), ('2', {'locked': True, 'username': 'marco', 'player_id': 2}), ('3', {'locked': True, 'username': 'giovanni', 'player_id': 3}), ('4', {'locked': True, 'username': 'bruno', 'player_id': 7})]
-DEBUG 2024-11-23 11:04:09,808 consumer Assigning slots 0 to 2 for game q - Round 1 - Game 1.
-DEBUG 2024-11-23 11:04:09,809 consumer Slot 1: player_id=1, username=luca
-DEBUG 2024-11-23 11:04:09,813 consumer Assigned luca to game q - Round 1 - Game 1 (ID: 13) as player1
-DEBUG 2024-11-23 11:04:09,814 consumer Slot 2: player_id=2, username=marco
-DEBUG 2024-11-23 11:04:09,818 consumer Assigned marco to game q - Round 1 - Game 1 (ID: 13) as player2
-DEBUG 2024-11-23 11:04:09,828 consumer Assigning slots 2 to 4 for game q - Round 1 - Game 2.
-DEBUG 2024-11-23 11:04:09,828 consumer Slot 3: player_id=3, username=giovanni
-DEBUG 2024-11-23 11:04:09,832 consumer Assigned giovanni to game q - Round 1 - Game 2 (ID: 14) as player1
-DEBUG 2024-11-23 11:04:09,832 consumer Slot 4: player_id=7, username=bruno
-DEBUG 2024-11-23 11:04:09,835 consumer Assigned bruno to game q - Round 1 - Game 2 (ID: 14) as player2
-INFO 2024-11-23 11:04:09,841 consumer Notifications sent to all players to join the game.
-INFO 2024-11-23 11:04:45,554 runserver WebSocket DISCONNECT /wss/tournament/6/ [172.18.0.3:44348]
-INFO 2024-11-23 11:04:45,555 consumer Disconnecting from tournament room: tournament_6 with close code: None
-INFO 2024-11-23 11:04:45,566 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzYwMDY0LCJpYXQiOjE3MzIzNTg4NDUsImp0aSI6IjJkY2Q0YTg2OGIyZTQ2Mjc5MGFmOGRjOWUyMWFiOGJmIiwidXNlcl9pZCI6N30.vCkJF_Z6N8AmrVSbnZ269Ew2nXHZEwMFILft7VVuy18 200 [0.01, 172.18.0.3:39428]
-INFO 2024-11-23 11:04:45,567 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-23 11:04:45,567 consumer Ready statuses after update: {'1': True, '2': True, '3': True, '4': False}
-INFO 2024-11-23 11:04:45,576 consumer Ready status saved successfully in the round database.
-INFO 2024-11-23 11:04:45,576 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '4': {'locked': True, 'username': 'bruno', 'player_id': 7}}, Ready status: {'1': True, '2': True, '3': True, '4': False}
-INFO 2024-11-23 11:04:45,577 consumer Ready status update sent to group: {'1': True, '2': True, '3': True, '4': False}
-INFO 2024-11-23 11:04:45,577 consumer User bruno removed from lobby, but still in the tournament.
-INFO 2024-11-23 11:04:45,578 consumer Attempting to retrieve user list for tournament_id: 6
-INFO 2024-11-23 11:04:45,583 runserver HTTP GET /api/game/14/ 200 [0.01, 172.18.0.3:39434]
-INFO 2024-11-23 11:04:45,583 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'bruno'}]
-INFO 2024-11-23 11:04:45,590 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:39448]
-INFO 2024-11-23 11:04:45,598 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.4144407214624124 200 [0.00, 172.18.0.3:39454]
-INFO 2024-11-23 11:04:45,608 runserver HTTP GET /static/js/game.js?v=0.27384600944207604 200 [0.00, 172.18.0.3:39470]
-INFO 2024-11-23 11:04:45,615 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:39486]
-INFO 2024-11-23 11:04:45,620 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:39494]
-INFO 2024-11-23 11:04:45,623 runserver HTTP GET /static/js/game/src/Init.js 200 [0.00, 172.18.0.3:39496]
-INFO 2024-11-23 11:04:45,630 runserver WebSocket HANDSHAKING /wss/game/14/ [172.18.0.3:39536]
-INFO 2024-11-23 11:04:45,633 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:39502]
-INFO 2024-11-23 11:04:45,633 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:39518]
-INFO 2024-11-23 11:04:45,634 runserver WebSocket CONNECT /wss/game/14/ [172.18.0.3:39536]
-INFO 2024-11-23 11:04:45,636 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.3:39530]
-INFO 2024-11-23 11:04:45,636 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:39544]
-INFO 2024-11-23 11:04:45,637 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:39546]
-INFO 2024-11-23 11:04:45,649 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:39548]
-INFO 2024-11-23 11:04:45,650 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:39550]
-INFO 2024-11-23 11:04:45,659 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:39560]
-INFO 2024-11-23 11:04:45,690 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:39570]
-INFO 2024-11-23 11:04:45,918 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:39572]
-INFO 2024-11-23 11:04:45,928 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39580]
-INFO 2024-11-23 11:04:45,930 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:39602]
-INFO 2024-11-23 11:04:45,932 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39576]
-INFO 2024-11-23 11:04:45,933 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39588]
-INFO 2024-11-23 11:04:45,935 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39618]
-INFO 2024-11-23 11:04:45,937 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39612]
-INFO 2024-11-23 11:04:45,939 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39628]
-INFO 2024-11-23 11:04:45,942 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:39638]
-INFO 2024-11-23 11:04:48,023 runserver WebSocket DISCONNECT /wss/tournament/6/ [172.18.0.3:52098]
-INFO 2024-11-23 11:04:48,024 consumer Disconnecting from tournament room: tournament_6 with close code: None
-INFO 2024-11-23 11:04:48,031 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzYwMDgzLCJpYXQiOjE3MzIzNTg3NTgsImp0aSI6Ijk5ZTY4NWU0N2Q5NDRmNGVhZjU2YmMxYjBiZDI0Zjk1IiwidXNlcl9pZCI6M30.M0CvGQcyxyNAdXCXQEV_vwbxGEB_zdUThc8kdoRTP-w 200 [0.01, 172.18.0.3:39644]
-INFO 2024-11-23 11:04:48,034 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': False}
-INFO 2024-11-23 11:04:48,034 consumer Ready statuses after update: {'1': True, '2': True, '3': False, '4': False}
-INFO 2024-11-23 11:04:48,038 consumer Ready status saved successfully in the round database.
-INFO 2024-11-23 11:04:48,039 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '4': {'locked': True, 'username': 'bruno', 'player_id': 7}}, Ready status: {'1': True, '2': True, '3': False, '4': False}
-INFO 2024-11-23 11:04:48,039 consumer Ready status update sent to group: {'1': True, '2': True, '3': False, '4': False}
-INFO 2024-11-23 11:04:48,039 consumer User giovanni removed from lobby, but still in the tournament.
-INFO 2024-11-23 11:04:48,039 consumer Attempting to retrieve user list for tournament_id: 6
-INFO 2024-11-23 11:04:48,044 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'bruno'}]
-INFO 2024-11-23 11:04:48,047 runserver HTTP GET /api/game/14/ 200 [0.01, 172.18.0.3:39654]
-INFO 2024-11-23 11:04:48,053 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.8437072022096772 200 [0.00, 172.18.0.3:39666]
-INFO 2024-11-23 11:04:48,058 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:39674]
-INFO 2024-11-23 11:04:48,065 runserver HTTP GET /static/js/game.js?v=0.47220084943360296 200 [0.00, 172.18.0.3:39690]
-INFO 2024-11-23 11:04:48,067 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:39682]
-INFO 2024-11-23 11:04:48,072 runserver WebSocket HANDSHAKING /wss/game/14/ [172.18.0.3:39734]
-INFO 2024-11-23 11:04:48,081 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.01, 172.18.0.3:39706]
-INFO 2024-11-23 11:04:48,082 runserver WebSocket CONNECT /wss/game/14/ [172.18.0.3:39734]
-INFO 2024-11-23 11:04:48,083 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.3:39718]
-INFO 2024-11-23 11:04:48,084 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:39750]
-INFO 2024-11-23 11:04:48,086 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:39760]
-INFO 2024-11-23 11:04:48,088 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.3:39766]
-INFO 2024-11-23 11:04:48,088 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:39762]
-INFO 2024-11-23 11:04:48,091 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:39772]
-INFO 2024-11-23 11:04:48,097 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:39784]
-INFO 2024-11-23 11:04:48,097 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:39798]
-INFO 2024-11-23 11:04:48,104 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:39808]
-INFO 2024-11-23 11:04:48,139 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:39818]
-INFO 2024-11-23 11:04:48,391 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:39830]
-INFO 2024-11-23 11:04:48,402 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39858]
-INFO 2024-11-23 11:04:48,402 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39874]
-INFO 2024-11-23 11:04:48,404 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39840]
-INFO 2024-11-23 11:04:48,405 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39890]
-INFO 2024-11-23 11:04:48,406 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39844]
-INFO 2024-11-23 11:04:48,408 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39900]
-INFO 2024-11-23 11:04:48,417 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:39916]
-INFO 2024-11-23 11:04:48,417 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:39926]
-INFO 2024-11-23 11:04:50,406 runserver WebSocket DISCONNECT /wss/tournament/6/ [172.18.0.3:44174]
-INFO 2024-11-23 11:04:50,407 consumer Disconnecting from tournament room: tournament_6 with close code: None
-INFO 2024-11-23 11:04:50,415 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzYwMDU5LCJpYXQiOjE3MzIzNTgwNDMsImp0aSI6Ijc5ODg3ZTI3MDViZTQxZWE4Mzk0ZTg2NDlmZWJhZmU5IiwidXNlcl9pZCI6MX0.BCpT4pM8goMSf-uc65sOvycP3CGbsLjlvNUY9Whxewo 200 [0.00, 172.18.0.3:39930]
-INFO 2024-11-23 11:04:50,417 consumer Ready statuses before update: {'1': True, '2': True, '3': False, '4': False}
-INFO 2024-11-23 11:04:50,417 consumer Ready statuses after update: {'1': False, '2': True, '3': False, '4': False}
-INFO 2024-11-23 11:04:50,426 consumer Ready status saved successfully in the round database.
-INFO 2024-11-23 11:04:50,427 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '4': {'locked': True, 'username': 'bruno', 'player_id': 7}}, Ready status: {'1': False, '2': True, '3': False, '4': False}
-INFO 2024-11-23 11:04:50,427 consumer Ready status update sent to group: {'1': False, '2': True, '3': False, '4': False}
-INFO 2024-11-23 11:04:50,428 consumer User luca removed from lobby, but still in the tournament.
-INFO 2024-11-23 11:04:50,428 consumer Attempting to retrieve user list for tournament_id: 6
-INFO 2024-11-23 11:04:50,431 runserver HTTP GET /api/game/13/ 200 [0.01, 172.18.0.3:39932]
-INFO 2024-11-23 11:04:50,433 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'bruno'}]
-INFO 2024-11-23 11:04:50,437 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.24523152177031826 200 [0.00, 172.18.0.3:39938]
-INFO 2024-11-23 11:04:50,443 runserver HTTP GET /static/js/game.js?v=0.9007889490362267 200 [0.00, 172.18.0.3:39944]
-INFO 2024-11-23 11:04:50,450 runserver WebSocket HANDSHAKING /wss/game/13/ [172.18.0.3:39948]
-INFO 2024-11-23 11:04:50,452 runserver WebSocket CONNECT /wss/game/13/ [172.18.0.3:39948]
-INFO 2024-11-23 11:04:50,453 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:39954]
-INFO 2024-11-23 11:04:50,462 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:39978]
-INFO 2024-11-23 11:04:50,462 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.3:39968]
-INFO 2024-11-23 11:04:50,462 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:39970]
-INFO 2024-11-23 11:04:50,464 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:39982]
-INFO 2024-11-23 11:04:50,464 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.00, 172.18.0.3:40000]
-INFO 2024-11-23 11:04:50,466 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:39986]
-INFO 2024-11-23 11:04:50,491 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:40010]
-INFO 2024-11-23 11:04:50,491 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:40004]
-INFO 2024-11-23 11:04:50,533 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:40018]
-INFO 2024-11-23 11:04:50,554 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:40020]
-INFO 2024-11-23 11:04:50,650 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:40028]
-INFO 2024-11-23 11:04:50,656 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:40038]
-INFO 2024-11-23 11:04:50,660 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:40034]
-INFO 2024-11-23 11:04:50,661 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:40064]
-INFO 2024-11-23 11:04:50,661 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:40052]
-INFO 2024-11-23 11:04:50,663 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:40048]
-INFO 2024-11-23 11:04:50,664 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:40062]
-INFO 2024-11-23 11:04:50,666 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:40068]
-INFO 2024-11-23 11:04:50,668 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:40076]
-INFO 2024-11-23 11:05:55,967 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.3:51800]
-INFO 2024-11-23 11:05:55,967 runserver WebSocket DISCONNECT /wss/game/14/ [172.18.0.3:39734]
-INFO 2024-11-23 11:05:57,352 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.3:43972]
-INFO 2024-11-23 11:05:57,352 runserver WebSocket DISCONNECT /wss/game/13/ [172.18.0.3:39948]
-INFO 2024-11-23 11:05:59,716 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.3:33246]
-INFO 2024-11-23 11:05:59,716 runserver WebSocket DISCONNECT /wss/game/14/ [172.18.0.3:39536]
-INFO 2024-11-24 14:35:24,770 autoreload Watching for file changes with StatReloader
-INFO 2024-11-25 09:52:30,476 autoreload Watching for file changes with StatReloader
-INFO 2024-11-25 12:02:34,265 autoreload Watching for file changes with StatReloader
-INFO 2024-11-25 14:06:54,424 autoreload Watching for file changes with StatReloader
-INFO 2024-11-25 16:36:44,969 autoreload Watching for file changes with StatReloader
-INFO 2024-11-26 15:02:17,422 autoreload Watching for file changes with StatReloader
-INFO 2024-11-27 10:49:23,351 autoreload Watching for file changes with StatReloader
-INFO 2024-11-28 12:40:53,411 autoreload Watching for file changes with StatReloader
-INFO 2024-11-28 14:13:23,949 autoreload Watching for file changes with StatReloader
-INFO 2024-11-28 13:17:49,404 autoreload /django/manage.py changed, reloading.
-INFO 2024-11-28 13:20:42,036 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 13:45:40,941 consumer Received message: {'action': 'start_tournament_preparation'}
+INFO 2024-11-28 13:45:40,941 consumer Starting tournament flow...
+INFO 2024-11-28 13:45:40,945 consumer Tournament test found with status waiting_for_matches.
+INFO 2024-11-28 13:45:40,954 consumer Tournament status updated to 'waiting_for_matches'.
+DEBUG 2024-11-28 13:45:40,961 consumer Round 1 retrieved with slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+DEBUG 2024-11-28 13:45:40,961 consumer Processing slot 1: {'locked': True, 'username': 'luca', 'player_id': 1}
+DEBUG 2024-11-28 13:45:40,961 consumer Processing slot 2: {'locked': True, 'username': 'giovanni', 'player_id': 3}
+DEBUG 2024-11-28 13:45:40,961 consumer Processing slot 3: {'locked': True, 'username': 'test', 'player_id': 4}
+DEBUG 2024-11-28 13:45:40,961 consumer Processing slot 4: {'locked': True, 'username': 'marco', 'player_id': 2}
+INFO 2024-11-28 13:45:40,965 consumer Slots updated and locked: 1 retrieved with slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 13:45:40,965 consumer Waiting for countdown to complete on client side...
+INFO 2024-11-28 13:45:42,063 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 9 seconds...'}
+INFO 2024-11-28 13:45:42,063 consumer Chat message sent by SYSTEM: Round starting in 9 seconds...
+INFO 2024-11-28 13:45:43,063 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 8 seconds...'}
+INFO 2024-11-28 13:45:43,064 consumer Chat message sent by SYSTEM: Round starting in 8 seconds...
+INFO 2024-11-28 13:45:44,067 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 7 seconds...'}
+INFO 2024-11-28 13:45:44,067 consumer Chat message sent by SYSTEM: Round starting in 7 seconds...
+INFO 2024-11-28 13:45:45,114 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 6 seconds...'}
+INFO 2024-11-28 13:45:45,115 consumer Chat message sent by SYSTEM: Round starting in 6 seconds...
+INFO 2024-11-28 13:45:46,121 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 5 seconds...'}
+INFO 2024-11-28 13:45:46,121 consumer Chat message sent by SYSTEM: Round starting in 5 seconds...
+INFO 2024-11-28 13:45:47,128 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 4 seconds...'}
+INFO 2024-11-28 13:45:47,128 consumer Chat message sent by SYSTEM: Round starting in 4 seconds...
+INFO 2024-11-28 13:45:48,139 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 3 seconds...'}
+INFO 2024-11-28 13:45:48,139 consumer Chat message sent by SYSTEM: Round starting in 3 seconds...
+INFO 2024-11-28 13:45:49,145 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 2 seconds...'}
+INFO 2024-11-28 13:45:49,146 consumer Chat message sent by SYSTEM: Round starting in 2 seconds...
+INFO 2024-11-28 13:45:50,153 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 1 seconds...'}
+INFO 2024-11-28 13:45:50,153 consumer Chat message sent by SYSTEM: Round starting in 1 seconds...
+INFO 2024-11-28 13:45:51,159 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 0 seconds...'}
+INFO 2024-11-28 13:45:51,160 consumer Chat message sent by SYSTEM: Round starting in 0 seconds...
+INFO 2024-11-28 13:45:51,161 consumer Received message: {'action': 'countdown_complete'}
+INFO 2024-11-28 13:45:51,161 consumer Notifying players for round 1.
+DEBUG 2024-11-28 13:45:51,167 consumer Games in round 1: ['test - Round 1 - Game 1', 'test - Round 1 - Game 2']
+DEBUG 2024-11-28 13:45:51,167 consumer Slots content: [('1', {'locked': True, 'username': 'luca', 'player_id': 1}), ('2', {'locked': True, 'username': 'giovanni', 'player_id': 3}), ('3', {'locked': True, 'username': 'test', 'player_id': 4}), ('4', {'locked': True, 'username': 'marco', 'player_id': 2})]
+DEBUG 2024-11-28 13:45:51,167 consumer Assigning slots 0 to 2 for game test - Round 1 - Game 1.
+DEBUG 2024-11-28 13:45:51,167 consumer Slot 1: player_id=1, username=luca
+DEBUG 2024-11-28 13:45:51,174 consumer Assigned luca to game test - Round 1 - Game 1 (ID: 15) as player1
+DEBUG 2024-11-28 13:45:51,174 consumer Slot 2: player_id=3, username=giovanni
+DEBUG 2024-11-28 13:45:51,180 consumer Assigned giovanni to game test - Round 1 - Game 1 (ID: 15) as player2
+DEBUG 2024-11-28 13:45:51,191 consumer Assigning slots 2 to 4 for game test - Round 1 - Game 2.
+DEBUG 2024-11-28 13:45:51,192 consumer Slot 3: player_id=4, username=test
+DEBUG 2024-11-28 13:45:51,196 consumer Assigned test to game test - Round 1 - Game 2 (ID: 16) as player1
+DEBUG 2024-11-28 13:45:51,196 consumer Slot 4: player_id=2, username=marco
+DEBUG 2024-11-28 13:45:51,200 consumer Assigned marco to game test - Round 1 - Game 2 (ID: 16) as player2
+INFO 2024-11-28 13:45:51,205 consumer Notifications sent to all players to join the game.
+INFO 2024-11-28 13:46:04,582 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:49372]
+INFO 2024-11-28 13:46:04,582 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:46:04,590 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.01, 172.18.0.2:48052]
+INFO 2024-11-28 13:46:04,593 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
+INFO 2024-11-28 13:46:04,593 consumer Ready statuses after update: {'1': True, '2': True, '3': False, '4': True}
+INFO 2024-11-28 13:46:04,599 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:46:04,599 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': True, '2': True, '3': False, '4': True}
+INFO 2024-11-28 13:46:04,601 consumer Ready status update sent to group: {'1': True, '2': True, '3': False, '4': True}
+INFO 2024-11-28 13:46:04,601 consumer User test removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:46:04,601 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:46:04,607 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:46:04,618 runserver HTTP GET /api/game/16/ 200 [0.02, 172.18.0.2:48062]
+INFO 2024-11-28 13:46:04,642 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:48068]
+INFO 2024-11-28 13:46:04,643 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.8212557500049613 200 [0.00, 172.18.0.2:48076]
+INFO 2024-11-28 13:46:04,644 runserver HTTP GET /static/js/game.js?v=0.8782502406829256 200 [0.00, 172.18.0.2:48096]
+INFO 2024-11-28 13:46:04,648 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:48090]
+INFO 2024-11-28 13:46:04,658 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.01, 172.18.0.2:48100]
+INFO 2024-11-28 13:46:04,659 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.2:48104]
+INFO 2024-11-28 13:46:04,659 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.2:48116]
+INFO 2024-11-28 13:46:04,661 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.2:48120]
+INFO 2024-11-28 13:46:04,664 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.00, 172.18.0.2:48132]
+INFO 2024-11-28 13:46:04,669 runserver WebSocket HANDSHAKING /wss/game/16/ [172.18.0.2:48152]
+INFO 2024-11-28 13:46:04,672 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.2:48128]
+INFO 2024-11-28 13:46:04,674 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.2:48148]
+INFO 2024-11-28 13:46:04,678 runserver WebSocket CONNECT /wss/game/16/ [172.18.0.2:48152]
+INFO 2024-11-28 13:46:04,679 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.01, 172.18.0.2:48170]
+INFO 2024-11-28 13:46:04,679 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.01, 172.18.0.2:48168]
+INFO 2024-11-28 13:46:04,693 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.2:48184]
+INFO 2024-11-28 13:46:04,728 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.2:48190]
+INFO 2024-11-28 13:46:04,933 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.2:48198]
+INFO 2024-11-28 13:46:04,949 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.2:48232]
+INFO 2024-11-28 13:46:04,950 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.2:48224]
+INFO 2024-11-28 13:46:04,952 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.2:48250]
+INFO 2024-11-28 13:46:04,954 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.2:48220]
+INFO 2024-11-28 13:46:04,955 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.2:48206]
+INFO 2024-11-28 13:46:04,955 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.2:48236]
+INFO 2024-11-28 13:46:04,960 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.2:48274]
+INFO 2024-11-28 13:46:04,961 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.2:48262]
+INFO 2024-11-28 13:46:05,309 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:34830]
+INFO 2024-11-28 13:46:05,310 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:46:05,319 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.01, 172.18.0.2:55912]
+INFO 2024-11-28 13:46:05,323 consumer Ready statuses before update: {'1': True, '2': True, '3': False, '4': True}
+INFO 2024-11-28 13:46:05,323 consumer Ready statuses after update: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:05,327 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:46:05,327 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:05,328 consumer Ready status update sent to group: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:05,328 consumer User marco removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:46:05,328 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:46:05,335 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:46:05,340 runserver HTTP GET /api/game/16/ 200 [0.02, 172.18.0.2:55918]
+INFO 2024-11-28 13:46:05,346 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:55922]
+INFO 2024-11-28 13:46:05,355 runserver HTTP GET /static/js/game.js?v=0.5361701907230565 200 [0.01, 172.18.0.2:55928]
+INFO 2024-11-28 13:46:05,356 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.41955397752912305 200 [0.01, 172.18.0.2:55938]
+INFO 2024-11-28 13:46:05,359 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:55950]
+INFO 2024-11-28 13:46:05,369 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.00, 172.18.0.2:55980]
+INFO 2024-11-28 13:46:05,369 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.2:55966]
+INFO 2024-11-28 13:46:05,369 runserver HTTP GET /static/js/game/src/Init.js 200 [0.00, 172.18.0.2:55974]
+INFO 2024-11-28 13:46:05,376 runserver WebSocket HANDSHAKING /wss/game/16/ [172.18.0.2:56034]
+INFO 2024-11-28 13:46:05,380 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.2:56020]
+INFO 2024-11-28 13:46:05,380 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.2:56004]
+INFO 2024-11-28 13:46:05,384 runserver WebSocket CONNECT /wss/game/16/ [172.18.0.2:56034]
+INFO 2024-11-28 13:46:05,384 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.2:55994]
+INFO 2024-11-28 13:46:05,386 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.01, 172.18.0.2:56048]
+INFO 2024-11-28 13:46:05,386 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.2:56032]
+INFO 2024-11-28 13:46:05,388 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.01, 172.18.0.2:56046]
+INFO 2024-11-28 13:46:05,398 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.2:56060]
+INFO 2024-11-28 13:46:05,434 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.2:56068]
+INFO 2024-11-28 13:46:05,530 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.2:56080]
+INFO 2024-11-28 13:46:05,541 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.2:56088]
+INFO 2024-11-28 13:46:05,541 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.2:56118]
+INFO 2024-11-28 13:46:05,542 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.2:56120]
+INFO 2024-11-28 13:46:05,543 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.2:56082]
+INFO 2024-11-28 13:46:05,544 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.2:56100]
+INFO 2024-11-28 13:46:05,545 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.2:56102]
+INFO 2024-11-28 13:46:05,557 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.2:56148]
+INFO 2024-11-28 13:46:05,558 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.2:56134]
+INFO 2024-11-28 13:46:08,504 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:41060]
+INFO 2024-11-28 13:46:08,504 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:46:08,510 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:56156]
+INFO 2024-11-28 13:46:08,513 consumer Ready statuses before update: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:08,513 consumer Ready statuses after update: {'1': False, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:08,519 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:46:08,519 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': False, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:08,519 consumer Ready status update sent to group: {'1': False, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:08,520 consumer User luca removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:46:08,520 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:46:08,527 runserver HTTP GET /api/game/15/ 200 [0.01, 172.18.0.2:56158]
+INFO 2024-11-28 13:46:08,527 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:46:08,533 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.3280768863416085 200 [0.00, 172.18.0.2:56168]
+INFO 2024-11-28 13:46:08,542 runserver HTTP GET /static/js/game.js?v=0.8960656807972478 200 [0.00, 172.18.0.2:56182]
+INFO 2024-11-28 13:46:08,551 runserver WebSocket HANDSHAKING /wss/game/15/ [172.18.0.2:56198]
+INFO 2024-11-28 13:46:08,556 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.01, 172.18.0.2:56186]
+INFO 2024-11-28 13:46:08,557 runserver WebSocket CONNECT /wss/game/15/ [172.18.0.2:56198]
+INFO 2024-11-28 13:46:08,559 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.2:56202]
+INFO 2024-11-28 13:46:08,559 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.2:56218]
+INFO 2024-11-28 13:46:08,561 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.2:56236]
+INFO 2024-11-28 13:46:08,562 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.2:56228]
+INFO 2024-11-28 13:46:08,563 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.00, 172.18.0.2:56246]
+INFO 2024-11-28 13:46:08,564 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.2:56242]
+INFO 2024-11-28 13:46:08,594 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.2:56248]
+INFO 2024-11-28 13:46:08,595 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.2:56250]
+INFO 2024-11-28 13:46:08,605 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.2:56258]
+INFO 2024-11-28 13:46:08,641 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.2:56272]
+INFO 2024-11-28 13:46:08,721 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.2:56286]
+INFO 2024-11-28 13:46:08,724 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.00, 172.18.0.2:56298]
+INFO 2024-11-28 13:46:08,728 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.00, 172.18.0.2:56314]
+INFO 2024-11-28 13:46:08,732 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.2:56338]
+INFO 2024-11-28 13:46:08,733 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.00, 172.18.0.2:56324]
+INFO 2024-11-28 13:46:08,740 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.00, 172.18.0.2:56346]
+INFO 2024-11-28 13:46:08,742 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.2:56344]
+INFO 2024-11-28 13:46:08,744 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.2:56360]
+INFO 2024-11-28 13:46:08,746 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.2:56366]
+INFO 2024-11-28 13:46:09,292 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:50676]
+INFO 2024-11-28 13:46:09,292 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:46:09,301 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:56376]
+INFO 2024-11-28 13:46:09,303 consumer Ready statuses before update: {'1': False, '2': True, '3': False, '4': False}
+INFO 2024-11-28 13:46:09,303 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:46:09,308 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:46:09,308 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:46:09,308 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:46:09,308 consumer User giovanni removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:46:09,308 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:46:09,314 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:46:09,318 runserver HTTP GET /api/game/15/ 200 [0.01, 172.18.0.2:56384]
+INFO 2024-11-28 13:46:09,325 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:56400]
+INFO 2024-11-28 13:46:09,333 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.35372103977069225 200 [0.00, 172.18.0.2:56428]
+INFO 2024-11-28 13:46:09,334 runserver HTTP GET /static/js/game.js?v=0.8338118448434217 200 [0.01, 172.18.0.2:56416]
+INFO 2024-11-28 13:46:09,336 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:56434]
+INFO 2024-11-28 13:46:09,345 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.2:56440]
+INFO 2024-11-28 13:46:09,346 runserver HTTP GET /static/js/game/src/Init.js 200 [0.00, 172.18.0.2:56448]
+INFO 2024-11-28 13:46:09,347 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.00, 172.18.0.2:56462]
+INFO 2024-11-28 13:46:09,350 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.00, 172.18.0.2:56470]
+INFO 2024-11-28 13:46:09,355 runserver WebSocket HANDSHAKING /wss/game/15/ [172.18.0.2:56524]
+INFO 2024-11-28 13:46:09,357 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.2:56480]
+INFO 2024-11-28 13:46:09,358 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.2:56494]
+INFO 2024-11-28 13:46:09,360 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.2:56474]
+INFO 2024-11-28 13:46:09,362 runserver WebSocket CONNECT /wss/game/15/ [172.18.0.2:56524]
+INFO 2024-11-28 13:46:09,363 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.01, 172.18.0.2:56508]
+INFO 2024-11-28 13:46:09,363 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.01, 172.18.0.2:56538]
+INFO 2024-11-28 13:46:09,372 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.2:56550]
+INFO 2024-11-28 13:46:09,404 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.2:56554]
+INFO 2024-11-28 13:46:09,666 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.2:56556]
+INFO 2024-11-28 13:46:09,675 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.00, 172.18.0.2:56582]
+INFO 2024-11-28 13:46:09,676 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.00, 172.18.0.2:56596]
+INFO 2024-11-28 13:46:09,677 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.2:56622]
+INFO 2024-11-28 13:46:09,678 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.2:56566]
+INFO 2024-11-28 13:46:09,678 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.2:56606]
+INFO 2024-11-28 13:46:09,679 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.2:56568]
+INFO 2024-11-28 13:46:09,686 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.2:56630]
+INFO 2024-11-28 13:46:09,686 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.2:56644]
+INFO 2024-11-28 13:46:59,738 runserver WebSocket DISCONNECT /wss/game/15/ [172.18.0.2:56198]
+INFO 2024-11-28 13:46:59,753 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.2:49444]
+INFO 2024-11-28 13:46:59,855 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49456]
+INFO 2024-11-28 13:46:59,874 runserver HTTP GET /api/tournament_lobby/7/ 200 [0.01, 172.18.0.2:49464]
+INFO 2024-11-28 13:46:59,881 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.2:49470]
+INFO 2024-11-28 13:46:59,884 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.2:49478]
+INFO 2024-11-28 13:46:59,891 runserver WebSocket HANDSHAKING /wss/socket-server/ [172.18.0.2:49484]
+INFO 2024-11-28 13:46:59,892 runserver WebSocket CONNECT /wss/socket-server/ [172.18.0.2:49484]
+INFO 2024-11-28 13:46:59,897 runserver WebSocket HANDSHAKING /wss/tournament/7/ [172.18.0.2:49496]
+INFO 2024-11-28 13:46:59,900 consumer Connecting to tournament room: tournament_7 with tournament_id: 7
+INFO 2024-11-28 13:46:59,906 consumer User luca connected successfully.
+INFO 2024-11-28 13:46:59,908 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:49502]
+INFO 2024-11-28 13:46:59,908 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:49508]
+INFO 2024-11-28 13:46:59,914 runserver WebSocket CONNECT /wss/tournament/7/ [172.18.0.2:49496]
+INFO 2024-11-28 13:46:59,914 consumer Connection accepted.
+INFO 2024-11-28 13:46:59,962 consumer Received message: {'action': 'join', 'round_id_lobby': '7', 'username': 'luca'}
+DEBUG 2024-11-28 13:46:59,971 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:46:59,971 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:46:59,972 consumer User luca joined lobby via WebSocket.
+DEBUG 2024-11-28 13:46:59,972 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:46:59,973 consumer Attempting to retrieve user list for tournament_id: 7
+DEBUG 2024-11-28 13:46:59,973 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:46:59,979 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:46:59,981 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:49514]
+INFO 2024-11-28 13:46:59,982 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:49520]
+INFO 2024-11-28 13:46:59,988 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 13:46:59,988 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:46:59,993 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:00,001 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 13:47:00,003 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49526]
+DEBUG 2024-11-28 13:47:00,046 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:00,047 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:00,052 runserver HTTP GET /api/request_user/2/ 200 [0.01, 172.18.0.2:49532]
+INFO 2024-11-28 13:47:00,104 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49544]
+DEBUG 2024-11-28 13:47:00,173 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:00,174 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:00,179 runserver HTTP GET /api/request_user/3/ 200 [0.01, 172.18.0.2:49552]
+INFO 2024-11-28 13:47:00,250 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49558]
+DEBUG 2024-11-28 13:47:00,264 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:00,265 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:00,270 runserver HTTP GET /api/request_user/4/ 200 [0.01, 172.18.0.2:49574]
+INFO 2024-11-28 13:47:00,282 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49578]
+DEBUG 2024-11-28 13:47:00,296 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:00,298 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:00,303 runserver HTTP GET /api/request_user/1/ 200 [0.01, 172.18.0.2:49590]
+INFO 2024-11-28 13:47:03,469 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:49496]
+INFO 2024-11-28 13:47:03,470 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:47:03,479 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:03,479 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:03,487 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:47:03,487 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:03,488 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:03,488 consumer User luca removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:47:03,488 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:03,492 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:03,533 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49604]
+INFO 2024-11-28 13:47:03,557 runserver HTTP GET /api/profile/1/ 200 [0.01, 172.18.0.2:49608]
+INFO 2024-11-28 13:47:03,563 runserver HTTP GET /static/js/profile.js 200 [0.00, 172.18.0.2:49612]
+INFO 2024-11-28 13:47:03,577 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49620]
+INFO 2024-11-28 13:47:03,581 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.2:49616]
+DEBUG 2024-11-28 13:47:03,618 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:03,619 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:03,624 runserver HTTP GET /api/userinfo/1/ 200 [0.01, 172.18.0.2:49630]
+INFO 2024-11-28 13:47:04,981 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:49634]
+INFO 2024-11-28 13:47:04,995 runserver HTTP GET /api/dashboard_nav/ 200 [0.01, 172.18.0.2:49646]
+INFO 2024-11-28 13:47:05,000 runserver HTTP GET /static/js/dashboard.js 200 [0.00, 172.18.0.2:49652]
+INFO 2024-11-28 13:47:05,010 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.2:49666]
+INFO 2024-11-28 13:47:17,620 runserver WebSocket DISCONNECT /wss/game/15/ [172.18.0.2:56524]
+INFO 2024-11-28 13:47:17,631 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.2:54628]
+INFO 2024-11-28 13:47:17,734 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.00, 172.18.0.2:54636]
+INFO 2024-11-28 13:47:17,749 runserver HTTP GET /api/tournament_lobby/7/ 200 [0.01, 172.18.0.2:54642]
+INFO 2024-11-28 13:47:17,759 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:54658]
+INFO 2024-11-28 13:47:17,760 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.2:54672]
+INFO 2024-11-28 13:47:17,760 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.2:54682]
+INFO 2024-11-28 13:47:17,763 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:54692]
+INFO 2024-11-28 13:47:17,765 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.2:48248]
+INFO 2024-11-28 13:47:17,774 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:54702]
+DEBUG 2024-11-28 13:47:17,785 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,786 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:17,789 runserver WebSocket HANDSHAKING /wss/socket-server/ [172.18.0.2:54730]
+INFO 2024-11-28 13:47:17,791 runserver WebSocket CONNECT /wss/socket-server/ [172.18.0.2:54730]
+INFO 2024-11-28 13:47:17,792 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:54714]
+INFO 2024-11-28 13:47:17,804 runserver WebSocket HANDSHAKING /wss/tournament/7/ [172.18.0.2:54772]
+INFO 2024-11-28 13:47:17,806 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:54742]
+INFO 2024-11-28 13:47:17,807 consumer Connecting to tournament room: tournament_7 with tournament_id: 7
+INFO 2024-11-28 13:47:17,808 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:54760]
+INFO 2024-11-28 13:47:17,810 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54766]
+INFO 2024-11-28 13:47:17,810 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54754]
+INFO 2024-11-28 13:47:17,813 consumer User giovanni connected successfully.
+DEBUG 2024-11-28 13:47:17,827 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:17,827 runserver WebSocket CONNECT /wss/tournament/7/ [172.18.0.2:54772]
+INFO 2024-11-28 13:47:17,827 consumer Connection accepted.
+DEBUG 2024-11-28 13:47:17,828 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,829 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:17,830 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,830 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:17,830 consumer Received message: {'action': 'join', 'round_id_lobby': '7', 'username': 'giovanni'}
+DEBUG 2024-11-28 13:47:17,832 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,833 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:17,837 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:17,847 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:54782]
+INFO 2024-11-28 13:47:17,848 consumer User giovanni joined lobby via WebSocket.
+INFO 2024-11-28 13:47:17,848 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:17,849 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:54792]
+INFO 2024-11-28 13:47:17,851 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:54796]
+INFO 2024-11-28 13:47:17,852 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:54800]
+INFO 2024-11-28 13:47:17,855 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:17,864 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:54816]
+INFO 2024-11-28 13:47:17,865 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 13:47:17,865 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:17,867 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54826]
+INFO 2024-11-28 13:47:17,868 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54822]
+INFO 2024-11-28 13:47:17,871 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+DEBUG 2024-11-28 13:47:17,880 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,883 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,883 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:17,883 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:17,883 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+DEBUG 2024-11-28 13:47:17,885 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:17,886 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:17,896 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:54834]
+INFO 2024-11-28 13:47:17,896 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:54840]
+INFO 2024-11-28 13:47:17,898 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:54846]
+INFO 2024-11-28 13:47:17,910 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:54850]
+INFO 2024-11-28 13:47:17,911 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54852]
+INFO 2024-11-28 13:47:17,912 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54868]
+DEBUG 2024-11-28 13:47:17,924 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,926 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:17,927 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,927 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,929 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:17,930 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:17,938 runserver HTTP GET /api/request_user/4/ 200 [0.02, 172.18.0.2:54874]
+INFO 2024-11-28 13:47:17,939 runserver HTTP GET /api/request_user/4/ 200 [0.02, 172.18.0.2:54894]
+INFO 2024-11-28 13:47:17,940 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:54888]
+INFO 2024-11-28 13:47:17,947 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:54908]
+INFO 2024-11-28 13:47:17,949 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54916]
+DEBUG 2024-11-28 13:47:17,960 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,962 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:17,969 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:54924]
+DEBUG 2024-11-28 13:47:17,972 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,974 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:17,979 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:54934]
+INFO 2024-11-28 13:47:17,981 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:54932]
+INFO 2024-11-28 13:47:17,990 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:54946]
+DEBUG 2024-11-28 13:47:17,992 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:17,994 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:17,999 runserver HTTP GET /api/request_user/3/ 200 [0.02, 172.18.0.2:54938]
+DEBUG 2024-11-28 13:47:18,002 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:18,004 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:18,008 runserver HTTP GET /api/request_user/3/ 200 [0.02, 172.18.0.2:54952]
+INFO 2024-11-28 13:47:19,829 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:54772]
+INFO 2024-11-28 13:47:19,830 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:47:19,838 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:19,838 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:19,847 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:47:19,847 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:19,847 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:19,847 consumer User giovanni removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:47:19,847 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:19,852 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:19,901 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.00, 172.18.0.2:54966]
+INFO 2024-11-28 13:47:19,918 runserver HTTP GET /api/profile/3/ 200 [0.01, 172.18.0.2:54982]
+INFO 2024-11-28 13:47:19,928 runserver HTTP GET /static/media/profiles/default.png 200 [0.01, 172.18.0.2:54984]
+INFO 2024-11-28 13:47:19,929 runserver HTTP GET /static/js/profile.js 200 [0.00, 172.18.0.2:54990]
+INFO 2024-11-28 13:47:19,934 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:55002]
+INFO 2024-11-28 13:47:19,942 runserver HTTP GET /api/request_status/3/ 200 [0.02, 172.18.0.2:54994]
+INFO 2024-11-28 13:47:19,943 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:55008]
+DEBUG 2024-11-28 13:47:19,955 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:19,957 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:19,962 runserver HTTP GET /api/userinfo/3/ 200 [0.02, 172.18.0.2:55010]
+INFO 2024-11-28 13:47:25,910 runserver WebSocket DISCONNECT /wss/game/16/ [172.18.0.2:48152]
+INFO 2024-11-28 13:47:25,924 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.2:37024]
+INFO 2024-11-28 13:47:26,011 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.00, 172.18.0.2:37036]
+INFO 2024-11-28 13:47:26,038 runserver HTTP GET /api/tournament_lobby/7/ 200 [0.01, 172.18.0.2:37042]
+INFO 2024-11-28 13:47:26,045 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:37044]
+INFO 2024-11-28 13:47:26,055 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.2:37046]
+INFO 2024-11-28 13:47:26,062 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.2:36114]
+INFO 2024-11-28 13:47:26,067 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.01, 172.18.0.2:37066]
+INFO 2024-11-28 13:47:26,073 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:37050]
+INFO 2024-11-28 13:47:26,076 runserver WebSocket HANDSHAKING /wss/socket-server/ [172.18.0.2:37098]
+INFO 2024-11-28 13:47:26,078 runserver WebSocket CONNECT /wss/socket-server/ [172.18.0.2:37098]
+INFO 2024-11-28 13:47:26,082 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:37082]
+INFO 2024-11-28 13:47:26,088 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.02, 172.18.0.2:37088]
+INFO 2024-11-28 13:47:26,101 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.02, 172.18.0.2:37100]
+INFO 2024-11-28 13:47:26,107 runserver WebSocket HANDSHAKING /wss/tournament/7/ [172.18.0.2:37144]
+DEBUG 2024-11-28 13:47:26,107 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,110 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:26,110 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,113 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:26,114 consumer Connecting to tournament room: tournament_7 with tournament_id: 7
+INFO 2024-11-28 13:47:26,119 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.03, 172.18.0.2:37116]
+INFO 2024-11-28 13:47:26,120 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.03, 172.18.0.2:37122]
+INFO 2024-11-28 13:47:26,122 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.03, 172.18.0.2:37128]
+INFO 2024-11-28 13:47:26,122 consumer User test connected successfully.
+INFO 2024-11-28 13:47:26,131 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:37104]
+INFO 2024-11-28 13:47:26,133 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:37142]
+DEBUG 2024-11-28 13:47:26,136 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:26,136 runserver WebSocket CONNECT /wss/tournament/7/ [172.18.0.2:37144]
+INFO 2024-11-28 13:47:26,137 consumer Connection accepted.
+DEBUG 2024-11-28 13:47:26,138 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:26,142 consumer Received message: {'action': 'join', 'round_id_lobby': '7', 'username': 'test'}
+DEBUG 2024-11-28 13:47:26,146 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,149 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:26,152 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,153 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:26,159 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:26,161 runserver HTTP GET /api/request_user/4/ 200 [0.05, 172.18.0.2:37152]
+INFO 2024-11-28 13:47:26,162 consumer User test joined lobby via WebSocket.
+DEBUG 2024-11-28 13:47:26,162 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:26,163 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:26,168 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.03, 172.18.0.2:37182]
+INFO 2024-11-28 13:47:26,170 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.03, 172.18.0.2:37178]
+INFO 2024-11-28 13:47:26,170 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:26,171 runserver HTTP GET /api/request_user/3/ 200 [0.05, 172.18.0.2:37158]
+INFO 2024-11-28 13:47:26,174 runserver HTTP GET /api/request_user/4/ 200 [0.05, 172.18.0.2:37166]
+INFO 2024-11-28 13:47:26,177 runserver HTTP GET /api/request_user/1/ 200 [0.05, 172.18.0.2:37170]
+INFO 2024-11-28 13:47:26,187 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 13:47:26,189 consumer Attempting to retrieve user list for tournament_id: 7
+DEBUG 2024-11-28 13:47:26,190 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,193 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:26,196 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:26,196 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+DEBUG 2024-11-28 13:47:26,198 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:26,200 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.02, 172.18.0.2:37202]
+INFO 2024-11-28 13:47:26,203 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.02, 172.18.0.2:37210]
+INFO 2024-11-28 13:47:26,211 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.03, 172.18.0.2:37224]
+INFO 2024-11-28 13:47:26,211 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:37186]
+INFO 2024-11-28 13:47:26,213 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 13:47:26,216 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:37192]
+DEBUG 2024-11-28 13:47:26,223 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,226 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:26,227 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,230 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:26,240 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,242 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:26,243 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.02, 172.18.0.2:37276]
+INFO 2024-11-28 13:47:26,244 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:37238]
+INFO 2024-11-28 13:47:26,245 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:37246]
+INFO 2024-11-28 13:47:26,247 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.03, 172.18.0.2:37272]
+INFO 2024-11-28 13:47:26,250 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:37260]
+INFO 2024-11-28 13:47:26,267 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.01, 172.18.0.2:37314]
+DEBUG 2024-11-28 13:47:26,268 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,268 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:26,269 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.02, 172.18.0.2:37300]
+DEBUG 2024-11-28 13:47:26,270 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:26,271 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:26,276 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.02, 172.18.0.2:37338]
+INFO 2024-11-28 13:47:26,281 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:37326]
+INFO 2024-11-28 13:47:26,283 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:37290]
+DEBUG 2024-11-28 13:47:26,293 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,294 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,296 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:26,297 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:26,303 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,306 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:26,311 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.02, 172.18.0.2:37368]
+INFO 2024-11-28 13:47:26,313 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:37356]
+INFO 2024-11-28 13:47:26,315 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:37344]
+INFO 2024-11-28 13:47:26,316 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.03, 172.18.0.2:37372]
+INFO 2024-11-28 13:47:26,321 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:37366]
+DEBUG 2024-11-28 13:47:26,332 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,334 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:26,334 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,336 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:26,337 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.02, 172.18.0.2:37390]
+INFO 2024-11-28 13:47:26,346 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.02, 172.18.0.2:37412]
+INFO 2024-11-28 13:47:26,348 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37376]
+INFO 2024-11-28 13:47:26,349 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37406]
+INFO 2024-11-28 13:47:26,349 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.02, 172.18.0.2:37418]
+DEBUG 2024-11-28 13:47:26,358 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,360 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:26,367 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,368 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:26,370 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37432]
+DEBUG 2024-11-28 13:47:26,372 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,375 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:26,382 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37434]
+INFO 2024-11-28 13:47:26,384 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37442]
+INFO 2024-11-28 13:47:26,387 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:37458]
+INFO 2024-11-28 13:47:26,393 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:37474]
+INFO 2024-11-28 13:47:26,396 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.01, 172.18.0.2:37476]
+DEBUG 2024-11-28 13:47:26,402 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,404 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:26,411 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:26,412 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:26,413 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:26,415 runserver HTTP GET /api/request_user/4/ 200 [0.02, 172.18.0.2:37488]
+DEBUG 2024-11-28 13:47:26,415 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:26,422 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:37498]
+INFO 2024-11-28 13:47:26,424 runserver HTTP GET /api/request_user/4/ 200 [0.02, 172.18.0.2:37500]
+INFO 2024-11-28 13:47:27,595 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:37144]
+INFO 2024-11-28 13:47:27,596 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:47:27,604 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:27,605 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:27,613 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:47:27,613 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:27,613 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:27,614 consumer User test removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:47:27,614 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:27,619 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:27,671 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.00, 172.18.0.2:37508]
+INFO 2024-11-28 13:47:27,687 runserver HTTP GET /api/profile/4/ 200 [0.01, 172.18.0.2:37524]
+INFO 2024-11-28 13:47:27,693 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:37536]
+INFO 2024-11-28 13:47:27,699 runserver HTTP GET /static/js/profile.js 200 [0.00, 172.18.0.2:37542]
+INFO 2024-11-28 13:47:27,711 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:37560]
+INFO 2024-11-28 13:47:27,716 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.01, 172.18.0.2:37568]
+INFO 2024-11-28 13:47:27,718 runserver HTTP GET /api/request_status/4/ 200 [0.02, 172.18.0.2:37554]
+DEBUG 2024-11-28 13:47:27,728 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:27,730 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:27,736 runserver HTTP GET /api/userinfo/4/ 200 [0.01, 172.18.0.2:37572]
+INFO 2024-11-28 13:47:29,003 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.00, 172.18.0.2:37582]
+INFO 2024-11-28 13:47:29,021 runserver HTTP GET /api/dashboard_nav/ 200 [0.01, 172.18.0.2:37596]
+INFO 2024-11-28 13:47:29,033 runserver HTTP GET /static/js/dashboard.js 200 [0.00, 172.18.0.2:37612]
+INFO 2024-11-28 13:47:29,041 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.2:37642]
+INFO 2024-11-28 13:47:29,045 runserver HTTP GET /api/request_status/4/ 200 [0.01, 172.18.0.2:37626]
+INFO 2024-11-28 13:47:34,272 runserver WebSocket DISCONNECT /wss/game/16/ [172.18.0.2:56034]
+INFO 2024-11-28 13:47:34,285 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.2:37650]
+INFO 2024-11-28 13:47:34,505 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.00, 172.18.0.2:37664]
+INFO 2024-11-28 13:47:34,520 runserver HTTP GET /api/tournament_lobby/7/ 200 [0.01, 172.18.0.2:37670]
+INFO 2024-11-28 13:47:34,526 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:37672]
+INFO 2024-11-28 13:47:34,534 runserver HTTP GET /static/js/dashboard-base.js 200 [0.01, 172.18.0.2:37682]
+INFO 2024-11-28 13:47:34,535 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.2:37698]
+INFO 2024-11-28 13:47:34,538 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:37694]
+INFO 2024-11-28 13:47:34,541 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.2:48020]
+INFO 2024-11-28 13:47:34,556 runserver WebSocket HANDSHAKING /wss/tournament/7/ [172.18.0.2:37722]
+INFO 2024-11-28 13:47:34,558 consumer Connecting to tournament room: tournament_7 with tournament_id: 7
+INFO 2024-11-28 13:47:34,559 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:37718]
+INFO 2024-11-28 13:47:34,560 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.01, 172.18.0.2:37702]
+INFO 2024-11-28 13:47:34,561 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.02, 172.18.0.2:37700]
+INFO 2024-11-28 13:47:34,564 consumer User marco connected successfully.
+DEBUG 2024-11-28 13:47:34,575 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:34,576 runserver WebSocket CONNECT /wss/tournament/7/ [172.18.0.2:37722]
+INFO 2024-11-28 13:47:34,577 consumer Connection accepted.
+DEBUG 2024-11-28 13:47:34,577 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,579 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:34,580 consumer Received message: {'action': 'join', 'round_id_lobby': '7', 'username': 'marco'}
+DEBUG 2024-11-28 13:47:34,581 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,581 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:34,583 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,592 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:37738]
+INFO 2024-11-28 13:47:34,592 consumer User marco joined lobby via WebSocket.
+INFO 2024-11-28 13:47:34,593 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:34,593 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:37762]
+INFO 2024-11-28 13:47:34,594 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37754]
+INFO 2024-11-28 13:47:34,601 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:34,602 runserver WebSocket HANDSHAKING /wss/socket-server/ [172.18.0.2:37802]
+INFO 2024-11-28 13:47:34,610 runserver WebSocket CONNECT /wss/socket-server/ [172.18.0.2:37802]
+INFO 2024-11-28 13:47:34,611 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:37776]
+INFO 2024-11-28 13:47:34,614 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.02, 172.18.0.2:37792]
+INFO 2024-11-28 13:47:34,616 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.02, 172.18.0.2:37800]
+INFO 2024-11-28 13:47:34,617 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 13:47:34,617 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:34,626 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+DEBUG 2024-11-28 13:47:34,632 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,636 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,636 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,638 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:34,646 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.03, 172.18.0.2:37812]
+INFO 2024-11-28 13:47:34,649 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+DEBUG 2024-11-28 13:47:34,651 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,654 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:34,661 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:37824]
+INFO 2024-11-28 13:47:34,661 runserver HTTP GET /api/request_user/1/ 200 [0.05, 172.18.0.2:37820]
+INFO 2024-11-28 13:47:34,668 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.04, 172.18.0.2:37856]
+INFO 2024-11-28 13:47:34,669 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.04, 172.18.0.2:37882]
+INFO 2024-11-28 13:47:34,669 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.04, 172.18.0.2:37840]
+DEBUG 2024-11-28 13:47:34,672 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:34,672 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.04, 172.18.0.2:37868]
+DEBUG 2024-11-28 13:47:34,673 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:34,681 runserver HTTP GET /api/request_user/1/ 200 [0.06, 172.18.0.2:37828]
+INFO 2024-11-28 13:47:34,688 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:37888]
+INFO 2024-11-28 13:47:34,698 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.03, 172.18.0.2:37902]
+DEBUG 2024-11-28 13:47:34,699 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,700 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,701 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,702 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,703 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,704 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,706 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,707 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.04, 172.18.0.2:37916]
+DEBUG 2024-11-28 13:47:34,709 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,756 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.07, 172.18.0.2:37966]
+INFO 2024-11-28 13:47:34,758 runserver HTTP GET /api/request_user/2/ 200 [0.08, 172.18.0.2:37954]
+INFO 2024-11-28 13:47:34,759 runserver HTTP GET /api/request_user/1/ 200 [0.08, 172.18.0.2:37924]
+INFO 2024-11-28 13:47:34,760 runserver HTTP GET /api/request_user/4/ 200 [0.08, 172.18.0.2:37964]
+INFO 2024-11-28 13:47:34,761 runserver HTTP GET /api/request_user/3/ 200 [0.08, 172.18.0.2:37940]
+DEBUG 2024-11-28 13:47:34,765 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,769 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:34,772 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,773 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,784 runserver HTTP GET /api/request_user/3/ 200 [0.08, 172.18.0.2:37980]
+DEBUG 2024-11-28 13:47:34,789 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:34,790 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:37990]
+DEBUG 2024-11-28 13:47:34,791 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,792 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.02, 172.18.0.2:38022]
+INFO 2024-11-28 13:47:34,794 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.03, 172.18.0.2:38034]
+INFO 2024-11-28 13:47:34,795 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.03, 172.18.0.2:38040]
+INFO 2024-11-28 13:47:34,796 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.03, 172.18.0.2:38050]
+INFO 2024-11-28 13:47:34,807 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:38006]
+DEBUG 2024-11-28 13:47:34,822 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,823 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,824 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,825 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:34,826 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.04, 172.18.0.2:38060]
+DEBUG 2024-11-28 13:47:34,828 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,833 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,834 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,836 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:34,842 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.05, 172.18.0.2:38072]
+INFO 2024-11-28 13:47:34,847 runserver HTTP GET /api/request_user/1/ 200 [0.05, 172.18.0.2:38084]
+INFO 2024-11-28 13:47:34,850 runserver HTTP GET /api/request_user/1/ 200 [0.05, 172.18.0.2:38076]
+INFO 2024-11-28 13:47:34,855 runserver HTTP GET /api/request_user/1/ 200 [0.05, 172.18.0.2:38078]
+INFO 2024-11-28 13:47:34,855 runserver HTTP GET /api/request_user/1/ 200 [0.05, 172.18.0.2:38092]
+INFO 2024-11-28 13:47:34,856 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.04, 172.18.0.2:38108]
+DEBUG 2024-11-28 13:47:34,858 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,859 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:34,870 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,872 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,875 runserver HTTP GET /api/request_user/4/ 200 [0.04, 172.18.0.2:38114]
+INFO 2024-11-28 13:47:34,880 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.03, 172.18.0.2:38140]
+DEBUG 2024-11-28 13:47:34,883 views User profile: pageloader.Game.None
+INFO 2024-11-28 13:47:34,884 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.03, 172.18.0.2:38146]
+DEBUG 2024-11-28 13:47:34,885 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,887 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.03, 172.18.0.2:38156]
+INFO 2024-11-28 13:47:34,888 runserver HTTP GET /api/request_user/4/ 200 [0.04, 172.18.0.2:38126]
+INFO 2024-11-28 13:47:34,892 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.03, 172.18.0.2:38162]
+INFO 2024-11-28 13:47:34,899 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:38164]
+DEBUG 2024-11-28 13:47:34,904 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,906 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:34,907 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,909 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,909 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:34,911 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:34,911 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,915 views Game history: <QuerySet []>
+INFO 2024-11-28 13:47:34,921 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:38180]
+INFO 2024-11-28 13:47:34,924 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:38208]
+INFO 2024-11-28 13:47:34,925 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:38196]
+INFO 2024-11-28 13:47:34,928 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:38220]
+INFO 2024-11-28 13:47:34,940 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:38224]
+INFO 2024-11-28 13:47:34,942 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.01, 172.18.0.2:38226]
+INFO 2024-11-28 13:47:34,943 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.01, 172.18.0.2:38242]
+INFO 2024-11-28 13:47:34,947 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.01, 172.18.0.2:38246]
+DEBUG 2024-11-28 13:47:34,958 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,958 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,960 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,961 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 13:47:34,961 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,966 views Game history: <QuerySet []>
+DEBUG 2024-11-28 13:47:34,967 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,970 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:34,975 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:38260]
+INFO 2024-11-28 13:47:34,977 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:38272]
+INFO 2024-11-28 13:47:34,978 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:38280]
+INFO 2024-11-28 13:47:34,979 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:38296]
+INFO 2024-11-28 13:47:34,985 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.00, 172.18.0.2:38312]
+DEBUG 2024-11-28 13:47:34,995 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:34,996 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:35,003 runserver HTTP GET /api/request_user/2/ 200 [0.01, 172.18.0.2:38318]
+INFO 2024-11-28 13:47:37,711 runserver WebSocket DISCONNECT /wss/tournament/7/ [172.18.0.2:37722]
+INFO 2024-11-28 13:47:37,711 consumer Disconnecting from tournament room: tournament_7 with close code: None
+INFO 2024-11-28 13:47:37,720 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:37,720 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:37,728 consumer Ready status saved successfully in the round database.
+INFO 2024-11-28 13:47:37,728 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:37,729 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
+INFO 2024-11-28 13:47:37,729 consumer User marco removed from lobby, but still in the tournament.
+INFO 2024-11-28 13:47:37,729 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 13:47:37,733 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 13:47:37,784 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.00, 172.18.0.2:58388]
+INFO 2024-11-28 13:47:37,800 runserver HTTP GET /api/profile/2/ 200 [0.01, 172.18.0.2:58394]
+INFO 2024-11-28 13:47:37,808 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:58400]
+INFO 2024-11-28 13:47:37,809 runserver HTTP GET /static/js/profile.js 200 [0.00, 172.18.0.2:58410]
+INFO 2024-11-28 13:47:37,821 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:58430]
+INFO 2024-11-28 13:47:37,822 runserver HTTP GET /api/request_status/2/ 200 [0.02, 172.18.0.2:58424]
+INFO 2024-11-28 13:47:37,825 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.01, 172.18.0.2:58444]
+DEBUG 2024-11-28 13:47:37,835 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 13:47:37,837 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 13:47:37,842 runserver HTTP GET /api/userinfo/2/ 200 [0.01, 172.18.0.2:58446]
+INFO 2024-11-28 13:47:39,567 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.00, 172.18.0.2:58462]
+INFO 2024-11-28 13:47:39,579 runserver HTTP GET /api/dashboard_nav/ 200 [0.01, 172.18.0.2:58468]
+INFO 2024-11-28 13:47:39,586 runserver HTTP GET /static/js/dashboard.js 200 [0.00, 172.18.0.2:58472]
+INFO 2024-11-28 13:47:39,592 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.2:58496]
+INFO 2024-11-28 13:47:39,595 runserver HTTP GET /api/request_status/2/ 200 [0.01, 172.18.0.2:58488]
+INFO 2024-11-28 14:01:23,729 runserver HTTP GET /admin 200 [0.00, 172.18.0.2:43796]
+INFO 2024-11-28 14:01:23,747 runserver HTTP GET /static/css/bootstrap.min.css 304 [0.00, 172.18.0.2:43798]
+INFO 2024-11-28 14:01:23,748 runserver HTTP GET /static/css/style.css 304 [0.00, 172.18.0.2:43812]
+INFO 2024-11-28 14:01:23,749 runserver HTTP GET /static/js/lib/jquery.min.js 304 [0.00, 172.18.0.2:43820]
+INFO 2024-11-28 14:01:23,752 runserver HTTP GET /static/js/lib/popper.min.js 304 [0.00, 172.18.0.2:43822]
+INFO 2024-11-28 14:01:23,753 runserver HTTP GET /static/js/main.js 304 [0.00, 172.18.0.2:43826]
+INFO 2024-11-28 14:01:23,754 runserver HTTP GET /static/js/lib/bootstrap.min.js 304 [0.00, 172.18.0.2:43828]
+INFO 2024-11-28 14:01:23,755 runserver HTTP GET /static/js/game/module/three.min.js 304 [0.00, 172.18.0.2:43836]
+INFO 2024-11-28 14:01:23,999 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzQ5LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6ImNhMTg5ZDljZGU3YTRlOGNiN2ViN2I0NDg1NzQ5MjljIiwidXNlcl9pZCI6MX0.kHXNAkLU2Sb4EMZToEb4D88hRbsNBVmcMjMpo_8bgI4 200 [0.00, 172.18.0.2:43840]
+INFO 2024-11-28 14:01:24,015 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.2:43850]
+INFO 2024-11-28 14:01:24,019 runserver HTTP GET /api/admin 200 [0.00, 172.18.0.2:43866]
+INFO 2024-11-28 14:04:32,454 runserver HTTP GET /admin/ 301 [0.00, 172.18.0.1:42536]
+INFO 2024-11-28 14:04:35,118 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.2:49484]
+INFO 2024-11-28 14:04:35,138 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzU4LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjdlNzE5NjdlMjAyNTQ1NTFiMWJhMzUzYTNlZDg1NjZkIiwidXNlcl9pZCI6Mn0.PzS63UaSv3WSTr2-Si1WdhAPDkEwCb_yYpETjKCJKBk 200 [0.01, 172.18.0.2:34812]
+INFO 2024-11-28 14:04:35,139 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzYyLCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6ImYyZWZhZTU5ZmE1YzRhM2ViMzYwOTRiYTdiZjg1NDMxIiwidXNlcl9pZCI6M30.PAvwzD92cxrTEXCQHZXtDGIzALBUlhnD-qEw8hfVDos 200 [0.01, 172.18.0.2:34802]
+INFO 2024-11-28 14:04:35,146 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAxNzY1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6ImY2YWFhNWQ1MDg3NjQyM2RiN2YwODk5NTM2YjZjNDFmIiwidXNlcl9pZCI6NH0.vtDZrpTQNuZ9j3PSQTDXAI9jViEKQpoS2ib7AblXgvI 200 [0.01, 172.18.0.2:34828]
+INFO 2024-11-28 14:04:35,147 runserver HTTP GET /dashboard/ 200 [0.01, 172.18.0.2:34834]
+INFO 2024-11-28 14:04:35,156 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.2:34848]
+INFO 2024-11-28 14:04:35,159 runserver HTTP POST /api/token/refresh/ 200 [0.02, 172.18.0.2:34864]
+INFO 2024-11-28 14:04:35,167 runserver HTTP POST /api/token/refresh/ 200 [0.02, 172.18.0.2:34868]
+DEBUG 2024-11-28 14:04:35,172 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,174 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,176 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,178 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,186 runserver HTTP GET /api/request_user/2/ 200 [0.02, 172.18.0.2:34870]
+DEBUG 2024-11-28 14:04:35,187 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,189 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,191 runserver HTTP GET /static/css/bootstrap.min.css 200 [0.01, 172.18.0.2:34890]
+INFO 2024-11-28 14:04:35,199 runserver HTTP GET /static/css/style.css 200 [0.01, 172.18.0.2:34894]
+INFO 2024-11-28 14:04:35,199 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:34880]
+INFO 2024-11-28 14:04:35,201 runserver HTTP GET /static/js/lib/bootstrap.min.js 200 [0.01, 172.18.0.2:34918]
+INFO 2024-11-28 14:04:35,201 runserver HTTP GET /static/js/lib/jquery.min.js 200 [0.01, 172.18.0.2:34908]
+INFO 2024-11-28 14:04:35,203 runserver HTTP GET /static/js/lib/popper.min.js 200 [0.01, 172.18.0.2:34938]
+INFO 2024-11-28 14:04:35,203 runserver HTTP GET /static/js/main.js 200 [0.01, 172.18.0.2:34956]
+INFO 2024-11-28 14:04:35,204 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.01, 172.18.0.2:34930]
+INFO 2024-11-28 14:04:35,207 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:34884]
+INFO 2024-11-28 14:04:35,211 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.02, 172.18.0.2:34944]
+INFO 2024-11-28 14:04:35,214 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:34970]
+INFO 2024-11-28 14:04:35,220 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:34980]
+DEBUG 2024-11-28 14:04:35,225 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,228 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:04:35,228 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,230 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,236 runserver HTTP GET /api/request_user/3/ 200 [0.02, 172.18.0.2:34982]
+INFO 2024-11-28 14:04:35,238 runserver HTTP GET /api/request_user/3/ 200 [0.02, 172.18.0.2:34984]
+DEBUG 2024-11-28 14:04:35,240 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,242 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,249 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:34548]
+INFO 2024-11-28 14:04:35,250 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:34550]
+INFO 2024-11-28 14:04:35,250 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:35000]
+INFO 2024-11-28 14:04:35,261 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:34572]
+DEBUG 2024-11-28 14:04:35,263 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,264 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,264 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:04:35,266 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,273 runserver HTTP GET /api/request_user/4/ 200 [0.02, 172.18.0.2:34558]
+INFO 2024-11-28 14:04:35,274 runserver HTTP GET /api/request_user/4/ 200 [0.02, 172.18.0.2:34566]
+DEBUG 2024-11-28 14:04:35,278 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,280 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,287 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:34588]
+INFO 2024-11-28 14:04:35,289 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:34596]
+INFO 2024-11-28 14:04:35,289 runserver HTTP GET /api/request_user/4/ 200 [0.02, 172.18.0.2:34576]
+INFO 2024-11-28 14:04:35,300 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.00, 172.18.0.2:34638]
+DEBUG 2024-11-28 14:04:35,300 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,302 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,302 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,305 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:04:35,311 runserver HTTP GET /api/request_user/2/ 200 [0.02, 172.18.0.2:34608]
+INFO 2024-11-28 14:04:35,312 runserver HTTP GET /api/request_user/2/ 200 [0.02, 172.18.0.2:34622]
+DEBUG 2024-11-28 14:04:35,315 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,316 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:04:35,321 runserver HTTP GET /api/request_user/2/ 200 [0.02, 172.18.0.2:34646]
+INFO 2024-11-28 14:04:35,429 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.2:34662]
+INFO 2024-11-28 14:04:35,547 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.00, 172.18.0.2:34676]
+INFO 2024-11-28 14:04:35,576 runserver HTTP GET /api/dashboard/ 200 [0.01, 172.18.0.2:34692]
+INFO 2024-11-28 14:04:35,606 runserver HTTP GET /static/js/dashboard-base.js 200 [0.01, 172.18.0.2:34698]
+INFO 2024-11-28 14:04:35,606 runserver HTTP GET /static/js/dashboard.js 200 [0.01, 172.18.0.2:34702]
+INFO 2024-11-28 14:04:35,607 runserver HTTP GET /static/media/profiles/default.png 200 [0.01, 172.18.0.2:34708]
+INFO 2024-11-28 14:04:35,611 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.2:34704]
+INFO 2024-11-28 14:04:35,628 runserver WebSocket HANDSHAKING /wss/socket-server/ [172.18.0.2:34716]
+INFO 2024-11-28 14:04:35,630 runserver WebSocket CONNECT /wss/socket-server/ [172.18.0.2:34716]
+INFO 2024-11-28 14:04:35,642 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:34728]
+INFO 2024-11-28 14:04:35,649 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:34736]
+INFO 2024-11-28 14:04:35,650 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:34734]
+INFO 2024-11-28 14:04:35,651 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:34748]
+INFO 2024-11-28 14:04:35,652 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:34762]
+DEBUG 2024-11-28 14:04:35,660 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,662 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,670 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,670 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,672 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,673 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:04:35,674 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,677 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,682 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:34764]
+INFO 2024-11-28 14:04:35,687 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:34776]
+INFO 2024-11-28 14:04:35,687 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:34786]
+INFO 2024-11-28 14:04:35,689 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:34788]
+DEBUG 2024-11-28 14:04:35,692 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,694 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:04:35,706 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:34800]
+INFO 2024-11-28 14:04:35,707 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:34806]
+INFO 2024-11-28 14:04:35,708 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:34820]
+INFO 2024-11-28 14:04:35,709 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.02, 172.18.0.2:34808]
+DEBUG 2024-11-28 14:04:35,722 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,724 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:04:35,726 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,727 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,728 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:04:35,729 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,732 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.02, 172.18.0.2:34858]
+INFO 2024-11-28 14:04:35,737 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:34826]
+INFO 2024-11-28 14:04:35,738 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:34838]
+INFO 2024-11-28 14:04:35,739 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:34842]
+INFO 2024-11-28 14:04:35,753 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:34882]
+DEBUG 2024-11-28 14:04:35,753 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,755 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,756 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:34904]
+INFO 2024-11-28 14:04:35,759 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.02, 172.18.0.2:34892]
+INFO 2024-11-28 14:04:35,769 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:34872]
+DEBUG 2024-11-28 14:04:35,772 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,774 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:04:35,775 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,775 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,778 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:04:35,779 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,790 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:34910]
+INFO 2024-11-28 14:04:35,792 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:34912]
+INFO 2024-11-28 14:04:35,792 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.02, 172.18.0.2:34924]
+INFO 2024-11-28 14:04:35,794 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:34916]
+INFO 2024-11-28 14:04:35,806 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:34926]
+INFO 2024-11-28 14:04:35,808 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:34964]
+DEBUG 2024-11-28 14:04:35,811 views User profile: pageloader.Game.None
+INFO 2024-11-28 14:04:35,812 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:34950]
+DEBUG 2024-11-28 14:04:35,812 views Game history: <QuerySet []>
+INFO 2024-11-28 14:04:35,824 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:34942]
+DEBUG 2024-11-28 14:04:35,827 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,828 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,830 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,830 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,831 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,833 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:04:35,843 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:34986]
+INFO 2024-11-28 14:04:35,845 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:35014]
+INFO 2024-11-28 14:04:35,845 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:35002]
+INFO 2024-11-28 14:04:35,847 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:34988]
+INFO 2024-11-28 14:04:35,859 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:35024]
+INFO 2024-11-28 14:04:35,864 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:35036]
+INFO 2024-11-28 14:04:35,866 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:35040]
+DEBUG 2024-11-28 14:04:35,867 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,869 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,878 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,881 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:04:35,882 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:35048]
+DEBUG 2024-11-28 14:04:35,887 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,888 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,889 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:04:35,890 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:04:35,895 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:35056]
+INFO 2024-11-28 14:04:35,900 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:35072]
+INFO 2024-11-28 14:04:35,900 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:35064]
+INFO 2024-11-28 14:04:35,901 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:35078]
+DEBUG 2024-11-28 14:04:35,967 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:04:35,968 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:04:35,974 runserver HTTP GET /api/request_user/1/ 200 [0.01, 172.18.0.2:35092]
+INFO 2024-11-28 14:05:42,944 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.00, 172.18.0.2:45282]
+INFO 2024-11-28 14:05:42,959 runserver HTTP GET /api/profile/4/ 200 [0.01, 172.18.0.2:45296]
+INFO 2024-11-28 14:05:42,986 runserver HTTP GET /static/js/profile.js 200 [0.00, 172.18.0.2:45310]
+INFO 2024-11-28 14:05:42,991 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:45330]
+INFO 2024-11-28 14:05:42,998 runserver HTTP GET /api/request_status/4/ 200 [0.01, 172.18.0.2:45322]
+INFO 2024-11-28 14:05:43,001 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:45346]
+INFO 2024-11-28 14:05:43,002 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:45348]
+DEBUG 2024-11-28 14:05:43,013 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:05:43,014 views Game history: <QuerySet []>
+INFO 2024-11-28 14:05:43,020 runserver HTTP GET /api/userinfo/4/ 200 [0.01, 172.18.0.2:45350]
+INFO 2024-11-28 14:05:44,857 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.00, 172.18.0.2:45352]
+INFO 2024-11-28 14:05:44,870 runserver HTTP GET /api/dashboard_nav/ 200 [0.01, 172.18.0.2:45360]
+INFO 2024-11-28 14:05:44,883 runserver HTTP GET /static/js/dashboard.js 200 [0.01, 172.18.0.2:45364]
+INFO 2024-11-28 14:05:44,888 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:45382]
+INFO 2024-11-28 14:05:44,893 runserver HTTP GET /api/request_status/4/ 200 [0.01, 172.18.0.2:45368]
+INFO 2024-11-28 14:06:01,415 runserver HTTP GET /dashboard/ 200 [0.00, 172.18.0.2:37478]
+INFO 2024-11-28 14:06:01,435 runserver HTTP GET /static/css/bootstrap.min.css 200 [0.00, 172.18.0.2:37488]
+INFO 2024-11-28 14:06:01,438 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.2:37492]
+INFO 2024-11-28 14:06:01,438 runserver HTTP GET /static/js/lib/popper.min.js 200 [0.00, 172.18.0.2:37516]
+INFO 2024-11-28 14:06:01,440 runserver HTTP GET /static/js/lib/jquery.min.js 200 [0.01, 172.18.0.2:37502]
+INFO 2024-11-28 14:06:01,442 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.2:37542]
+INFO 2024-11-28 14:06:01,443 runserver HTTP GET /static/js/lib/bootstrap.min.js 200 [0.00, 172.18.0.2:37546]
+INFO 2024-11-28 14:06:01,443 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.01, 172.18.0.2:37530]
+INFO 2024-11-28 14:06:01,776 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.00, 172.18.0.2:37550]
+INFO 2024-11-28 14:06:01,810 runserver HTTP GET /api/dashboard/ 200 [0.01, 172.18.0.2:37566]
+INFO 2024-11-28 14:06:01,811 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.2:37574]
+INFO 2024-11-28 14:06:01,819 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.2:37578]
+INFO 2024-11-28 14:06:01,820 runserver HTTP GET /static/js/dashboard.js 200 [0.00, 172.18.0.2:37592]
+INFO 2024-11-28 14:06:01,821 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.2:37602]
+INFO 2024-11-28 14:06:01,829 runserver HTTP GET /api/request_status/4/ 200 [0.01, 172.18.0.2:37594]
+INFO 2024-11-28 14:06:01,839 runserver WebSocket HANDSHAKING /wss/socket-server/ [172.18.0.2:37612]
+INFO 2024-11-28 14:06:01,840 runserver WebSocket CONNECT /wss/socket-server/ [172.18.0.2:37612]
+INFO 2024-11-28 14:06:01,854 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:37624]
+INFO 2024-11-28 14:06:01,863 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:37650]
+INFO 2024-11-28 14:06:01,866 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.02, 172.18.0.2:37644]
+INFO 2024-11-28 14:06:01,867 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.02, 172.18.0.2:37636]
+INFO 2024-11-28 14:06:01,868 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.02, 172.18.0.2:37666]
+DEBUG 2024-11-28 14:06:01,873 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,876 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:01,876 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.02, 172.18.0.2:37682]
+INFO 2024-11-28 14:06:01,886 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:37690]
+DEBUG 2024-11-28 14:06:01,887 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,890 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,890 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:01,891 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,892 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:01,892 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,894 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:01,895 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:01,904 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:37698]
+INFO 2024-11-28 14:06:01,905 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:37710]
+INFO 2024-11-28 14:06:01,907 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:37724]
+INFO 2024-11-28 14:06:01,907 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:37714]
+INFO 2024-11-28 14:06:01,924 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:37762]
+INFO 2024-11-28 14:06:01,924 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.02, 172.18.0.2:37732]
+DEBUG 2024-11-28 14:06:01,925 views User profile: pageloader.Game.None
+INFO 2024-11-28 14:06:01,926 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.02, 172.18.0.2:37754]
+DEBUG 2024-11-28 14:06:01,926 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:01,928 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.02, 172.18.0.2:37774]
+INFO 2024-11-28 14:06:01,941 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:37744]
+DEBUG 2024-11-28 14:06:01,944 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,945 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,947 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,948 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:01,948 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:01,948 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:01,949 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:01,952 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:01,962 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:37820]
+INFO 2024-11-28 14:06:01,963 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37816]
+INFO 2024-11-28 14:06:01,964 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37788]
+INFO 2024-11-28 14:06:01,964 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37804]
+INFO 2024-11-28 14:06:01,967 runserver HTTP GET /api/request_user/3/ 200 [0.04, 172.18.0.2:37790]
+INFO 2024-11-28 14:06:01,980 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:37846]
+DEBUG 2024-11-28 14:06:01,982 views User profile: pageloader.Game.None
+INFO 2024-11-28 14:06:01,983 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:37860]
+INFO 2024-11-28 14:06:01,984 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:37864]
+DEBUG 2024-11-28 14:06:01,984 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:01,990 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.02, 172.18.0.2:37870]
+INFO 2024-11-28 14:06:01,997 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:37832]
+DEBUG 2024-11-28 14:06:02,003 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,005 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,005 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:02,007 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:02,008 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,008 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,011 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:02,012 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:02,023 runserver HTTP GET /api/request_user/4/ 200 [0.04, 172.18.0.2:37884]
+INFO 2024-11-28 14:06:02,024 runserver HTTP GET /api/request_user/4/ 200 [0.04, 172.18.0.2:37908]
+INFO 2024-11-28 14:06:02,026 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:37918]
+INFO 2024-11-28 14:06:02,026 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.02, 172.18.0.2:37922]
+INFO 2024-11-28 14:06:02,027 runserver HTTP GET /api/request_user/4/ 200 [0.04, 172.18.0.2:37892]
+INFO 2024-11-28 14:06:02,039 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:37940]
+INFO 2024-11-28 14:06:02,040 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:37924]
+INFO 2024-11-28 14:06:02,042 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:37952]
+INFO 2024-11-28 14:06:02,042 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:37970]
+DEBUG 2024-11-28 14:06:02,045 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,047 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:02,058 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:37962]
+DEBUG 2024-11-28 14:06:02,061 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,061 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,064 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,064 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:02,064 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,065 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:02,066 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:02,068 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:06:02,079 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.02, 172.18.0.2:38010]
+INFO 2024-11-28 14:06:02,079 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:38000]
+INFO 2024-11-28 14:06:02,081 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:37998]
+INFO 2024-11-28 14:06:02,082 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:37990]
+INFO 2024-11-28 14:06:02,082 runserver HTTP GET /api/request_user/2/ 200 [0.04, 172.18.0.2:37974]
+INFO 2024-11-28 14:06:02,098 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:38048]
+INFO 2024-11-28 14:06:02,098 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:38040]
+INFO 2024-11-28 14:06:02,101 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:38050]
+DEBUG 2024-11-28 14:06:02,101 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,103 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:06:02,104 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.02, 172.18.0.2:38024]
+INFO 2024-11-28 14:06:02,114 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:38030]
+DEBUG 2024-11-28 14:06:02,119 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,120 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,121 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:02,122 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,122 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:02,125 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:02,127 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,132 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:06:02,138 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:38074]
+INFO 2024-11-28 14:06:02,139 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:38064]
+INFO 2024-11-28 14:06:02,141 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.02, 172.18.0.2:38096]
+INFO 2024-11-28 14:06:02,142 runserver HTTP GET /api/request_user/1/ 200 [0.04, 172.18.0.2:38070]
+INFO 2024-11-28 14:06:02,143 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:38082]
+DEBUG 2024-11-28 14:06:02,152 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:02,153 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:06:02,158 runserver HTTP GET /api/request_user/1/ 200 [0.01, 172.18.0.2:38108]
+INFO 2024-11-28 14:06:06,972 runserver HTTP GET /admin 200 [0.00, 172.18.0.2:51522]
+INFO 2024-11-28 14:06:07,017 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.2:37612]
+INFO 2024-11-28 14:06:07,030 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:51554]
+INFO 2024-11-28 14:06:07,032 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:51560]
+INFO 2024-11-28 14:06:07,032 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:51538]
+INFO 2024-11-28 14:06:07,036 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:51568]
+DEBUG 2024-11-28 14:06:07,046 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,048 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,049 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,050 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,051 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:07,053 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,053 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,057 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:07,064 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:51574]
+INFO 2024-11-28 14:06:07,066 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:51594]
+INFO 2024-11-28 14:06:07,067 runserver HTTP GET /api/request_user/1/ 200 [0.03, 172.18.0.2:51582]
+INFO 2024-11-28 14:06:07,069 runserver HTTP GET /api/request_user/4/ 200 [0.03, 172.18.0.2:51598]
+INFO 2024-11-28 14:06:07,080 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:51600]
+INFO 2024-11-28 14:06:07,080 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:51606]
+INFO 2024-11-28 14:06:07,081 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:51612]
+INFO 2024-11-28 14:06:07,082 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:51614]
+DEBUG 2024-11-28 14:06:07,096 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,097 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,099 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:07,099 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,099 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:07,100 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,101 views Game history: <QuerySet []>
+DEBUG 2024-11-28 14:06:07,103 views Game history: <QuerySet []>
+INFO 2024-11-28 14:06:07,111 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:51618]
+INFO 2024-11-28 14:06:07,112 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:51628]
+INFO 2024-11-28 14:06:07,113 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:51632]
+INFO 2024-11-28 14:06:07,114 runserver HTTP GET /api/request_user/3/ 200 [0.03, 172.18.0.2:51638]
+INFO 2024-11-28 14:06:07,125 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:51646]
+INFO 2024-11-28 14:06:07,126 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:51644]
+INFO 2024-11-28 14:06:07,127 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:51662]
+INFO 2024-11-28 14:06:07,128 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:51676]
+DEBUG 2024-11-28 14:06:07,140 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,142 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,143 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,144 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,145 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,146 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,147 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,152 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:06:07,156 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:51690]
+INFO 2024-11-28 14:06:07,158 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:51706]
+INFO 2024-11-28 14:06:07,161 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:51732]
+INFO 2024-11-28 14:06:07,161 runserver HTTP GET /api/request_user/2/ 200 [0.03, 172.18.0.2:51716]
+INFO 2024-11-28 14:06:07,169 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNjMsImp0aSI6IjgzYzAwNzI4MjhhMzQwMDc4YmVkNzNiMjY5MTRkNDE0IiwidXNlcl9pZCI6M30.5QSHIJDhOORXuMGZaUnz8kXh7clEX_62m9KiPLiBbBA 200 [0.01, 172.18.0.2:51738]
+INFO 2024-11-28 14:06:07,171 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxOTgsImp0aSI6IjhjNmE2OTIyYmU5ZjQzZmU4YWE2MTdkNTIwNDBiMTU2IiwidXNlcl9pZCI6Mn0.rWz4SGT2tz89nqrcfF3JH-SRj1Snb4-OaHM8QiI9zr8 200 [0.01, 172.18.0.2:51746]
+INFO 2024-11-28 14:06:07,177 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.01, 172.18.0.2:51766]
+INFO 2024-11-28 14:06:07,177 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.01, 172.18.0.2:51750]
+DEBUG 2024-11-28 14:06:07,185 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,185 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,187 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,188 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,196 views User profile: pageloader.Game.None
+INFO 2024-11-28 14:06:07,197 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:51796]
+INFO 2024-11-28 14:06:07,197 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:51780]
+DEBUG 2024-11-28 14:06:07,197 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+DEBUG 2024-11-28 14:06:07,201 views User profile: pageloader.Game.None
+DEBUG 2024-11-28 14:06:07,203 views Game history: <QuerySet [<Game: Game object (1)>, <Game: Game object (2)>]>
+INFO 2024-11-28 14:06:07,206 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:51812]
+INFO 2024-11-28 14:06:07,209 runserver HTTP GET /api/request_user/1/ 200 [0.02, 172.18.0.2:51816]
+INFO 2024-11-28 14:06:07,296 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.00, 172.18.0.2:51828]
+INFO 2024-11-28 14:06:07,303 runserver HTTP GET /api/admin 200 [0.00, 172.18.0.2:51830]
+INFO 2024-11-28 14:06:07,312 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.2:51834]
+INFO 2024-11-28 14:06:57,721 runserver HTTP GET /admin 200 [0.00, 172.18.0.2:60234]
+INFO 2024-11-28 14:06:57,785 runserver HTTP GET /static/css/bootstrap.min.css 200 [0.00, 172.18.0.2:60244]
+INFO 2024-11-28 14:06:57,786 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.2:60254]
+INFO 2024-11-28 14:06:57,786 runserver HTTP GET /static/js/lib/jquery.min.js 200 [0.00, 172.18.0.2:60260]
+INFO 2024-11-28 14:06:57,800 runserver HTTP GET /static/js/lib/popper.min.js 200 [0.00, 172.18.0.2:60264]
+INFO 2024-11-28 14:06:57,805 runserver HTTP GET /static/js/lib/bootstrap.min.js 200 [0.00, 172.18.0.2:60268]
+INFO 2024-11-28 14:06:57,812 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.2:60284]
+INFO 2024-11-28 14:06:57,848 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.2:60292]
+INFO 2024-11-28 14:06:58,251 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyOTc1LCJpYXQiOjE3MzI4MDAxNDUsImp0aSI6IjEyNzE2MzdmNDZiOTQ2M2Q5NWI4NTlmYWI5YTY5NDY3IiwidXNlcl9pZCI6NH0.ECPSS4M0_NAWEK1cxyMBjR3CYWJNS0UbxG1wUqSNYfs 200 [0.00, 172.18.0.2:60308]
+INFO 2024-11-28 14:06:58,260 runserver HTTP GET /api/admin 200 [0.00, 172.18.0.2:60318]
+INFO 2024-11-28 14:06:58,267 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.2:60330]
+INFO 2024-11-28 14:07:32,464 runserver HTTP GET /admin/ 302 [0.01, 172.18.0.2:35866]
+INFO 2024-11-28 14:07:32,482 runserver HTTP GET /admin/login/?next=/admin/ 200 [0.02, 172.18.0.2:35876]
+INFO 2024-11-28 14:07:32,504 runserver HTTP GET /static/admin/css/dark_mode.css 200 [0.00, 172.18.0.2:35894]
+INFO 2024-11-28 14:07:32,505 runserver HTTP GET /static/admin/css/base.css 200 [0.00, 172.18.0.2:35888]
+INFO 2024-11-28 14:07:32,508 runserver HTTP GET /static/admin/css/nav_sidebar.css 200 [0.01, 172.18.0.2:35906]
+INFO 2024-11-28 14:07:32,509 runserver HTTP GET /static/admin/js/theme.js 200 [0.01, 172.18.0.2:35904]
+INFO 2024-11-28 14:07:32,510 runserver HTTP GET /static/admin/css/login.css 200 [0.01, 172.18.0.2:35934]
+INFO 2024-11-28 14:07:32,510 runserver HTTP GET /static/admin/js/nav_sidebar.js 200 [0.01, 172.18.0.2:35918]
+INFO 2024-11-28 14:07:32,511 runserver HTTP GET /static/admin/css/responsive.css 200 [0.00, 172.18.0.2:35942]
+INFO 2024-11-28 14:07:40,541 runserver HTTP POST /admin/login/?next=/admin/ 302 [0.15, 172.18.0.2:33954]
+INFO 2024-11-28 14:07:40,563 runserver HTTP GET /admin/ 200 [0.02, 172.18.0.2:33962]
+INFO 2024-11-28 14:07:40,610 runserver HTTP GET /static/admin/css/dashboard.css 200 [0.00, 172.18.0.2:33976]
+INFO 2024-11-28 14:07:40,615 runserver HTTP GET /static/admin/img/icon-addlink.svg 200 [0.00, 172.18.0.2:33990]
+INFO 2024-11-28 14:07:40,615 runserver HTTP GET /static/admin/img/icon-changelink.svg 200 [0.00, 172.18.0.2:33996]
+INFO 2024-11-28 14:07:54,209 runserver HTTP GET /admin/pageloader/tournament/ 200 [0.02, 172.18.0.2:44700]
+INFO 2024-11-28 14:07:54,240 runserver HTTP GET /static/admin/js/jquery.init.js 200 [0.00, 172.18.0.2:44732]
+INFO 2024-11-28 14:07:54,241 runserver HTTP GET /static/admin/css/changelists.css 200 [0.01, 172.18.0.2:44710]
+INFO 2024-11-28 14:07:54,242 runserver HTTP GET /static/admin/js/core.js 200 [0.01, 172.18.0.2:44744]
+INFO 2024-11-28 14:07:54,244 runserver HTTP GET /static/admin/js/admin/RelatedObjectLookups.js 200 [0.01, 172.18.0.2:44756]
+INFO 2024-11-28 14:07:54,244 runserver HTTP GET /static/admin/js/vendor/jquery/jquery.js 200 [0.01, 172.18.0.2:44724]
+INFO 2024-11-28 14:07:54,251 runserver HTTP GET /static/admin/js/actions.js 200 [0.01, 172.18.0.2:44764]
+INFO 2024-11-28 14:07:54,251 runserver HTTP GET /static/admin/js/urlify.js 200 [0.01, 172.18.0.2:44766]
+INFO 2024-11-28 14:07:54,252 runserver HTTP GET /static/admin/js/prepopulate.js 200 [0.01, 172.18.0.2:44776]
+INFO 2024-11-28 14:07:54,253 runserver HTTP GET /static/admin/js/filters.js 200 [0.00, 172.18.0.2:44792]
+INFO 2024-11-28 14:07:54,254 runserver HTTP GET /static/admin/js/vendor/xregexp/xregexp.js 200 [0.01, 172.18.0.2:44782]
+INFO 2024-11-28 14:07:54,255 runserver HTTP GET /admin/jsi18n/ 200 [0.02, 172.18.0.2:44720]
+INFO 2024-11-28 14:07:54,270 runserver HTTP GET /static/admin/img/tooltag-add.svg 200 [0.00, 172.18.0.2:44796]
+INFO 2024-11-28 14:07:56,905 runserver HTTP GET /admin/pageloader/tournament/7/change/ 200 [0.04, 172.18.0.2:35556]
+INFO 2024-11-28 14:07:56,926 runserver HTTP GET /static/admin/css/forms.css 200 [0.00, 172.18.0.2:35572]
+INFO 2024-11-28 14:07:56,929 runserver HTTP GET /static/admin/js/prepopulate_init.js 200 [0.00, 172.18.0.2:35592]
+INFO 2024-11-28 14:07:56,929 runserver HTTP GET /static/admin/js/change_form.js 200 [0.01, 172.18.0.2:35590]
+INFO 2024-11-28 14:07:56,931 runserver HTTP GET /static/admin/css/widgets.css 200 [0.00, 172.18.0.2:35596]
+INFO 2024-11-28 14:07:56,934 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:35588]
+INFO 2024-11-28 14:07:56,936 runserver HTTP GET /static/admin/img/icon-viewlink.svg 200 [0.00, 172.18.0.2:35608]
+INFO 2024-11-28 14:08:11,901 runserver HTTP GET /admin/pageloader/game/ 200 [0.02, 172.18.0.2:36018]
+INFO 2024-11-28 14:08:11,931 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:36020]
+INFO 2024-11-28 14:08:14,528 runserver HTTP GET /admin/pageloader/game/1/change/ 200 [0.04, 172.18.0.2:36030]
+INFO 2024-11-28 14:08:14,556 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:36040]
+INFO 2024-11-28 14:08:14,558 runserver HTTP GET /static/admin/img/icon-deletelink.svg 200 [0.00, 172.18.0.2:36042]
+INFO 2024-11-28 14:08:43,377 runserver HTTP POST /admin/pageloader/game/1/change/ 200 [0.04, 172.18.0.2:42640]
+INFO 2024-11-28 14:08:43,397 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:42652]
+INFO 2024-11-28 14:08:53,407 runserver HTTP POST /admin/pageloader/game/1/change/ 302 [0.02, 172.18.0.2:40294]
+INFO 2024-11-28 14:08:53,425 runserver HTTP GET /admin/pageloader/game/ 200 [0.02, 172.18.0.2:40296]
+INFO 2024-11-28 14:08:53,451 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:40308]
+INFO 2024-11-28 14:08:53,466 runserver HTTP GET /static/admin/img/icon-yes.svg 200 [0.00, 172.18.0.2:40310]
+INFO 2024-11-28 14:08:56,364 runserver HTTP GET /admin/pageloader/game/2/change/ 200 [0.05, 172.18.0.2:41844]
+INFO 2024-11-28 14:08:56,392 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:41846]
+INFO 2024-11-28 14:09:01,214 runserver HTTP GET /admin/pageloader/game/ 200 [0.02, 172.18.0.2:41848]
+INFO 2024-11-28 14:09:02,291 runserver HTTP GET /admin/pageloader/game/15/change/ 200 [0.04, 172.18.0.2:41856]
+INFO 2024-11-28 14:09:02,318 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:41872]
+INFO 2024-11-28 14:09:16,691 runserver HTTP POST /admin/pageloader/game/15/change/ 200 [0.04, 172.18.0.2:48910]
+INFO 2024-11-28 14:09:16,710 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:48922]
+INFO 2024-11-28 14:09:33,094 runserver HTTP POST /admin/pageloader/game/15/change/ 302 [0.03, 172.18.0.2:47942]
+INFO 2024-11-28 14:09:33,112 runserver HTTP GET /admin/pageloader/game/ 200 [0.01, 172.18.0.2:47946]
+INFO 2024-11-28 14:09:33,137 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:47948]
+INFO 2024-11-28 14:09:35,792 runserver HTTP GET /admin/pageloader/game/16/change/ 200 [0.04, 172.18.0.2:53296]
+INFO 2024-11-28 14:09:35,814 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:53308]
+INFO 2024-11-28 14:09:57,827 runserver HTTP POST /admin/pageloader/game/16/change/ 200 [0.05, 172.18.0.2:35938]
+INFO 2024-11-28 14:09:57,853 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:35952]
+INFO 2024-11-28 14:10:03,844 runserver HTTP POST /admin/pageloader/game/16/change/ 200 [0.05, 172.18.0.2:35958]
+INFO 2024-11-28 14:10:03,870 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:35966]
+INFO 2024-11-28 14:10:19,021 runserver HTTP POST /admin/pageloader/game/16/change/ 302 [0.02, 172.18.0.2:46810]
+INFO 2024-11-28 14:10:19,039 runserver HTTP GET /admin/pageloader/game/ 200 [0.01, 172.18.0.2:46820]
+INFO 2024-11-28 14:10:19,070 runserver HTTP GET /admin/jsi18n/ 200 [0.01, 172.18.0.2:46836]
+INFO 2024-11-28 14:10:23,276 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAyNzg0LCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjJiYzYxMTMxYjAwNjQ4OThiMjJjOGZlYmJkYzM2MTkyIiwidXNlcl9pZCI6MX0.YWAtgtpvjVh9h_bKWhaBn7B9BmaE0nt4Ckt33_n3HkY 200 [0.00, 172.18.0.2:46842]
+INFO 2024-11-28 14:10:23,294 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.2:46856]
+INFO 2024-11-28 14:10:23,306 runserver HTTP GET /api/multiplayer/ 200 [0.01, 172.18.0.2:46862]
+INFO 2024-11-28 14:10:23,316 runserver HTTP GET /static/js/multiplayer.js 200 [0.00, 172.18.0.2:46872]
+INFO 2024-11-28 14:10:23,329 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.2:46878]
+INFO 2024-11-28 14:10:24,107 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAzMzIzLCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjczNTNiZDlhMmVhMDQ2ZjY5ZDAxZjdkZDJjZGRiMmI0IiwidXNlcl9pZCI6MX0.0NOcp2N_AiVZrZZu-LAV1gMwYg6mKGmcC1DpiqSBTx4 200 [0.00, 172.18.0.2:46890]
+INFO 2024-11-28 14:10:24,122 runserver HTTP GET /api/remote/ 200 [0.01, 172.18.0.2:46902]
+INFO 2024-11-28 14:10:24,136 runserver HTTP GET /static/js/remote.js 200 [0.00, 172.18.0.2:46908]
+INFO 2024-11-28 14:10:24,143 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.2:46914]
+INFO 2024-11-28 14:10:24,805 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAzMzIzLCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjczNTNiZDlhMmVhMDQ2ZjY5ZDAxZjdkZDJjZGRiMmI0IiwidXNlcl9pZCI6MX0.0NOcp2N_AiVZrZZu-LAV1gMwYg6mKGmcC1DpiqSBTx4 200 [0.00, 172.18.0.2:46928]
+INFO 2024-11-28 14:10:24,822 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.2:46934]
+INFO 2024-11-28 14:10:24,833 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.2:46940]
+INFO 2024-11-28 14:10:24,842 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.2:46944]
+INFO 2024-11-28 14:10:27,657 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAzMzIzLCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjczNTNiZDlhMmVhMDQ2ZjY5ZDAxZjdkZDJjZGRiMmI0IiwidXNlcl9pZCI6MX0.0NOcp2N_AiVZrZZu-LAV1gMwYg6mKGmcC1DpiqSBTx4 200 [0.00, 172.18.0.2:36080]
+INFO 2024-11-28 14:10:27,675 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.2:36090]
+INFO 2024-11-28 14:10:27,682 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.2:36106]
+INFO 2024-11-28 14:10:27,692 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.2:36118]
+INFO 2024-11-28 14:10:28,671 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.2:36130]
+INFO 2024-11-28 14:10:28,788 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyODAzMzIzLCJpYXQiOjE3MzI4MDAxMDksImp0aSI6IjczNTNiZDlhMmVhMDQ2ZjY5ZDAxZjdkZDJjZGRiMmI0IiwidXNlcl9pZCI6MX0.0NOcp2N_AiVZrZZu-LAV1gMwYg6mKGmcC1DpiqSBTx4 200 [0.00, 172.18.0.2:36144]
+INFO 2024-11-28 14:10:28,809 runserver HTTP GET /api/tournament_lobby/7/ 200 [0.01, 172.18.0.2:36152]
+INFO 2024-11-28 14:10:28,817 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.2:36154]
+INFO 2024-11-28 14:10:28,826 runserver WebSocket HANDSHAKING /wss/tournament/7/ [172.18.0.2:36168]
+INFO 2024-11-28 14:10:28,832 consumer Connecting to tournament room: tournament_7 with tournament_id: 7
+INFO 2024-11-28 14:10:28,836 consumer User luca connected successfully.
+INFO 2024-11-28 14:10:28,843 runserver WebSocket CONNECT /wss/tournament/7/ [172.18.0.2:36168]
+INFO 2024-11-28 14:10:28,843 consumer Connection accepted.
+INFO 2024-11-28 14:10:28,846 consumer Received message: {'action': 'join', 'round_id_lobby': '7', 'username': 'luca'}
+INFO 2024-11-28 14:10:28,853 consumer User luca joined lobby via WebSocket.
+INFO 2024-11-28 14:10:28,853 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 14:10:28,857 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 14:10:28,866 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+INFO 2024-11-28 14:10:28,866 consumer Attempting to retrieve user list for tournament_id: 7
+INFO 2024-11-28 14:10:28,871 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
+INFO 2024-11-28 14:10:28,879 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '3': {'locked': True, 'username': 'test', 'player_id': 4}, '4': {'locked': True, 'username': 'marco', 'player_id': 2}}
+WARNING 2024-11-28 14:19:14,633 runserver HTTP GET /static/css/bootstrap.min.css.map 404 [0.00, 172.18.0.2:59478]
+INFO 2024-11-28 14:58:41,912 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 14:58:42,355 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 15:04:48,649 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 15:04:49,063 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 15:07:17,748 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 15:07:18,168 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 15:19:16,275 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 15:19:16,694 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 15:20:58,575 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 15:20:58,979 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 15:39:16,454 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 15:39:16,869 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 16:06:05,987 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 16:06:06,411 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 16:06:19,861 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 16:06:20,282 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 16:20:46,544 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 16:20:46,988 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 16:26:23,854 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 16:26:24,275 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 16:35:02,202 autoreload /django/pageloader/consumer.py changed, reloading.
+INFO 2024-11-28 16:35:02,624 autoreload Watching for file changes with StatReloader
