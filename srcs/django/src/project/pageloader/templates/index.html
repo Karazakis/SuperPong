@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Pong</title>
     <!-- Includi il CSS di Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <!-- Includi jQuery, Popper.js, e il JavaScript di Bootstrap -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/js/lib/jquery.min.js"></script>
+    <script src="/static/js/lib/popper.min.js"></script>
+    <script src="/static/js/lib/bootstrap.min.js"></script>
     
     <!-- Includi Three.js -->
     <script src="/static/js/game/module/three.min.js"></script>    
@@ -137,7 +137,7 @@
                         }
                     });
                 }  else {
-                    console.log("URL contiene 'lobby'. Esecuzione comportamento specifico...");
+                    console.log("URL NON contiene 'lobby'. Esecuzione comportamento specifico...");
                     let gameId = url.split("/").pop();
                     recoverUser(localStorage.getItem("userId")).then((data) => {
                         console.log("Dati utente recuperati:", data);
@@ -162,6 +162,7 @@
                     });
                 }              
             }
+            localStorage.setItem("redirect", "game");
         }
         window.initStarSky = function () {
             window.starScene = new THREE.Scene();

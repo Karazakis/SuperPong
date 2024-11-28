@@ -1698,6 +1698,7 @@ class GameAPIView(APIView):
             data = request.data
 
             try:
+                
                 # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
                 game = Game.objects.get(id=pk)
 
@@ -1726,14 +1727,13 @@ class ForbiddenAPIView(APIView):
     def get(self, request, reason):
 
         if request.user.is_authenticated:
-
             if reason == 'game':
                 html = render_to_string('forbidden-game.html')
             elif reason == 'tournament':
                 html = render_to_string('forbidden-tournament.html')
             elif reason == 'lobby':
                 html = render_to_string('forbidden-lobby.html')
-        
+    
             user = User.objects.get(pk=request.user.id)
             user_profile = UserProfile.objects.get(user=user)
             context = {
@@ -1742,7 +1742,7 @@ class ForbiddenAPIView(APIView):
             }
             dash_base = render_to_string('dashboard-base.html', context)
             data = {
-               'url': 'forbidden/',
+               'url': 'forbidden/' + reason + '/',
                 'html': html,
                 'dash_base': dash_base,
                 'scripts': 'forbidden.js',

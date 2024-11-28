@@ -3,12 +3,26 @@ var game_id_lobby = urlPathLobby.split('/').filter(part => part !== '').pop();
 var userId_lobby = localStorage.getItem('userId'); // Assicurati che l'ID utente sia memorizzato in localStorage
 var username_lobby = localStorage.getItem('username'); // Assicurati che il nome utente sia memorizzato in localStorage
 
-var lobby = `wss://${window.location.host}/wss/lobby/${game_id_lobby}/?id=${userId_lobby}`;
-var LobbySocket = new WebSocket(lobby);
+if (typeof lobby === 'undefined') {
+  let lobby = null;
+}
+lobby = `wss://${window.location.host}/wss/lobby/${game_id_lobby}/?id=${userId_lobby}`;
 
+if (typeof LobbySocket === 'undefined') {
+    let LobbySocket = null;
+} else {
+    LobbySocket.close();
+    LobbySocket = null;
+}
+LobbySocket = new WebSocket(lobby);
+
+try {
 LobbySocket.onopen = function(e) {
     LobbySocket.send(JSON.stringify({ action: "join", game_id_lobby: game_id_lobby, username: username_lobby }));
-};
+} 
+} catch (error) {
+    console.log('Errore durante la creazione:', error);
+}
 
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);

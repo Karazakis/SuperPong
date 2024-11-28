@@ -71,7 +71,7 @@ function cleanupGame() {
     scoreTeam = [20, 20];
     isPaused = false;
     window.removeEventListener('resize', window.onWindowResize, false);
-    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament-game") {
+    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament") {
         window.removeEventListener('keydown', handleKeyDownOnline);
         window.handleKeyDownOnline = null;
         window.removeEventListener('keyup', handleKeyUpOnline);
@@ -517,7 +517,8 @@ const cornerTotLeft = new Corner(window.gameScene, -21, 21, 0, 5);
 const model3D = new Model3D();
 let ufo = [];
 
-const isOnlineGame = gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament-game";
+const isOnlineGame = gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament";
+console.log("il game mode e il posit", gameSettings.gameMode, posit);
 export const isHost = posit === "p1";
 
 if (gameSettings.gameType == "single-game") {
@@ -545,7 +546,7 @@ if (gameSettings.gameType == "single-game") {
         walls[1] = false; 
         walls[3] = false;
     }
-} else if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament-game") {
+} else if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament") {
     p2Controls = getPlayerControls("player1");
     console.log("controllo p2", p2Controls);
     paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.right, p2Controls.left, p2Controls.shoot, p2Controls.boost);
@@ -602,7 +603,7 @@ function launchBall(n2online = 0, ballId = null) {
     let n2 = Math.floor(Math.random() * 4);
     let x = 0;
     let y = 0;
-    if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament-game") {
+    if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament") {
         if(posit == "p1"){
             n2 = n2online;
         }
@@ -1374,7 +1375,7 @@ let flagTimer = true;
 
 let gametype = document.getElementById('gametype').innerText;
 
-if(gametype == 'remote-game')
+if(gametype == 'remote-game' || gametype == 'tournament')
 {
     window.handleKeyDownOnline = function(event) {
         if(isInKeyPlayer(event.code) && !keyboardState[event.code])

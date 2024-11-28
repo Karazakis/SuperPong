@@ -46,7 +46,6 @@ function initializeWebSocket() {
         chatSocket.close();
     }
 	let id = localStorage.getItem('userId');
-	console.log("la figa qui? ", id);
 	let url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 	chatSocket = new WebSocket(url);
 	chatSocket.onopen = async function(event) {
@@ -168,7 +167,7 @@ function initializeWebSocket() {
 		    let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
 	    
 		    if (invite) {
-			let request_url = `/api/invite_game/${data.request_type}/${data.target_user}/`;
+			let request_url = `/api/request/${data.request_type}/${data.target_user}/`;
 			let requestData = {
 			    target_user: data.target_user,
 			    requesting_user: data.requesting_user,
@@ -533,8 +532,9 @@ async function recoverUser(id) {
         return data; // Modifica questo percorso in base alla struttura della tua risposta
 
     } catch (error) {
-        console.error('Errore durante il recupero dei dati dell\'utente:', error);
-        throw error;
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
+        //throw error;
     }
 }
 
@@ -723,7 +723,7 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 			'pending_request': 'send',
 			'target_user': id,
 			'requesting_user': localStorage.getItem('userId'),
-			'type': 'game'
+			'type': requestType
 		    }));
 		}
 	    } catch (error) {
@@ -998,7 +998,8 @@ async function updateUserProfile() {
         }
 
     } catch (error) {
-        console.error('Errore durante il recupero dei dati dell\'utente:', error);
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
     }
 }
 

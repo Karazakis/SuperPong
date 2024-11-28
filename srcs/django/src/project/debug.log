@@ -1,760 +1,170 @@
-INFO 2024-11-19 14:13:48,651 consumer Received message: {'action': 'start_tournament_preparation'}
-INFO 2024-11-19 14:13:48,651 consumer Starting tournament flow...
-INFO 2024-11-19 14:13:48,655 consumer Tournament www found with status not_started.
-INFO 2024-11-19 14:13:48,663 consumer Tournament status updated to 'waiting_for_matches'.
-INFO 2024-11-19 14:13:48,676 consumer Slots updated and locked.
-INFO 2024-11-19 14:13:48,676 consumer Waiting for countdown to complete on client side...
-INFO 2024-11-19 14:13:49,651 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 9 seconds...'}
-INFO 2024-11-19 14:13:49,651 consumer Chat message sent by SYSTEM: Round starting in 9 seconds...
-INFO 2024-11-19 14:13:50,651 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 8 seconds...'}
-INFO 2024-11-19 14:13:50,651 consumer Chat message sent by SYSTEM: Round starting in 8 seconds...
-INFO 2024-11-19 14:13:51,651 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 7 seconds...'}
-INFO 2024-11-19 14:13:51,651 consumer Chat message sent by SYSTEM: Round starting in 7 seconds...
-INFO 2024-11-19 14:13:52,658 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 6 seconds...'}
-INFO 2024-11-19 14:13:52,659 consumer Chat message sent by SYSTEM: Round starting in 6 seconds...
-INFO 2024-11-19 14:13:53,664 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 5 seconds...'}
-INFO 2024-11-19 14:13:53,665 consumer Chat message sent by SYSTEM: Round starting in 5 seconds...
-INFO 2024-11-19 14:13:54,671 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 4 seconds...'}
-INFO 2024-11-19 14:13:54,671 consumer Chat message sent by SYSTEM: Round starting in 4 seconds...
-INFO 2024-11-19 14:13:55,677 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 3 seconds...'}
-INFO 2024-11-19 14:13:55,677 consumer Chat message sent by SYSTEM: Round starting in 3 seconds...
-INFO 2024-11-19 14:13:56,684 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 2 seconds...'}
-INFO 2024-11-19 14:13:56,684 consumer Chat message sent by SYSTEM: Round starting in 2 seconds...
-INFO 2024-11-19 14:13:57,765 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 1 seconds...'}
-INFO 2024-11-19 14:13:57,765 consumer Chat message sent by SYSTEM: Round starting in 1 seconds...
-INFO 2024-11-19 14:13:58,779 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 0 seconds...'}
-INFO 2024-11-19 14:13:58,779 consumer Chat message sent by SYSTEM: Round starting in 0 seconds...
-INFO 2024-11-19 14:13:58,781 consumer Received message: {'action': 'countdown_complete'}
-INFO 2024-11-19 14:13:58,781 consumer Notifying players for round 1.
-DEBUG 2024-11-19 14:13:58,788 consumer Games in round 1: ['www - Round 1 - Game 1', 'www - Round 1 - Game 2']
-DEBUG 2024-11-19 14:13:58,788 consumer Slots: {'1': {'username': 'luca', 'player_id': 1}, '2': {'username': 'empty', 'player_id': None}, '3': {'username': 'empty', 'player_id': None}, '4': {'username': 'empty', 'player_id': None}}
-ERROR 2024-11-19 14:13:58,788 consumer One or more slots are empty. Aborting notification.
-INFO 2024-11-19 14:14:58,792 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:48730]
-INFO 2024-11-19 14:14:58,793 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:54174]
-INFO 2024-11-19 14:14:58,793 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:47232]
-INFO 2024-11-19 14:14:58,793 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:59042]
-INFO 2024-11-19 14:14:58,794 consumer Disconnecting from tournament room: tournament_4 with close code: 1006
-INFO 2024-11-19 14:14:58,794 consumer Disconnecting from tournament room: tournament_4 with close code: 1006
-INFO 2024-11-19 14:14:58,795 consumer Disconnecting from tournament room: tournament_4 with close code: 1006
-INFO 2024-11-19 14:14:58,795 consumer Disconnecting from tournament room: tournament_4 with close code: 1006
-INFO 2024-11-19 14:14:58,817 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,817 consumer Ready statuses after update: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,820 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,820 consumer Ready statuses after update: {'1': True, '2': True, '3': True, '4': False}
-INFO 2024-11-19 14:14:58,823 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,823 consumer Ready statuses after update: {'1': True, '2': False, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,827 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,827 consumer Ready statuses after update: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:14:58,835 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:14:58,835 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,836 consumer Ready status update sent to group: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,836 consumer User luca removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:14:58,839 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:14:58,839 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': True, '2': True, '3': True, '4': False}
-INFO 2024-11-19 14:14:58,839 consumer Ready status update sent to group: {'1': True, '2': True, '3': True, '4': False}
-INFO 2024-11-19 14:14:58,839 consumer User giovanni removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:14:58,843 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:14:58,843 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': True, '2': False, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,843 consumer Ready status update sent to group: {'1': True, '2': False, '3': True, '4': True}
-INFO 2024-11-19 14:14:58,843 consumer User marco removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:14:58,846 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:14:58,847 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:14:58,847 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:14:58,847 consumer Ready status update sent to group: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:14:58,847 consumer User Bob removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:14:58,851 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:14:58,852 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:14:58,857 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:14:58,857 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:14:58,861 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:14:58,862 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:14:58,866 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:20:05,692 autoreload /django/pageloader/consumer.py changed, reloading.
-INFO 2024-11-19 14:20:06,171 autoreload Watching for file changes with StatReloader
-INFO 2024-11-19 14:21:25,526 runserver HTTP GET /tournament_lobby/4/ 200 [0.01, 172.18.0.3:34112]
-INFO 2024-11-19 14:21:25,671 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:34122]
-INFO 2024-11-19 14:21:25,702 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:34126]
-INFO 2024-11-19 14:21:25,703 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:34134]
-INFO 2024-11-19 14:21:26,407 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI1ODI5LCJpYXQiOjE3MzIwMjU1MjksImp0aSI6IjUzNDBmNmU5OGI0ZjQ3NDE5NjQwNzk3NjM3OGVkMzExIiwidXNlcl9pZCI6Nn0.2RMpW_OxqR5bSqlj2sjHFh084DahPB8Mmx9Ioa2KW1o 200 [0.01, 172.18.0.3:34142]
-INFO 2024-11-19 14:21:26,441 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.3:34156]
-INFO 2024-11-19 14:21:26,454 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:34162]
-INFO 2024-11-19 14:21:26,463 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:34174]
-INFO 2024-11-19 14:21:26,472 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:34198]
-INFO 2024-11-19 14:21:26,472 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:34186]
-INFO 2024-11-19 14:21:26,473 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:34206]
-INFO 2024-11-19 14:21:26,492 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:34218]
-INFO 2024-11-19 14:21:26,493 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:21:26,505 consumer CONNECT: User Bob connected successfully.
-INFO 2024-11-19 14:21:26,514 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:21:26,514 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:34218]
-DEBUG 2024-11-19 14:21:26,519 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:21:26,519 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:21:26,519 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'Bob'}
-INFO 2024-11-19 14:21:26,527 consumer User Bob joined lobby via WebSocket.
-INFO 2024-11-19 14:21:26,527 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:26,532 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:26,547 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:26,547 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:26,555 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:26,569 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:29,956 runserver HTTP GET /tournament_lobby/4/ 200 [0.00, 172.18.0.3:34234]
-INFO 2024-11-19 14:21:30,037 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:34250]
-INFO 2024-11-19 14:21:30,041 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:34262]
-INFO 2024-11-19 14:21:30,042 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:34256]
-INFO 2024-11-19 14:21:30,277 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI1NzUyLCJpYXQiOjE3MzIwMjU0NTIsImp0aSI6IjMxOTVkYjA4MmI5MjRiYzI4YTUyNWYyM2FlYzE5OGZjIiwidXNlcl9pZCI6M30.x1NjzsoZgcZwt2IRgIqPQJC55Ktf2SUIN9dJ8cLeI4U 200 [0.00, 172.18.0.3:34266]
-INFO 2024-11-19 14:21:30,298 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:34286]
-INFO 2024-11-19 14:21:30,302 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.3:34276]
-INFO 2024-11-19 14:21:30,318 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:34288]
-INFO 2024-11-19 14:21:30,386 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:34300]
-INFO 2024-11-19 14:21:30,387 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:34312]
-INFO 2024-11-19 14:21:30,387 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:34328]
-INFO 2024-11-19 14:21:30,405 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:34330]
-INFO 2024-11-19 14:21:30,406 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:21:30,418 consumer CONNECT: User giovanni connected successfully.
-INFO 2024-11-19 14:21:30,425 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:21:30,425 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:34330]
-DEBUG 2024-11-19 14:21:30,429 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:21:30,429 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:21:30,430 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'giovanni'}
-INFO 2024-11-19 14:21:30,437 consumer User giovanni joined lobby via WebSocket.
-INFO 2024-11-19 14:21:30,437 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:30,442 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:30,452 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:30,452 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:30,456 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:30,465 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:31,725 runserver HTTP GET /tournament_lobby/4/ 200 [0.00, 172.18.0.3:34344]
-INFO 2024-11-19 14:21:31,908 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:34352]
-INFO 2024-11-19 14:21:31,913 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:34376]
-INFO 2024-11-19 14:21:31,914 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:34360]
-INFO 2024-11-19 14:21:32,412 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI1NzI3LCJpYXQiOjE3MzIwMjU0MjcsImp0aSI6IjgxODg2MmZkZTJkZDQ5YTBhYjRjMTFmOGNiNTBlZjYyIiwidXNlcl9pZCI6Mn0.72m-pv1QljACijAEqNtTCOlfbx9-4VrfcTYVFxqKWco 200 [0.00, 172.18.0.3:34382]
-INFO 2024-11-19 14:21:32,421 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:34392]
-INFO 2024-11-19 14:21:32,430 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.3:34406]
-INFO 2024-11-19 14:21:32,444 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:34412]
-INFO 2024-11-19 14:21:32,453 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:34428]
-INFO 2024-11-19 14:21:32,453 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:34438]
-INFO 2024-11-19 14:21:32,454 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:34452]
-INFO 2024-11-19 14:21:32,472 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:34464]
-INFO 2024-11-19 14:21:32,473 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:21:32,485 consumer CONNECT: User marco connected successfully.
-INFO 2024-11-19 14:21:32,493 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:21:32,493 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:34464]
-DEBUG 2024-11-19 14:21:32,497 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:21:32,497 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:21:32,498 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'marco'}
-INFO 2024-11-19 14:21:32,506 consumer User marco joined lobby via WebSocket.
-INFO 2024-11-19 14:21:32,506 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:32,511 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:32,521 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:32,522 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:32,527 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:32,538 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:34,931 runserver HTTP GET /tournament_lobby/4/ 200 [0.00, 172.18.0.3:44654]
-INFO 2024-11-19 14:21:34,981 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:34218]
-INFO 2024-11-19 14:21:34,982 consumer Disconnecting from tournament room: tournament_4 with close code: 1001
-INFO 2024-11-19 14:21:34,991 consumer Ready statuses before update: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:21:34,992 consumer Ready statuses after update: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:21:34,999 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:44656]
-INFO 2024-11-19 14:21:35,000 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:44674]
-INFO 2024-11-19 14:21:35,001 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.01, 172.18.0.3:44668]
-INFO 2024-11-19 14:21:35,002 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:21:35,002 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:21:35,002 consumer Ready status update sent to group: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:21:35,002 consumer User Bob removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:21:35,003 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:35,008 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:35,596 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2Mzg2LCJpYXQiOjE3MzIwMjU1MjksImp0aSI6IjQ5Njc1ZjdmMGRkNjQ4ZDZhNzRkZTJjYzEwNzhhYTQzIiwidXNlcl9pZCI6Nn0.HMt6AU2SgxSQYfdxhtSP4abYsq4jbU8YBkPD1HOL_zw 200 [0.00, 172.18.0.3:44690]
-INFO 2024-11-19 14:21:35,636 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:44714]
-INFO 2024-11-19 14:21:35,638 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.02, 172.18.0.3:44698]
-INFO 2024-11-19 14:21:35,646 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:44730]
-INFO 2024-11-19 14:21:35,647 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:44742]
-INFO 2024-11-19 14:21:35,647 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:44756]
-INFO 2024-11-19 14:21:35,666 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:44768]
-INFO 2024-11-19 14:21:35,667 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:21:35,679 consumer CONNECT: User Bob connected successfully.
-INFO 2024-11-19 14:21:35,687 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:21:35,688 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:44768]
-DEBUG 2024-11-19 14:21:35,692 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:21:35,692 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:21:35,692 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'Bob'}
-INFO 2024-11-19 14:21:35,700 consumer User Bob joined lobby via WebSocket.
-INFO 2024-11-19 14:21:35,700 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:35,705 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:35,715 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:35,715 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:21:35,721 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:21:35,730 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:21:41,765 consumer Received message: {'action': 'player_ready', 'slot': '3', 'username': 'Bob', 'status': 'ready'}
-INFO 2024-11-19 14:21:41,765 consumer Ready status received: Slot 3, Username: Bob, Ready Status: ready
-INFO 2024-11-19 14:21:41,770 consumer Ready statuses before update: {'1': True, '2': True, '3': False, '4': True}
-INFO 2024-11-19 14:21:41,770 consumer Ready statuses after update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:21:41,774 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:21:41,774 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:21:41,775 consumer Ready status update sent to group: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:08,309 runserver HTTP GET /tournament_lobby/4/ 200 [0.00, 172.18.0.3:55556]
-INFO 2024-11-19 14:22:08,345 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:55572]
-INFO 2024-11-19 14:22:08,348 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:55584]
-INFO 2024-11-19 14:22:08,350 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:55590]
-INFO 2024-11-19 14:22:08,567 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:55606]
-INFO 2024-11-19 14:22:08,690 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI1Njk1LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6ImMzNDE4MTQyODlhZjQyZmVhZWYxNGQ1MWMzMWMwM2Y3IiwidXNlcl9pZCI6MX0.fi41RUBIRPfpjCB7SMCAT7B1UNQxr-hNUa3lQQfr9qs 200 [0.00, 172.18.0.3:55618]
-INFO 2024-11-19 14:22:08,725 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.3:55624]
-INFO 2024-11-19 14:22:08,762 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:55632]
-INFO 2024-11-19 14:22:08,770 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:55646]
-INFO 2024-11-19 14:22:08,772 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:55648]
-INFO 2024-11-19 14:22:08,773 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:55656]
-INFO 2024-11-19 14:22:08,788 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:55670]
-INFO 2024-11-19 14:22:08,788 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:22:08,799 consumer CONNECT: User luca connected successfully.
-INFO 2024-11-19 14:22:08,806 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:22:08,807 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:55670]
-DEBUG 2024-11-19 14:22:08,811 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:22:08,811 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:22:08,818 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'luca'}
-INFO 2024-11-19 14:22:08,826 consumer User luca joined lobby via WebSocket.
-INFO 2024-11-19 14:22:08,826 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:08,831 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:08,840 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:22:08,841 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:08,847 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:08,859 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:22:26,040 runserver HTTP POST /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:55974]
-INFO 2024-11-19 14:22:26,042 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:55670]
-INFO 2024-11-19 14:22:26,042 consumer Received message: {'action': 'leave', 'username': 'luca'}
-INFO 2024-11-19 14:22:26,049 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:26,049 consumer Ready statuses after update: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:26,057 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:22:26,057 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:26,058 consumer Ready status update sent to group: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:26,058 consumer User luca removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:22:26,058 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:26,063 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:26,066 consumer Disconnecting from tournament room: tournament_4 with close code: None
-INFO 2024-11-19 14:22:26,195 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NDI4LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0MGMwMWI1NGFkZjQxNGNiMDcwMDE1YjI3YmM2MDNlIiwidXNlcl9pZCI6MX0.lhC8zwJaBoayAeSWEC3DL0Jp7FMkV9KLnLUG-6X3ovs 200 [0.00, 172.18.0.3:55984]
-INFO 2024-11-19 14:22:26,220 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.3:55994]
-INFO 2024-11-19 14:22:26,228 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.3:56002]
-INFO 2024-11-19 14:22:26,237 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:56010]
-INFO 2024-11-19 14:22:27,374 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NDI4LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0MGMwMWI1NGFkZjQxNGNiMDcwMDE1YjI3YmM2MDNlIiwidXNlcl9pZCI6MX0.lhC8zwJaBoayAeSWEC3DL0Jp7FMkV9KLnLUG-6X3ovs 200 [0.00, 172.18.0.3:56020]
-INFO 2024-11-19 14:22:27,392 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.3:56030]
-INFO 2024-11-19 14:22:27,408 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.3:56032]
-INFO 2024-11-19 14:22:27,416 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:56044]
-INFO 2024-11-19 14:22:28,641 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.3:56060]
-INFO 2024-11-19 14:22:28,757 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NDI4LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0MGMwMWI1NGFkZjQxNGNiMDcwMDE1YjI3YmM2MDNlIiwidXNlcl9pZCI6MX0.lhC8zwJaBoayAeSWEC3DL0Jp7FMkV9KLnLUG-6X3ovs 200 [0.00, 172.18.0.3:56068]
-INFO 2024-11-19 14:22:28,773 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:56082]
-INFO 2024-11-19 14:22:28,780 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:56090]
-INFO 2024-11-19 14:22:28,795 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:56102]
-INFO 2024-11-19 14:22:28,796 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:22:28,808 consumer CONNECT: User luca connected successfully.
-INFO 2024-11-19 14:22:28,816 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:22:28,816 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:56102]
-DEBUG 2024-11-19 14:22:28,820 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:22:28,820 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:22:28,820 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'luca'}
-INFO 2024-11-19 14:22:28,826 consumer User luca joined lobby via WebSocket.
-INFO 2024-11-19 14:22:28,827 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:28,832 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:28,842 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:22:28,842 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:28,850 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:28,861 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:22:31,817 consumer Received message: {'action': 'player_ready', 'slot': '1', 'username': 'luca', 'status': 'ready'}
-INFO 2024-11-19 14:22:31,817 consumer Ready status received: Slot 1, Username: luca, Ready Status: ready
-INFO 2024-11-19 14:22:31,821 consumer Ready statuses before update: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:31,821 consumer Ready statuses after update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:31,830 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:22:31,830 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:31,831 consumer Ready status update sent to group: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:37,045 consumer Received message: {'action': 'start_tournament_preparation'}
-INFO 2024-11-19 14:22:37,045 consumer Starting tournament flow...
-INFO 2024-11-19 14:22:37,049 consumer Tournament www found with status waiting_for_matches.
-INFO 2024-11-19 14:22:37,053 consumer Tournament status updated to 'waiting_for_matches'.
-DEBUG 2024-11-19 14:22:37,067 consumer Saved slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:22:37,067 consumer Slots updated and locked.
-INFO 2024-11-19 14:22:37,067 consumer Waiting for countdown to complete on client side...
-INFO 2024-11-19 14:22:38,045 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 9 seconds...'}
-INFO 2024-11-19 14:22:38,046 consumer Chat message sent by SYSTEM: Round starting in 9 seconds...
-INFO 2024-11-19 14:22:39,045 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 8 seconds...'}
-INFO 2024-11-19 14:22:39,046 consumer Chat message sent by SYSTEM: Round starting in 8 seconds...
-INFO 2024-11-19 14:22:40,046 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 7 seconds...'}
-INFO 2024-11-19 14:22:40,046 consumer Chat message sent by SYSTEM: Round starting in 7 seconds...
-INFO 2024-11-19 14:22:41,046 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 6 seconds...'}
-INFO 2024-11-19 14:22:41,046 consumer Chat message sent by SYSTEM: Round starting in 6 seconds...
-INFO 2024-11-19 14:22:42,052 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 5 seconds...'}
-INFO 2024-11-19 14:22:42,053 consumer Chat message sent by SYSTEM: Round starting in 5 seconds...
-INFO 2024-11-19 14:22:43,067 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 4 seconds...'}
-INFO 2024-11-19 14:22:43,067 consumer Chat message sent by SYSTEM: Round starting in 4 seconds...
-INFO 2024-11-19 14:22:44,075 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 3 seconds...'}
-INFO 2024-11-19 14:22:44,075 consumer Chat message sent by SYSTEM: Round starting in 3 seconds...
-INFO 2024-11-19 14:22:45,083 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 2 seconds...'}
-INFO 2024-11-19 14:22:45,083 consumer Chat message sent by SYSTEM: Round starting in 2 seconds...
-INFO 2024-11-19 14:22:46,092 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 1 seconds...'}
-INFO 2024-11-19 14:22:46,092 consumer Chat message sent by SYSTEM: Round starting in 1 seconds...
-INFO 2024-11-19 14:22:47,099 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 0 seconds...'}
-INFO 2024-11-19 14:22:47,099 consumer Chat message sent by SYSTEM: Round starting in 0 seconds...
-INFO 2024-11-19 14:22:47,101 consumer Received message: {'action': 'countdown_complete'}
-INFO 2024-11-19 14:22:47,101 consumer Notifying players for round 1.
-DEBUG 2024-11-19 14:22:47,106 consumer Games in round 1: ['www - Round 1 - Game 1', 'www - Round 1 - Game 2']
-DEBUG 2024-11-19 14:22:47,106 consumer Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-DEBUG 2024-11-19 14:22:47,106 consumer Sorted slots: [('1', {'locked': True, 'username': 'luca', 'player_id': 1}), ('2', {'locked': True, 'username': 'marco', 'player_id': 2}), ('3', {'locked': True, 'username': 'Bob', 'player_id': 6}), ('4', {'locked': True, 'username': 'giovanni', 'player_id': 3})]
-DEBUG 2024-11-19 14:22:47,106 consumer Players per game: 2
-DEBUG 2024-11-19 14:22:47,107 consumer Assigning slots 0 to 2 for game www - Round 1 - Game 1.
-DEBUG 2024-11-19 14:22:47,111 consumer Assigned luca to game www - Round 1 - Game 1 as player1
-DEBUG 2024-11-19 14:22:47,115 consumer Assigned marco to game www - Round 1 - Game 1 as player2
-DEBUG 2024-11-19 14:22:47,125 consumer Assigning slots 2 to 4 for game www - Round 1 - Game 2.
-DEBUG 2024-11-19 14:22:47,130 consumer Assigned Bob to game www - Round 1 - Game 2 as player1
-DEBUG 2024-11-19 14:22:47,134 consumer Assigned giovanni to game www - Round 1 - Game 2 as player2
-INFO 2024-11-19 14:22:47,140 consumer Notifications sent to all players to join the game.
-INFO 2024-11-19 14:22:48,862 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:56102]
-INFO 2024-11-19 14:22:48,863 consumer Disconnecting from tournament room: tournament_4 with close code: None
-INFO 2024-11-19 14:22:48,869 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NDI4LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0MGMwMWI1NGFkZjQxNGNiMDcwMDE1YjI3YmM2MDNlIiwidXNlcl9pZCI6MX0.lhC8zwJaBoayAeSWEC3DL0Jp7FMkV9KLnLUG-6X3ovs 200 [0.00, 172.18.0.3:44400]
-INFO 2024-11-19 14:22:48,872 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:48,872 consumer Ready statuses after update: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:48,881 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:22:48,882 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:48,882 consumer Ready status update sent to group: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:48,882 consumer User luca removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:22:48,883 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:48,887 runserver HTTP GET /api/game/9/ 200 [0.01, 172.18.0.3:44406]
-INFO 2024-11-19 14:22:48,890 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:48,895 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.644949465200987 200 [0.00, 172.18.0.3:44422]
-INFO 2024-11-19 14:22:48,903 runserver HTTP GET /static/js/game.js?v=0.9180385281478367 200 [0.00, 172.18.0.3:44424]
-INFO 2024-11-19 14:22:48,905 runserver WebSocket HANDSHAKING /wss/game/9/ [172.18.0.3:44426]
-INFO 2024-11-19 14:22:48,906 runserver WebSocket CONNECT /wss/game/9/ [172.18.0.3:44426]
-INFO 2024-11-19 14:22:48,913 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:44440]
-INFO 2024-11-19 14:22:48,916 runserver HTTP GET /static/js/game/src/Init.js 200 [0.00, 172.18.0.3:44446]
-INFO 2024-11-19 14:22:48,919 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.00, 172.18.0.3:44452]
-INFO 2024-11-19 14:22:48,920 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.00, 172.18.0.3:44454]
-INFO 2024-11-19 14:22:48,935 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.00, 172.18.0.3:44462]
-INFO 2024-11-19 14:22:48,935 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.00, 172.18.0.3:44482]
-INFO 2024-11-19 14:22:48,937 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.00, 172.18.0.3:44466]
-INFO 2024-11-19 14:22:48,946 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:44502]
-INFO 2024-11-19 14:22:48,947 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:44494]
-INFO 2024-11-19 14:22:48,958 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:44512]
-INFO 2024-11-19 14:22:49,000 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:44514]
-INFO 2024-11-19 14:22:49,024 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:44526]
-INFO 2024-11-19 14:22:49,025 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.00, 172.18.0.3:44550]
-INFO 2024-11-19 14:22:49,027 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:44538]
-INFO 2024-11-19 14:22:49,035 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.00, 172.18.0.3:44556]
-INFO 2024-11-19 14:22:49,036 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:44566]
-INFO 2024-11-19 14:22:49,039 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:44580]
-INFO 2024-11-19 14:22:49,041 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.00, 172.18.0.3:44586]
-INFO 2024-11-19 14:22:49,042 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:44596]
-INFO 2024-11-19 14:22:49,043 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:44590]
-INFO 2024-11-19 14:22:49,662 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:34330]
-INFO 2024-11-19 14:22:49,663 consumer Disconnecting from tournament room: tournament_4 with close code: None
-INFO 2024-11-19 14:22:49,670 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2MzkwLCJpYXQiOjE3MzIwMjU0NTIsImp0aSI6IjMzZjkzZmJlMmU3ZjRmNTZiZmYyMTdiYmIxOTc1N2M4IiwidXNlcl9pZCI6M30._FfDu9T6zPzfxLFYiv4x3S6gVOUB9dPvNWiZjqJkg8w 200 [0.00, 172.18.0.3:44602]
-INFO 2024-11-19 14:22:49,672 consumer Ready statuses before update: {'1': False, '2': True, '3': True, '4': True}
-INFO 2024-11-19 14:22:49,672 consumer Ready statuses after update: {'1': False, '2': True, '3': True, '4': False}
-INFO 2024-11-19 14:22:49,676 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:22:49,676 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': True, '3': True, '4': False}
-INFO 2024-11-19 14:22:49,677 consumer Ready status update sent to group: {'1': False, '2': True, '3': True, '4': False}
-INFO 2024-11-19 14:22:49,677 consumer User giovanni removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:22:49,677 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:49,683 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:49,687 runserver HTTP GET /api/game/10/ 200 [0.01, 172.18.0.3:44606]
-INFO 2024-11-19 14:22:49,693 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:44614]
-INFO 2024-11-19 14:22:49,704 runserver HTTP GET /static/js/game.js?v=0.13871648481989562 200 [0.00, 172.18.0.3:44626]
-INFO 2024-11-19 14:22:49,705 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.47141069566542115 200 [0.00, 172.18.0.3:44634]
-INFO 2024-11-19 14:22:49,709 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:44646]
-INFO 2024-11-19 14:22:49,716 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:44652]
-INFO 2024-11-19 14:22:49,720 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:44684]
-INFO 2024-11-19 14:22:49,721 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.3:44668]
-INFO 2024-11-19 14:22:49,727 runserver WebSocket HANDSHAKING /wss/game/10/ [172.18.0.3:44714]
-INFO 2024-11-19 14:22:49,733 runserver WebSocket CONNECT /wss/game/10/ [172.18.0.3:44714]
-INFO 2024-11-19 14:22:49,734 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:44722]
-INFO 2024-11-19 14:22:49,735 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.3:44694]
-INFO 2024-11-19 14:22:49,736 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:44710]
-INFO 2024-11-19 14:22:49,736 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.01, 172.18.0.3:44728]
-INFO 2024-11-19 14:22:49,737 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.01, 172.18.0.3:44738]
-INFO 2024-11-19 14:22:49,738 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:44686]
-INFO 2024-11-19 14:22:49,747 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:44750]
-INFO 2024-11-19 14:22:49,787 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:44760]
-INFO 2024-11-19 14:22:49,956 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:44762]
-INFO 2024-11-19 14:22:49,967 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:44804]
-INFO 2024-11-19 14:22:49,968 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:44790]
-INFO 2024-11-19 14:22:49,969 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:44820]
-INFO 2024-11-19 14:22:49,970 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:44770]
-INFO 2024-11-19 14:22:49,971 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:44822]
-INFO 2024-11-19 14:22:49,974 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:44776]
-INFO 2024-11-19 14:22:49,980 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:44828]
-INFO 2024-11-19 14:22:49,980 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:44834]
-INFO 2024-11-19 14:22:50,983 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:34464]
-INFO 2024-11-19 14:22:50,983 consumer Disconnecting from tournament room: tournament_4 with close code: None
-INFO 2024-11-19 14:22:50,990 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2MzkyLCJpYXQiOjE3MzIwMjU0MjcsImp0aSI6ImQ1YTZmODNlY2YwNDRkMmJiZmU2OGFkNjIyZGZiODMzIiwidXNlcl9pZCI6Mn0.Yn2fqmuIDv_CKRUC6LvyR055e4nUgQ8TYCPR91dOflM 200 [0.00, 172.18.0.3:44850]
-INFO 2024-11-19 14:22:50,993 consumer Ready statuses before update: {'1': False, '2': True, '3': True, '4': False}
-INFO 2024-11-19 14:22:50,993 consumer Ready statuses after update: {'1': False, '2': False, '3': True, '4': False}
-INFO 2024-11-19 14:22:50,998 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:22:50,998 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': False, '3': True, '4': False}
-INFO 2024-11-19 14:22:50,999 consumer Ready status update sent to group: {'1': False, '2': False, '3': True, '4': False}
-INFO 2024-11-19 14:22:50,999 consumer User marco removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:22:50,999 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:51,003 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:51,007 runserver HTTP GET /api/game/9/ 200 [0.01, 172.18.0.3:44862]
-INFO 2024-11-19 14:22:51,013 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:44872]
-INFO 2024-11-19 14:22:51,021 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.07833344740120829 200 [0.00, 172.18.0.3:44888]
-INFO 2024-11-19 14:22:51,022 runserver HTTP GET /static/js/game.js?v=0.152652982948708 200 [0.00, 172.18.0.3:44874]
-INFO 2024-11-19 14:22:51,024 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:44900]
-INFO 2024-11-19 14:22:51,032 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:44910]
-INFO 2024-11-19 14:22:51,034 runserver HTTP GET /static/js/game/src/Init.js 200 [0.00, 172.18.0.3:44920]
-INFO 2024-11-19 14:22:51,034 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.00, 172.18.0.3:44928]
-INFO 2024-11-19 14:22:51,039 runserver WebSocket HANDSHAKING /wss/game/9/ [172.18.0.3:44956]
-INFO 2024-11-19 14:22:51,043 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.3:44940]
-INFO 2024-11-19 14:22:51,044 runserver WebSocket CONNECT /wss/game/9/ [172.18.0.3:44956]
-INFO 2024-11-19 14:22:51,045 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:44938]
-INFO 2024-11-19 14:22:51,047 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:44950]
-INFO 2024-11-19 14:22:51,048 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:44930]
-INFO 2024-11-19 14:22:51,048 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.01, 172.18.0.3:44970]
-INFO 2024-11-19 14:22:51,049 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.01, 172.18.0.3:44968]
-INFO 2024-11-19 14:22:51,056 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:44978]
-INFO 2024-11-19 14:22:51,092 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:44980]
-INFO 2024-11-19 14:22:51,169 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:44996]
-INFO 2024-11-19 14:22:51,179 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:45022]
-INFO 2024-11-19 14:22:51,180 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:45028]
-INFO 2024-11-19 14:22:51,182 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:45012]
-INFO 2024-11-19 14:22:51,183 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:45030]
-INFO 2024-11-19 14:22:51,184 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:45042]
-INFO 2024-11-19 14:22:51,185 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:45018]
-INFO 2024-11-19 14:22:51,191 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:45068]
-INFO 2024-11-19 14:22:51,191 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:45054]
-INFO 2024-11-19 14:22:52,479 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:44768]
-INFO 2024-11-19 14:22:52,480 consumer Disconnecting from tournament room: tournament_4 with close code: None
-INFO 2024-11-19 14:22:52,489 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2Mzg2LCJpYXQiOjE3MzIwMjU1MjksImp0aSI6IjQ5Njc1ZjdmMGRkNjQ4ZDZhNzRkZTJjYzEwNzhhYTQzIiwidXNlcl9pZCI6Nn0.HMt6AU2SgxSQYfdxhtSP4abYsq4jbU8YBkPD1HOL_zw 200 [0.01, 172.18.0.3:45072]
-INFO 2024-11-19 14:22:52,490 consumer Ready statuses before update: {'1': False, '2': False, '3': True, '4': False}
-INFO 2024-11-19 14:22:52,490 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:22:52,500 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:22:52,501 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:22:52,502 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:22:52,502 consumer User Bob removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:22:52,502 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:22:52,506 runserver HTTP GET /api/game/10/ 200 [0.01, 172.18.0.3:45082]
-INFO 2024-11-19 14:22:52,507 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:22:52,514 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:45088]
-INFO 2024-11-19 14:22:52,520 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.6074068340745551 200 [0.00, 172.18.0.3:45090]
-INFO 2024-11-19 14:22:52,527 runserver HTTP GET /static/js/game.js?v=0.9642593415078611 200 [0.00, 172.18.0.3:45104]
-INFO 2024-11-19 14:22:52,538 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:45108]
-INFO 2024-11-19 14:22:52,538 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:45118]
-INFO 2024-11-19 14:22:52,553 runserver WebSocket HANDSHAKING /wss/game/10/ [172.18.0.3:45158]
-INFO 2024-11-19 14:22:52,557 runserver WebSocket CONNECT /wss/game/10/ [172.18.0.3:45158]
-INFO 2024-11-19 14:22:52,558 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:45130]
-INFO 2024-11-19 14:22:52,560 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.3:45146]
-INFO 2024-11-19 14:22:52,562 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:45166]
-INFO 2024-11-19 14:22:52,562 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.3:45184]
-INFO 2024-11-19 14:22:52,563 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:45182]
-INFO 2024-11-19 14:22:52,565 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:45186]
-INFO 2024-11-19 14:22:52,573 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:45208]
-INFO 2024-11-19 14:22:52,574 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:45192]
-INFO 2024-11-19 14:22:52,582 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:45220]
-INFO 2024-11-19 14:22:52,614 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:45222]
-INFO 2024-11-19 14:22:52,689 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:45236]
-INFO 2024-11-19 14:22:52,696 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.00, 172.18.0.3:45254]
-INFO 2024-11-19 14:22:52,697 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.00, 172.18.0.3:45244]
-INFO 2024-11-19 14:22:52,730 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:45274]
-INFO 2024-11-19 14:22:52,732 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:45306]
-INFO 2024-11-19 14:22:52,732 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:45284]
-INFO 2024-11-19 14:22:52,733 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:45264]
-INFO 2024-11-19 14:22:52,734 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:45280]
-INFO 2024-11-19 14:22:52,735 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:45290]
-INFO 2024-11-19 14:24:42,555 runserver WebSocket DISCONNECT /wss/game/10/ [172.18.0.3:44714]
-INFO 2024-11-19 14:24:42,570 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.3:59032]
-INFO 2024-11-19 14:24:42,658 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2MzkwLCJpYXQiOjE3MzIwMjU0NTIsImp0aSI6IjMzZjkzZmJlMmU3ZjRmNTZiZmYyMTdiYmIxOTc1N2M4IiwidXNlcl9pZCI6M30._FfDu9T6zPzfxLFYiv4x3S6gVOUB9dPvNWiZjqJkg8w 200 [0.00, 172.18.0.3:59034]
-INFO 2024-11-19 14:24:42,672 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:59036]
-INFO 2024-11-19 14:24:42,679 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:59044]
-INFO 2024-11-19 14:24:42,687 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:59064]
-INFO 2024-11-19 14:24:42,687 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:59066]
-INFO 2024-11-19 14:24:42,689 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:59060]
-INFO 2024-11-19 14:24:42,705 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:59068]
-INFO 2024-11-19 14:24:42,706 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:24:42,720 consumer CONNECT: User giovanni connected successfully.
-INFO 2024-11-19 14:24:42,727 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:24:42,728 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:59068]
-DEBUG 2024-11-19 14:24:42,732 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:24:42,732 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:24:42,732 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'giovanni'}
-INFO 2024-11-19 14:24:42,738 consumer User giovanni joined lobby via WebSocket.
-INFO 2024-11-19 14:24:42,739 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:24:42,743 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:24:42,750 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:24:42,750 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:24:42,754 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:24:42,762 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:24:50,429 runserver WebSocket DISCONNECT /wss/game/9/ [172.18.0.3:44426]
-INFO 2024-11-19 14:24:50,445 runserver HTTP POST /api/join_tournament/ 200 [0.01, 172.18.0.3:49348]
-INFO 2024-11-19 14:24:50,574 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NDI4LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0MGMwMWI1NGFkZjQxNGNiMDcwMDE1YjI3YmM2MDNlIiwidXNlcl9pZCI6MX0.lhC8zwJaBoayAeSWEC3DL0Jp7FMkV9KLnLUG-6X3ovs 200 [0.00, 172.18.0.3:49358]
-INFO 2024-11-19 14:24:50,595 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:49366]
-INFO 2024-11-19 14:24:50,608 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:49378]
-INFO 2024-11-19 14:24:50,613 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:49392]
-INFO 2024-11-19 14:24:50,626 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:49394]
-INFO 2024-11-19 14:24:50,627 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:24:50,639 consumer CONNECT: User luca connected successfully.
-INFO 2024-11-19 14:24:50,646 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:24:50,647 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:49394]
-DEBUG 2024-11-19 14:24:50,651 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:24:50,651 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:24:50,652 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'luca'}
-INFO 2024-11-19 14:24:50,658 consumer User luca joined lobby via WebSocket.
-INFO 2024-11-19 14:24:50,658 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:24:50,663 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:24:50,672 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:24:50,672 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:24:50,677 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:24:50,686 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:26:57,233 runserver WebSocket DISCONNECT /wss/game/9/ [172.18.0.3:44956]
-WARNING 2024-11-19 14:26:57,239 log Unauthorized: /api/join_tournament/
-WARNING 2024-11-19 14:26:57,240 runserver HTTP POST /api/join_tournament/ 401 [0.00, 172.18.0.3:50730]
-INFO 2024-11-19 14:27:05,393 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:59068]
-INFO 2024-11-19 14:27:05,393 consumer Disconnecting from tournament room: tournament_4 with close code: 1001
-INFO 2024-11-19 14:27:05,402 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:05,402 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:05,412 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:27:05,412 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:05,412 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:05,412 consumer User giovanni removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:27:05,413 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:27:05,417 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-WARNING 2024-11-19 14:27:19,870 log Unauthorized: /api/tournament_lobby/4/
-WARNING 2024-11-19 14:27:19,870 runserver HTTP POST /api/tournament_lobby/4/ 401 [0.00, 172.18.0.3:41642]
-INFO 2024-11-19 14:27:35,531 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:49394]
-INFO 2024-11-19 14:27:35,532 consumer Disconnecting from tournament room: tournament_4 with close code: 1001
-INFO 2024-11-19 14:27:35,539 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:35,539 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:35,543 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:27:35,543 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:35,544 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:35,544 consumer User luca removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:27:35,544 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:27:35,549 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:27:35,559 runserver HTTP GET /tournament_lobby/4/ 200 [0.00, 172.18.0.3:55080]
-INFO 2024-11-19 14:27:35,585 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:55088]
-INFO 2024-11-19 14:27:35,589 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:55104]
-INFO 2024-11-19 14:27:35,590 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:55116]
-INFO 2024-11-19 14:27:35,912 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:55120]
-INFO 2024-11-19 14:27:35,990 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NDI4LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0MGMwMWI1NGFkZjQxNGNiMDcwMDE1YjI3YmM2MDNlIiwidXNlcl9pZCI6MX0.lhC8zwJaBoayAeSWEC3DL0Jp7FMkV9KLnLUG-6X3ovs 200 [0.00, 172.18.0.3:55124]
-INFO 2024-11-19 14:27:36,018 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.3:55126]
-INFO 2024-11-19 14:27:36,059 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:55140]
-INFO 2024-11-19 14:27:36,069 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:55150]
-INFO 2024-11-19 14:27:36,069 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:55160]
-INFO 2024-11-19 14:27:36,070 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:55168]
-INFO 2024-11-19 14:27:36,083 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:55182]
-INFO 2024-11-19 14:27:36,084 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:27:36,094 consumer CONNECT: User luca connected successfully.
-INFO 2024-11-19 14:27:36,103 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:27:36,103 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:55182]
-DEBUG 2024-11-19 14:27:36,108 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:27:36,108 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:27:36,112 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'luca'}
-INFO 2024-11-19 14:27:36,118 consumer User luca joined lobby via WebSocket.
-INFO 2024-11-19 14:27:36,119 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:27:36,123 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:27:36,131 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:27:36,131 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:27:36,135 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:27:36,143 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:27:37,389 runserver HTTP POST /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:55184]
-INFO 2024-11-19 14:27:37,392 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:55182]
-INFO 2024-11-19 14:27:37,392 consumer Received message: {'action': 'leave', 'username': 'luca'}
-INFO 2024-11-19 14:27:37,399 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:37,399 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:37,403 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:27:37,403 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:37,403 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:27:37,403 consumer User luca removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:27:37,403 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:27:37,407 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:27:37,408 consumer Disconnecting from tournament room: tournament_4 with close code: None
-INFO 2024-11-19 14:27:37,571 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NzU2LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0ZmNmYjFhMTkzMjQ2N2FiNTVjYjhmODZlYTc4N2U4IiwidXNlcl9pZCI6MX0.uUmyWra3DLb-BnCRLCufKzKU9LetSfTfBYkaLXlgPrk 200 [0.00, 172.18.0.3:55190]
-INFO 2024-11-19 14:27:37,583 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.3:55200]
-INFO 2024-11-19 14:27:37,587 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.3:55216]
-INFO 2024-11-19 14:27:37,596 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:55222]
-INFO 2024-11-19 14:27:39,242 runserver HTTP GET /tournaments/ 200 [0.00, 172.18.0.3:55224]
-INFO 2024-11-19 14:27:39,263 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:55238]
-INFO 2024-11-19 14:27:39,266 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:55252]
-INFO 2024-11-19 14:27:39,267 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:55240]
-INFO 2024-11-19 14:27:39,478 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:55254]
-INFO 2024-11-19 14:27:39,540 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NzU2LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0ZmNmYjFhMTkzMjQ2N2FiNTVjYjhmODZlYTc4N2U4IiwidXNlcl9pZCI6MX0.uUmyWra3DLb-BnCRLCufKzKU9LetSfTfBYkaLXlgPrk 200 [0.00, 172.18.0.3:55264]
-INFO 2024-11-19 14:27:39,564 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.3:55280]
-INFO 2024-11-19 14:27:39,578 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:55296]
-INFO 2024-11-19 14:27:39,580 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.3:55298]
-INFO 2024-11-19 14:27:39,581 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:55316]
-INFO 2024-11-19 14:27:39,588 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:55300]
-INFO 2024-11-19 14:28:31,859 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NzU2LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0ZmNmYjFhMTkzMjQ2N2FiNTVjYjhmODZlYTc4N2U4IiwidXNlcl9pZCI6MX0.uUmyWra3DLb-BnCRLCufKzKU9LetSfTfBYkaLXlgPrk 200 [0.00, 172.18.0.3:56496]
-INFO 2024-11-19 14:28:31,878 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.3:56500]
-INFO 2024-11-19 14:28:31,898 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.3:56506]
-INFO 2024-11-19 14:28:31,905 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:56518]
-INFO 2024-11-19 14:28:37,806 runserver HTTP GET /join_tournament/ 200 [0.00, 172.18.0.3:34410]
-INFO 2024-11-19 14:28:37,836 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:34422]
-INFO 2024-11-19 14:28:37,839 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:34438]
-INFO 2024-11-19 14:28:37,840 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:34434]
-INFO 2024-11-19 14:28:38,093 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:34442]
-INFO 2024-11-19 14:28:38,156 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NzU2LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0ZmNmYjFhMTkzMjQ2N2FiNTVjYjhmODZlYTc4N2U4IiwidXNlcl9pZCI6MX0.uUmyWra3DLb-BnCRLCufKzKU9LetSfTfBYkaLXlgPrk 200 [0.00, 172.18.0.3:34448]
-INFO 2024-11-19 14:28:38,174 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.3:34450]
-INFO 2024-11-19 14:28:38,192 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.3:34476]
-INFO 2024-11-19 14:28:38,193 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:34462]
-INFO 2024-11-19 14:28:38,193 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:34494]
-INFO 2024-11-19 14:28:38,201 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:34488]
-INFO 2024-11-19 14:32:36,263 runserver WebSocket DISCONNECT /wss/game/10/ [172.18.0.3:45158]
-WARNING 2024-11-19 14:32:36,285 log Unauthorized: /api/join_tournament/
-WARNING 2024-11-19 14:32:36,285 runserver HTTP POST /api/join_tournament/ 401 [0.00, 172.18.0.3:56958]
-INFO 2024-11-19 14:32:41,365 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2Mzg2LCJpYXQiOjE3MzIwMjU1MjksImp0aSI6IjQ5Njc1ZjdmMGRkNjQ4ZDZhNzRkZTJjYzEwNzhhYTQzIiwidXNlcl9pZCI6Nn0.HMt6AU2SgxSQYfdxhtSP4abYsq4jbU8YBkPD1HOL_zw 200 [0.00, 172.18.0.3:56966]
-INFO 2024-11-19 14:32:41,381 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:56988]
-INFO 2024-11-19 14:32:41,384 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.3:56978]
-INFO 2024-11-19 14:32:41,398 runserver HTTP GET /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:56992]
-INFO 2024-11-19 14:32:41,407 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:56996]
-INFO 2024-11-19 14:32:41,409 runserver HTTP GET /static/js/tournament-lobby.js 200 [0.00, 172.18.0.3:57000]
-INFO 2024-11-19 14:32:41,411 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:57004]
-INFO 2024-11-19 14:32:41,428 runserver WebSocket HANDSHAKING /wss/tournament/4/ [172.18.0.3:57006]
-INFO 2024-11-19 14:32:41,429 consumer CONNECT: Connecting to tournament room: tournament_4 with tournament_id: 4
-INFO 2024-11-19 14:32:41,440 consumer CONNECT: User Bob connected successfully.
-INFO 2024-11-19 14:32:41,448 consumer Current round for tournament www: Round 1, Status: not_started
-INFO 2024-11-19 14:32:41,448 runserver WebSocket CONNECT /wss/tournament/4/ [172.18.0.3:57006]
-DEBUG 2024-11-19 14:32:41,452 consumer PREPARE NEXT ROUND: Generation message: Reached the final round: current round number: 1; next_round_number: 2, max_rounds: 1
-DEBUG 2024-11-19 14:32:41,452 consumer PREPARE NEXT ROUND: Tournament had problem generating next round.
-INFO 2024-11-19 14:32:41,452 consumer Received message: {'action': 'join', 'round_id_lobby': '4', 'username': 'Bob'}
-INFO 2024-11-19 14:32:41,459 consumer User Bob joined lobby via WebSocket.
-INFO 2024-11-19 14:32:41,459 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:32:41,463 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:32:41,470 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:32:41,470 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:32:41,474 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:32:41,482 consumer Slot status update sent to group: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}
-INFO 2024-11-19 14:32:43,121 runserver HTTP POST /api/tournament_lobby/4/ 200 [0.01, 172.18.0.3:57016]
-INFO 2024-11-19 14:32:43,124 runserver WebSocket DISCONNECT /wss/tournament/4/ [172.18.0.3:57006]
-INFO 2024-11-19 14:32:43,125 consumer Received message: {'action': 'leave', 'username': 'Bob'}
-INFO 2024-11-19 14:32:43,132 consumer Ready statuses before update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:32:43,133 consumer Ready statuses after update: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:32:43,141 consumer Ready status saved successfully in the round database.
-INFO 2024-11-19 14:32:43,141 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'Bob', 'player_id': 6}, '4': {'locked': True, 'username': 'giovanni', 'player_id': 3}}, Ready status: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:32:43,141 consumer Ready status update sent to group: {'1': False, '2': False, '3': False, '4': False}
-INFO 2024-11-19 14:32:43,141 consumer User Bob removed from lobby, but still in the tournament.
-INFO 2024-11-19 14:32:43,141 consumer Attempting to retrieve user list for tournament_id: 4
-INFO 2024-11-19 14:32:43,146 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'Bob'}]
-INFO 2024-11-19 14:32:43,147 consumer Disconnecting from tournament room: tournament_4 with close code: None
-INFO 2024-11-19 14:32:43,194 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI3MDYxLCJpYXQiOjE3MzIwMjU1MjksImp0aSI6IjlhYjdlYjA2Y2M1YTQ4MjQ4ZTBkNTJmZmQxMWRlYjk5IiwidXNlcl9pZCI6Nn0.X3XLijmDWir2E2fgc4X0CPpRBC55GtNx4lW4ca0YKjc 200 [0.00, 172.18.0.3:57030]
-INFO 2024-11-19 14:32:43,207 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.3:57044]
-INFO 2024-11-19 14:32:43,218 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.3:57054]
-INFO 2024-11-19 14:32:43,229 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:57084]
-INFO 2024-11-19 14:32:43,234 runserver HTTP GET /api/request_status/6/ 200 [0.01, 172.18.0.3:57070]
-INFO 2024-11-19 14:33:52,878 autoreload /django/pageloader/views.py changed, reloading.
-INFO 2024-11-19 14:33:53,311 autoreload Watching for file changes with StatReloader
-INFO 2024-11-19 14:33:58,936 runserver HTTP GET /tournaments/ 200 [0.01, 172.18.0.3:41816]
-INFO 2024-11-19 14:33:59,048 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:41820]
-INFO 2024-11-19 14:33:59,077 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:41828]
-INFO 2024-11-19 14:33:59,078 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:41844]
-INFO 2024-11-19 14:33:59,437 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI3MDYxLCJpYXQiOjE3MzIwMjU1MjksImp0aSI6IjlhYjdlYjA2Y2M1YTQ4MjQ4ZTBkNTJmZmQxMWRlYjk5IiwidXNlcl9pZCI6Nn0.X3XLijmDWir2E2fgc4X0CPpRBC55GtNx4lW4ca0YKjc 200 [0.01, 172.18.0.3:41852]
-INFO 2024-11-19 14:33:59,474 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:41866]
-INFO 2024-11-19 14:33:59,475 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.3:41860]
-INFO 2024-11-19 14:33:59,483 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:41882]
-INFO 2024-11-19 14:33:59,485 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.3:41896]
-INFO 2024-11-19 14:33:59,488 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:41912]
-INFO 2024-11-19 14:33:59,496 runserver HTTP GET /api/request_status/6/ 200 [0.01, 172.18.0.3:41908]
-INFO 2024-11-19 14:34:00,699 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI3MDYxLCJpYXQiOjE3MzIwMjU1MjksImp0aSI6IjlhYjdlYjA2Y2M1YTQ4MjQ4ZTBkNTJmZmQxMWRlYjk5IiwidXNlcl9pZCI6Nn0.X3XLijmDWir2E2fgc4X0CPpRBC55GtNx4lW4ca0YKjc 200 [0.00, 172.18.0.3:41926]
-INFO 2024-11-19 14:34:00,717 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.3:41934]
-INFO 2024-11-19 14:34:00,731 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.3:41946]
-INFO 2024-11-19 14:34:00,735 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:41962]
-INFO 2024-11-19 14:34:00,739 runserver HTTP GET /api/request_status/6/ 200 [0.01, 172.18.0.3:41952]
-INFO 2024-11-19 14:34:06,853 runserver HTTP GET /join_tournament/ 200 [0.00, 172.18.0.3:48624]
-INFO 2024-11-19 14:34:06,881 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:48634]
-INFO 2024-11-19 14:34:06,886 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:48646]
-INFO 2024-11-19 14:34:06,888 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:48660]
-INFO 2024-11-19 14:34:07,162 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:48676]
-INFO 2024-11-19 14:34:07,287 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI2NzU2LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6Ijc0ZmNmYjFhMTkzMjQ2N2FiNTVjYjhmODZlYTc4N2U4IiwidXNlcl9pZCI6MX0.uUmyWra3DLb-BnCRLCufKzKU9LetSfTfBYkaLXlgPrk 200 [0.00, 172.18.0.3:48678]
-INFO 2024-11-19 14:34:07,314 runserver HTTP POST /api/token/refresh/ 200 [0.01, 172.18.0.3:48692]
-INFO 2024-11-19 14:34:07,343 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.3:48696]
-INFO 2024-11-19 14:34:07,352 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:48712]
-INFO 2024-11-19 14:34:07,354 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.3:48718]
-INFO 2024-11-19 14:34:07,356 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:48724]
-INFO 2024-11-19 14:34:07,363 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:48720]
-INFO 2024-11-19 14:34:10,677 runserver HTTP DELETE /api/join_tournament/4/ 200 [0.02, 172.18.0.3:48730]
-INFO 2024-11-19 14:34:11,531 runserver HTTP GET /join_tournament/ 200 [0.00, 172.18.0.3:48734]
-INFO 2024-11-19 14:34:11,555 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:48736]
-INFO 2024-11-19 14:34:11,558 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:48748]
-INFO 2024-11-19 14:34:11,559 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:48738]
-INFO 2024-11-19 14:34:11,742 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:48758]
-INFO 2024-11-19 14:34:11,838 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI3MTQ3LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6ImM1NTMwMmRlZTRiYzQ1NWZiMTU5M2ZiMGQ1ZGU0M2JkIiwidXNlcl9pZCI6MX0.eHCBY521X5aC-PyTYaMkIEUuqlhTg_HzhfOqu8RrP2Y 200 [0.00, 172.18.0.3:48762]
-INFO 2024-11-19 14:34:11,865 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.3:48766]
-INFO 2024-11-19 14:34:11,881 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.3:48778]
-INFO 2024-11-19 14:34:11,882 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:48774]
-INFO 2024-11-19 14:34:11,883 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:48798]
-INFO 2024-11-19 14:34:11,890 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:48786]
-INFO 2024-11-19 14:34:13,190 runserver HTTP GET /join_tournament/ 200 [0.00, 172.18.0.3:48800]
-INFO 2024-11-19 14:34:13,216 runserver HTTP GET /static/css/style.css 200 [0.00, 172.18.0.3:48812]
-INFO 2024-11-19 14:34:13,218 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:48828]
-INFO 2024-11-19 14:34:13,218 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:48816]
-INFO 2024-11-19 14:34:13,360 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:48842]
-INFO 2024-11-19 14:34:13,470 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI3MTQ3LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6ImM1NTMwMmRlZTRiYzQ1NWZiMTU5M2ZiMGQ1ZGU0M2JkIiwidXNlcl9pZCI6MX0.eHCBY521X5aC-PyTYaMkIEUuqlhTg_HzhfOqu8RrP2Y 200 [0.00, 172.18.0.3:48848]
-INFO 2024-11-19 14:34:13,498 runserver HTTP GET /api/join_tournament/ 200 [0.01, 172.18.0.3:48856]
-INFO 2024-11-19 14:34:13,515 runserver HTTP GET /static/js/join.js 200 [0.00, 172.18.0.3:48874]
-INFO 2024-11-19 14:34:13,515 runserver HTTP GET /static/js/dashboard-base.js 200 [0.01, 172.18.0.3:48862]
-INFO 2024-11-19 14:34:13,516 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:48880]
-INFO 2024-11-19 14:34:13,524 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:48878]
-INFO 2024-11-19 14:34:28,640 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMDI3MTQ3LCJpYXQiOjE3MzIwMjUzOTUsImp0aSI6ImM1NTMwMmRlZTRiYzQ1NWZiMTU5M2ZiMGQ1ZGU0M2JkIiwidXNlcl9pZCI6MX0.eHCBY521X5aC-PyTYaMkIEUuqlhTg_HzhfOqu8RrP2Y 200 [0.00, 172.18.0.3:32890]
-INFO 2024-11-19 14:34:28,660 runserver HTTP GET /api/tournaments/ 200 [0.01, 172.18.0.3:32906]
-INFO 2024-11-19 14:34:28,673 runserver HTTP GET /static/js/tournaments.js 200 [0.00, 172.18.0.3:32920]
-INFO 2024-11-19 14:34:28,680 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:32922]
-INFO 2024-11-19 14:36:27,241 autoreload /django/pageloader/consumer.py changed, reloading.
-INFO 2024-11-19 14:36:27,664 autoreload Watching for file changes with StatReloader
-INFO 2024-11-19 14:38:40,095 runserver HTTP GET /tournaments/ 200 [0.01, 172.18.0.3:51616]
-INFO 2024-11-19 14:38:40,129 runserver HTTP GET /static/css/style.css 200 [0.01, 172.18.0.3:51630]
-INFO 2024-11-19 14:38:40,131 runserver HTTP GET /static/js/main.js 200 [0.00, 172.18.0.3:51644]
-INFO 2024-11-19 14:38:40,132 runserver HTTP GET /static/js/game/module/three.min.js 200 [0.00, 172.18.0.3:51636]
-INFO 2024-11-20 09:14:53,451 autoreload Watching for file changes with StatReloader
-INFO 2024-11-20 14:49:57,374 autoreload Watching for file changes with StatReloader
-INFO 2024-11-21 09:46:42,397 autoreload Watching for file changes with StatReloader
-INFO 2024-11-21 14:50:07,529 autoreload Watching for file changes with StatReloader
-INFO 2024-11-21 14:10:14,124 autoreload Watching for file changes with StatReloader
-ERROR 2024-11-21 14:32:16,962 exception Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
-Traceback (most recent call last):
-  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
-    raise exc_info[1]
-  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
-    response = await get_response(request)
-  File "/usr/local/lib/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
-    response = await sync_to_async(
-  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
-    ret = await asyncio.shield(exec_coro)
-  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
-    result = self.fn(*self.args, **self.kwargs)
-  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
-    return func(*args, **kwargs)
-  File "/usr/local/lib/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
-    host = request.get_host()
-  File "/usr/local/lib/python3.9/site-packages/django/http/request.py", line 150, in get_host
-    raise DisallowedHost(msg)
-django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
-WARNING 2024-11-21 14:32:16,981 log Bad Request: /
-WARNING 2024-11-21 14:32:16,981 runserver HTTP GET / 400 [0.02, 172.18.0.2:51432]
-ERROR 2024-11-21 14:32:17,001 exception Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
-Traceback (most recent call last):
-  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
-    raise exc_info[1]
-  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
-    response = await get_response(request)
-  File "/usr/local/lib/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
-    response = await sync_to_async(
-  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
-    ret = await asyncio.shield(exec_coro)
-  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
-    result = self.fn(*self.args, **self.kwargs)
-  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
-    return func(*args, **kwargs)
-  File "/usr/local/lib/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
-    host = request.get_host()
-  File "/usr/local/lib/python3.9/site-packages/django/http/request.py", line 150, in get_host
-    raise DisallowedHost(msg)
-django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'www.calciomercato.com'. You may need to add 'www.calciomercato.com' to ALLOWED_HOSTS.
-WARNING 2024-11-21 14:32:17,014 log Bad Request: /favicon.ico
-WARNING 2024-11-21 14:32:17,015 runserver HTTP GET /favicon.ico 400 [0.02, 172.18.0.2:51442]
-INFO 2024-11-23 11:26:31,546 autoreload Watching for file changes with StatReloader
-INFO 2024-11-23 10:33:53,604 runserver HTTP GET / 200 [0.01, 172.18.0.3:50536]
-INFO 2024-11-23 10:33:53,623 runserver HTTP GET /static/js/game/module/three.min.js 304 [0.00, 172.18.0.3:50544]
-INFO 2024-11-23 10:33:53,628 runserver HTTP GET /static/js/main.js 304 [0.00, 172.18.0.3:50558]
-INFO 2024-11-23 10:33:53,628 runserver HTTP GET /static/css/style.css 200 [0.01, 172.18.0.3:50540]
-INFO 2024-11-23 10:33:53,906 runserver HTTP GET /api/home/ 200 [0.00, 172.18.0.3:50576]
-INFO 2024-11-23 10:33:53,976 runserver HTTP GET /static/js/home.js 304 [0.00, 172.18.0.3:50588]
-INFO 2024-11-23 10:34:00,216 runserver HTTP GET /api/login/ 200 [0.00, 172.18.0.3:50596]
-INFO 2024-11-23 10:34:00,272 runserver HTTP GET /static/js/login.js 200 [0.00, 172.18.0.3:50604]
-INFO 2024-11-23 10:34:03,702 runserver HTTP POST /api/login/ 200 [0.15, 172.18.0.3:55136]
-INFO 2024-11-23 10:34:03,736 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzU4MzQzLCJpYXQiOjE3MzIzNTgwNDMsImp0aSI6IjE1Njc2ZjQwYmFiYTQwZTk5NWIwODFjNmM0OTI0NmFkIiwidXNlcl9pZCI6MX0.ZhAd08y_xgrVs7Ali22vHk64YP5Z3SfahLyju6GP29s 200 [0.00, 172.18.0.3:55142]
-INFO 2024-11-23 10:34:03,753 runserver HTTP GET /api/dashboard/ 200 [0.01, 172.18.0.3:55150]
-INFO 2024-11-23 10:34:03,766 runserver HTTP GET /static/js/dashboard.js 200 [0.00, 172.18.0.3:55156]
-INFO 2024-11-23 10:34:03,766 runserver HTTP GET /static/js/dashboard-base.js 200 [0.00, 172.18.0.3:55154]
-INFO 2024-11-23 10:34:03,769 runserver HTTP GET /static/media/profiles/default.png 304 [0.00, 172.18.0.3:55178]
-INFO 2024-11-23 10:34:03,776 runserver HTTP GET /api/request_status/1/ 200 [0.01, 172.18.0.3:55170]
+INFO 2024-11-23 11:03:59,693 consumer Received message: {'action': 'start_tournament_preparation'}
+INFO 2024-11-23 11:03:59,693 consumer Starting tournament flow...
+INFO 2024-11-23 11:03:59,697 consumer Tournament q found with status waiting_for_matches.
+INFO 2024-11-23 11:03:59,706 consumer Tournament status updated to 'waiting_for_matches'.
+INFO 2024-11-23 11:03:59,718 consumer Slots updated and locked.
+INFO 2024-11-23 11:03:59,718 consumer Waiting for countdown to complete on client side...
+INFO 2024-11-23 11:04:00,693 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 9 seconds...'}
+INFO 2024-11-23 11:04:00,693 consumer Chat message sent by SYSTEM: Round starting in 9 seconds...
+INFO 2024-11-23 11:04:01,693 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 8 seconds...'}
+INFO 2024-11-23 11:04:01,693 consumer Chat message sent by SYSTEM: Round starting in 8 seconds...
+INFO 2024-11-23 11:04:02,693 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 7 seconds...'}
+INFO 2024-11-23 11:04:02,693 consumer Chat message sent by SYSTEM: Round starting in 7 seconds...
+INFO 2024-11-23 11:04:03,761 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 6 seconds...'}
+INFO 2024-11-23 11:04:03,761 consumer Chat message sent by SYSTEM: Round starting in 6 seconds...
+INFO 2024-11-23 11:04:04,767 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 5 seconds...'}
+INFO 2024-11-23 11:04:04,767 consumer Chat message sent by SYSTEM: Round starting in 5 seconds...
+INFO 2024-11-23 11:04:05,773 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 4 seconds...'}
+INFO 2024-11-23 11:04:05,773 consumer Chat message sent by SYSTEM: Round starting in 4 seconds...
+INFO 2024-11-23 11:04:06,777 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 3 seconds...'}
+INFO 2024-11-23 11:04:06,778 consumer Chat message sent by SYSTEM: Round starting in 3 seconds...
+INFO 2024-11-23 11:04:07,783 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 2 seconds...'}
+INFO 2024-11-23 11:04:07,783 consumer Chat message sent by SYSTEM: Round starting in 2 seconds...
+INFO 2024-11-23 11:04:08,793 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 1 seconds...'}
+INFO 2024-11-23 11:04:08,794 consumer Chat message sent by SYSTEM: Round starting in 1 seconds...
+INFO 2024-11-23 11:04:09,800 consumer Received message: {'action': 'chat_message', 'username': 'SYSTEM', 'message': 'Round starting in 0 seconds...'}
+INFO 2024-11-23 11:04:09,800 consumer Chat message sent by SYSTEM: Round starting in 0 seconds...
+INFO 2024-11-23 11:04:09,802 consumer Received message: {'action': 'countdown_complete'}
+INFO 2024-11-23 11:04:09,802 consumer Notifying players for round 1.
+DEBUG 2024-11-23 11:04:09,808 consumer Games in round 1: ['q - Round 1 - Game 1', 'q - Round 1 - Game 2']
+DEBUG 2024-11-23 11:04:09,808 consumer Slots content: [('1', {'locked': True, 'username': 'luca', 'player_id': 1}), ('2', {'locked': True, 'username': 'marco', 'player_id': 2}), ('3', {'locked': True, 'username': 'giovanni', 'player_id': 3}), ('4', {'locked': True, 'username': 'bruno', 'player_id': 7})]
+DEBUG 2024-11-23 11:04:09,808 consumer Assigning slots 0 to 2 for game q - Round 1 - Game 1.
+DEBUG 2024-11-23 11:04:09,809 consumer Slot 1: player_id=1, username=luca
+DEBUG 2024-11-23 11:04:09,813 consumer Assigned luca to game q - Round 1 - Game 1 (ID: 13) as player1
+DEBUG 2024-11-23 11:04:09,814 consumer Slot 2: player_id=2, username=marco
+DEBUG 2024-11-23 11:04:09,818 consumer Assigned marco to game q - Round 1 - Game 1 (ID: 13) as player2
+DEBUG 2024-11-23 11:04:09,828 consumer Assigning slots 2 to 4 for game q - Round 1 - Game 2.
+DEBUG 2024-11-23 11:04:09,828 consumer Slot 3: player_id=3, username=giovanni
+DEBUG 2024-11-23 11:04:09,832 consumer Assigned giovanni to game q - Round 1 - Game 2 (ID: 14) as player1
+DEBUG 2024-11-23 11:04:09,832 consumer Slot 4: player_id=7, username=bruno
+DEBUG 2024-11-23 11:04:09,835 consumer Assigned bruno to game q - Round 1 - Game 2 (ID: 14) as player2
+INFO 2024-11-23 11:04:09,841 consumer Notifications sent to all players to join the game.
+INFO 2024-11-23 11:04:45,554 runserver WebSocket DISCONNECT /wss/tournament/6/ [172.18.0.3:44348]
+INFO 2024-11-23 11:04:45,555 consumer Disconnecting from tournament room: tournament_6 with close code: None
+INFO 2024-11-23 11:04:45,566 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzYwMDY0LCJpYXQiOjE3MzIzNTg4NDUsImp0aSI6IjJkY2Q0YTg2OGIyZTQ2Mjc5MGFmOGRjOWUyMWFiOGJmIiwidXNlcl9pZCI6N30.vCkJF_Z6N8AmrVSbnZ269Ew2nXHZEwMFILft7VVuy18 200 [0.01, 172.18.0.3:39428]
+INFO 2024-11-23 11:04:45,567 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': True}
+INFO 2024-11-23 11:04:45,567 consumer Ready statuses after update: {'1': True, '2': True, '3': True, '4': False}
+INFO 2024-11-23 11:04:45,576 consumer Ready status saved successfully in the round database.
+INFO 2024-11-23 11:04:45,576 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '4': {'locked': True, 'username': 'bruno', 'player_id': 7}}, Ready status: {'1': True, '2': True, '3': True, '4': False}
+INFO 2024-11-23 11:04:45,577 consumer Ready status update sent to group: {'1': True, '2': True, '3': True, '4': False}
+INFO 2024-11-23 11:04:45,577 consumer User bruno removed from lobby, but still in the tournament.
+INFO 2024-11-23 11:04:45,578 consumer Attempting to retrieve user list for tournament_id: 6
+INFO 2024-11-23 11:04:45,583 runserver HTTP GET /api/game/14/ 200 [0.01, 172.18.0.3:39434]
+INFO 2024-11-23 11:04:45,583 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'bruno'}]
+INFO 2024-11-23 11:04:45,590 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:39448]
+INFO 2024-11-23 11:04:45,598 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.4144407214624124 200 [0.00, 172.18.0.3:39454]
+INFO 2024-11-23 11:04:45,608 runserver HTTP GET /static/js/game.js?v=0.27384600944207604 200 [0.00, 172.18.0.3:39470]
+INFO 2024-11-23 11:04:45,615 runserver HTTP GET /favicon.ico 200 [0.00, 172.18.0.3:39486]
+INFO 2024-11-23 11:04:45,620 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:39494]
+INFO 2024-11-23 11:04:45,623 runserver HTTP GET /static/js/game/src/Init.js 200 [0.00, 172.18.0.3:39496]
+INFO 2024-11-23 11:04:45,630 runserver WebSocket HANDSHAKING /wss/game/14/ [172.18.0.3:39536]
+INFO 2024-11-23 11:04:45,633 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:39502]
+INFO 2024-11-23 11:04:45,633 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:39518]
+INFO 2024-11-23 11:04:45,634 runserver WebSocket CONNECT /wss/game/14/ [172.18.0.3:39536]
+INFO 2024-11-23 11:04:45,636 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.3:39530]
+INFO 2024-11-23 11:04:45,636 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:39544]
+INFO 2024-11-23 11:04:45,637 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:39546]
+INFO 2024-11-23 11:04:45,649 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:39548]
+INFO 2024-11-23 11:04:45,650 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:39550]
+INFO 2024-11-23 11:04:45,659 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:39560]
+INFO 2024-11-23 11:04:45,690 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:39570]
+INFO 2024-11-23 11:04:45,918 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:39572]
+INFO 2024-11-23 11:04:45,928 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39580]
+INFO 2024-11-23 11:04:45,930 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:39602]
+INFO 2024-11-23 11:04:45,932 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39576]
+INFO 2024-11-23 11:04:45,933 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39588]
+INFO 2024-11-23 11:04:45,935 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39618]
+INFO 2024-11-23 11:04:45,937 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39612]
+INFO 2024-11-23 11:04:45,939 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39628]
+INFO 2024-11-23 11:04:45,942 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:39638]
+INFO 2024-11-23 11:04:48,023 runserver WebSocket DISCONNECT /wss/tournament/6/ [172.18.0.3:52098]
+INFO 2024-11-23 11:04:48,024 consumer Disconnecting from tournament room: tournament_6 with close code: None
+INFO 2024-11-23 11:04:48,031 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzYwMDgzLCJpYXQiOjE3MzIzNTg3NTgsImp0aSI6Ijk5ZTY4NWU0N2Q5NDRmNGVhZjU2YmMxYjBiZDI0Zjk1IiwidXNlcl9pZCI6M30.M0CvGQcyxyNAdXCXQEV_vwbxGEB_zdUThc8kdoRTP-w 200 [0.01, 172.18.0.3:39644]
+INFO 2024-11-23 11:04:48,034 consumer Ready statuses before update: {'1': True, '2': True, '3': True, '4': False}
+INFO 2024-11-23 11:04:48,034 consumer Ready statuses after update: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-23 11:04:48,038 consumer Ready status saved successfully in the round database.
+INFO 2024-11-23 11:04:48,039 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '4': {'locked': True, 'username': 'bruno', 'player_id': 7}}, Ready status: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-23 11:04:48,039 consumer Ready status update sent to group: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-23 11:04:48,039 consumer User giovanni removed from lobby, but still in the tournament.
+INFO 2024-11-23 11:04:48,039 consumer Attempting to retrieve user list for tournament_id: 6
+INFO 2024-11-23 11:04:48,044 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'bruno'}]
+INFO 2024-11-23 11:04:48,047 runserver HTTP GET /api/game/14/ 200 [0.01, 172.18.0.3:39654]
+INFO 2024-11-23 11:04:48,053 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.8437072022096772 200 [0.00, 172.18.0.3:39666]
+INFO 2024-11-23 11:04:48,058 runserver HTTP GET /static/media/profiles/default.png 200 [0.00, 172.18.0.3:39674]
+INFO 2024-11-23 11:04:48,065 runserver HTTP GET /static/js/game.js?v=0.47220084943360296 200 [0.00, 172.18.0.3:39690]
+INFO 2024-11-23 11:04:48,067 runserver HTTP GET /favicon.ico 200 [0.01, 172.18.0.3:39682]
+INFO 2024-11-23 11:04:48,072 runserver WebSocket HANDSHAKING /wss/game/14/ [172.18.0.3:39734]
+INFO 2024-11-23 11:04:48,081 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.01, 172.18.0.3:39706]
+INFO 2024-11-23 11:04:48,082 runserver WebSocket CONNECT /wss/game/14/ [172.18.0.3:39734]
+INFO 2024-11-23 11:04:48,083 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.3:39718]
+INFO 2024-11-23 11:04:48,084 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:39750]
+INFO 2024-11-23 11:04:48,086 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:39760]
+INFO 2024-11-23 11:04:48,088 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.01, 172.18.0.3:39766]
+INFO 2024-11-23 11:04:48,088 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:39762]
+INFO 2024-11-23 11:04:48,091 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:39772]
+INFO 2024-11-23 11:04:48,097 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:39784]
+INFO 2024-11-23 11:04:48,097 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:39798]
+INFO 2024-11-23 11:04:48,104 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:39808]
+INFO 2024-11-23 11:04:48,139 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:39818]
+INFO 2024-11-23 11:04:48,391 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:39830]
+INFO 2024-11-23 11:04:48,402 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39858]
+INFO 2024-11-23 11:04:48,402 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:39874]
+INFO 2024-11-23 11:04:48,404 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39840]
+INFO 2024-11-23 11:04:48,405 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39890]
+INFO 2024-11-23 11:04:48,406 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:39844]
+INFO 2024-11-23 11:04:48,408 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:39900]
+INFO 2024-11-23 11:04:48,417 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:39916]
+INFO 2024-11-23 11:04:48,417 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:39926]
+INFO 2024-11-23 11:04:50,406 runserver WebSocket DISCONNECT /wss/tournament/6/ [172.18.0.3:44174]
+INFO 2024-11-23 11:04:50,407 consumer Disconnecting from tournament room: tournament_6 with close code: None
+INFO 2024-11-23 11:04:50,415 runserver HTTP GET /api/token/refresh/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMzYwMDU5LCJpYXQiOjE3MzIzNTgwNDMsImp0aSI6Ijc5ODg3ZTI3MDViZTQxZWE4Mzk0ZTg2NDlmZWJhZmU5IiwidXNlcl9pZCI6MX0.BCpT4pM8goMSf-uc65sOvycP3CGbsLjlvNUY9Whxewo 200 [0.00, 172.18.0.3:39930]
+INFO 2024-11-23 11:04:50,417 consumer Ready statuses before update: {'1': True, '2': True, '3': False, '4': False}
+INFO 2024-11-23 11:04:50,417 consumer Ready statuses after update: {'1': False, '2': True, '3': False, '4': False}
+INFO 2024-11-23 11:04:50,426 consumer Ready status saved successfully in the round database.
+INFO 2024-11-23 11:04:50,427 consumer Sending ready status update. Slots: {'1': {'locked': True, 'username': 'luca', 'player_id': 1}, '2': {'locked': True, 'username': 'marco', 'player_id': 2}, '3': {'locked': True, 'username': 'giovanni', 'player_id': 3}, '4': {'locked': True, 'username': 'bruno', 'player_id': 7}}, Ready status: {'1': False, '2': True, '3': False, '4': False}
+INFO 2024-11-23 11:04:50,427 consumer Ready status update sent to group: {'1': False, '2': True, '3': False, '4': False}
+INFO 2024-11-23 11:04:50,428 consumer User luca removed from lobby, but still in the tournament.
+INFO 2024-11-23 11:04:50,428 consumer Attempting to retrieve user list for tournament_id: 6
+INFO 2024-11-23 11:04:50,431 runserver HTTP GET /api/game/13/ 200 [0.01, 172.18.0.3:39932]
+INFO 2024-11-23 11:04:50,433 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'bruno'}]
+INFO 2024-11-23 11:04:50,437 runserver HTTP GET /static/js/game-dashboard-base.js?v=0.24523152177031826 200 [0.00, 172.18.0.3:39938]
+INFO 2024-11-23 11:04:50,443 runserver HTTP GET /static/js/game.js?v=0.9007889490362267 200 [0.00, 172.18.0.3:39944]
+INFO 2024-11-23 11:04:50,450 runserver WebSocket HANDSHAKING /wss/game/13/ [172.18.0.3:39948]
+INFO 2024-11-23 11:04:50,452 runserver WebSocket CONNECT /wss/game/13/ [172.18.0.3:39948]
+INFO 2024-11-23 11:04:50,453 runserver HTTP GET /static/js/game/src/Corner.js 200 [0.00, 172.18.0.3:39954]
+INFO 2024-11-23 11:04:50,462 runserver HTTP GET /static/js/game/src/Model3D.js 200 [0.01, 172.18.0.3:39978]
+INFO 2024-11-23 11:04:50,462 runserver HTTP GET /static/js/game/src/Init.js 200 [0.01, 172.18.0.3:39968]
+INFO 2024-11-23 11:04:50,462 runserver HTTP GET /static/js/game/src/BotTop.js 200 [0.01, 172.18.0.3:39970]
+INFO 2024-11-23 11:04:50,464 runserver HTTP GET /static/js/game/src/BotSide.js 200 [0.01, 172.18.0.3:39982]
+INFO 2024-11-23 11:04:50,464 runserver HTTP GET /static/js/game/src/Collision.js 200 [0.00, 172.18.0.3:40000]
+INFO 2024-11-23 11:04:50,466 runserver HTTP GET /static/js/game/module/three.module.js 200 [0.01, 172.18.0.3:39986]
+INFO 2024-11-23 11:04:50,491 runserver HTTP GET /static/js/game/module/OBJLoader.js 200 [0.00, 172.18.0.3:40010]
+INFO 2024-11-23 11:04:50,491 runserver HTTP GET /static/js/game/module/GLTFLoader.js 200 [0.00, 172.18.0.3:40004]
+INFO 2024-11-23 11:04:50,533 runserver HTTP GET /static/js/game/module/BufferGeometryUtils.js 200 [0.00, 172.18.0.3:40018]
+INFO 2024-11-23 11:04:50,554 runserver HTTP GET /static/js/game/asset/ufo/scene.gltf 200 [0.00, 172.18.0.3:40020]
+INFO 2024-11-23 11:04:50,650 runserver HTTP GET /static/js/game/asset/ufo/scene.bin 200 [0.00, 172.18.0.3:40028]
+INFO 2024-11-23 11:04:50,656 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:40038]
+INFO 2024-11-23 11:04:50,660 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:40034]
+INFO 2024-11-23 11:04:50,661 runserver HTTP GET /static/js/game/asset/ufo/textures/material_metallicRoughness.png 200 [0.01, 172.18.0.3:40064]
+INFO 2024-11-23 11:04:50,661 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.01, 172.18.0.3:40052]
+INFO 2024-11-23 11:04:50,663 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:40048]
+INFO 2024-11-23 11:04:50,664 runserver HTTP GET /static/js/game/asset/ufo/textures/material_baseColor.png 200 [0.01, 172.18.0.3:40062]
+INFO 2024-11-23 11:04:50,666 runserver HTTP GET /static/js/game/asset/ufo/textures/material_normal.png 200 [0.01, 172.18.0.3:40068]
+INFO 2024-11-23 11:04:50,668 runserver HTTP GET /static/js/game/asset/ufo/textures/UfoGlass_baseColor.png 200 [0.00, 172.18.0.3:40076]
+INFO 2024-11-23 11:05:55,967 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.3:51800]
+INFO 2024-11-23 11:05:55,967 runserver WebSocket DISCONNECT /wss/game/14/ [172.18.0.3:39734]
+INFO 2024-11-23 11:05:57,352 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.3:43972]
+INFO 2024-11-23 11:05:57,352 runserver WebSocket DISCONNECT /wss/game/13/ [172.18.0.3:39948]
+INFO 2024-11-23 11:05:59,716 runserver WebSocket DISCONNECT /wss/socket-server/ [172.18.0.3:33246]
+INFO 2024-11-23 11:05:59,716 runserver WebSocket DISCONNECT /wss/game/14/ [172.18.0.3:39536]
+INFO 2024-11-24 14:35:24,770 autoreload Watching for file changes with StatReloader
+INFO 2024-11-25 09:52:30,476 autoreload Watching for file changes with StatReloader
+INFO 2024-11-25 12:02:34,265 autoreload Watching for file changes with StatReloader
+INFO 2024-11-25 14:06:54,424 autoreload Watching for file changes with StatReloader
+INFO 2024-11-25 16:36:44,969 autoreload Watching for file changes with StatReloader
+INFO 2024-11-26 15:02:17,422 autoreload Watching for file changes with StatReloader
+INFO 2024-11-27 10:49:23,351 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 12:40:53,411 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 14:13:23,949 autoreload Watching for file changes with StatReloader
+INFO 2024-11-28 13:17:49,404 autoreload /django/manage.py changed, reloading.
+INFO 2024-11-28 13:20:42,036 autoreload Watching for file changes with StatReloader
