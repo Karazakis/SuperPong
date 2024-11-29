@@ -16,8 +16,10 @@ joinButtons.forEach(button => {
 
 var refreshButton = document.getElementById('refresh-btn');
 refreshButton.addEventListener('click', function() {
-    loadPage("api/join_lobby/");
+    var currentUrl = window.location.pathname; // Ottiene l'URL corrente
+    loadPage("api"+currentUrl); // Usa l'URL corrente per caricare la pagina
 });
+
 
 
 var goBackBtn = document.getElementById('go-back-btn');

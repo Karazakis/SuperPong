@@ -833,17 +833,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.accept()
         logger.info("Connection accepted.")
 
-        # Controlla lo stato del torneo
-        if self.tournament.status == 'waiting_for_matches':
-            logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_matches' state. Generating next round.")
-            await self.prepare_next_round()
-            self.tournament.status = 'waiting_for_round'
-            await database_sync_to_async(self.tournament.save)()
-            logger.info(f"Tournament status updated to 'waiting_for_round'.")
+        # # Controlla lo stato del torneo
+        # if self.tournament.status == 'waiting_for_matches':
+        #     logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_matches' state. Generating next round.")
+        #     await self.prepare_next_round()
+        #     self.tournament.status = 'waiting_for_round'
+        #     await database_sync_to_async(self.tournament.save)()
+        #     logger.info(f"Tournament status updated to 'waiting_for_round'.")
 
-        if self.tournament.status == 'waiting_for_round':
-            logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_round' state. Checking current round games.")
-            await self.check_current_round_games()
+        # if self.tournament.status == 'waiting_for_round':
+        #     logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_round' state. Checking current round games.")
+        #     await self.check_current_round_games()
 
 
     async def disconnect(self, close_code):
@@ -1370,7 +1370,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         e assegna i giocatori ai campi del game.
         """
         try:
-            round = self.current_round
+            round = await self.get_current_round()
             if not round:
                 logger.error("Current round not found.")
                 return
@@ -1381,79 +1381,96 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             games = await database_sync_to_async(list)(round.games.all())
             logger.debug(f"Games in round {round.round_number}: {[game.name for game in games]}")
 
-            # Ordina gli slot per garantire un ordine consistente
-            slots = round.slots
-            sorted_slots = sorted(slots.items(), key=lambda x: int(x[0]))  # Ordina per numero di slot
-
-            # Log per ispezionare gli slot e i loro contenuti
-            logger.debug(f"Slots content: {sorted_slots}")
-
-            # Calcola il numero di giocatori per game in base al numero di slot e di game
+            # Ottieni gli slot
+            slots = list(round.slots.items())  # Converti in lista ordinata
             players_per_game = len(slots) // len(games) if games else 0
 
             if players_per_game == 0:
                 logger.error("No players per game could be calculated. Check the number of slots and games.")
                 return
 
-            # Assegna i giocatori ai game in base agli slot
-            for idx, game in enumerate(games):
-                # Calcola gli indici degli slot per questo game
-                start_idx = idx * players_per_game
-                end_idx = start_idx + players_per_game
-                game_slots = sorted_slots[start_idx:end_idx]
+            max_attempts = 5  # Numero massimo di tentativi per l'assegnazione
+            for attempt in range(max_attempts):
+                all_games_assigned = True  # Verifica se tutti i giochi sono stati completati
+                for idx, game in enumerate(games):
+                    # Calcola gli indici degli slot per questo game
+                    start_idx = idx * players_per_game
+                    end_idx = start_idx + players_per_game
+                    game_slots = slots[start_idx:end_idx]
 
-                logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
+                    logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
 
-                # Assegna i giocatori ai campi del game in base agli slot
-                for player_idx, (slot, slot_data) in enumerate(game_slots):
-                    player_id = slot_data.get('player_id')
-                    username = slot_data.get('username')
+                    # Assegna i giocatori ai campi del game in base agli slot
+                    for player_idx, (slot, slot_data) in enumerate(game_slots):
+                        player_id = slot_data.get('player_id')
+                        username = slot_data.get('username')
 
-                    # Log per ispezionare ogni slot e i suoi contenuti
-                    logger.debug(f"Slot {slot}: player_id={player_id}, username={username}")
+                        # Log per ispezionare ogni slot e i suoi contenuti
+                        logger.debug(f"Slot {slot}: player_id={player_id}, username={username}")
 
-                    if player_id:
-                        try:
-                            # Recupera il giocatore tramite il player_id
-                            player = await database_sync_to_async(User.objects.get)(id=player_id)
+                        if player_id:
+                            try:
+                                # Recupera il giocatore tramite il player_id
+                                player = await database_sync_to_async(User.objects.get)(id=player_id)
 
-                            # Assegna il giocatore al campo corretto del game
-                            if player_idx == 0:
-                                game.player1 = player
-                            elif player_idx == 1:
-                                game.player2 = player
-                            elif player_idx == 2 and game.mode != '1v1':
-                                game.player3 = player
-                            elif player_idx == 3 and game.mode != '1v1':
-                                game.player4 = player
+                                # Assegna il giocatore al campo corretto del game
+                                if player_idx == 0:
+                                    game.player1 = player
+                                elif player_idx == 1:
+                                    game.player2 = player
+                                elif player_idx == 2 and game.mode != '1v1':
+                                    game.player3 = player
+                                elif player_idx == 3 and game.mode != '1v1':
+                                    game.player4 = player
 
-                            logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
+                                logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
+                            except User.DoesNotExist:
+                                logger.error(f"Player with ID {player_id} not found for slot {slot}.")
+                                all_games_assigned = False
+                        else:
+                            logger.error(f"No player assigned to slot {slot}. Skipping this slot.")
+                            all_games_assigned = False
 
-                            # Invia il link per il game al giocatore
-                            message = {
-                                'type': 'join_game_notification',
-                                'slot': slot,
-                                'username': player.username,
-                                'game_link': f'/api/game/{game.id}/'  # Link per joinare il game
-                            }
-                            await self.channel_layer.group_send(
-                                f"user_{player.username}",
-                                {
-                                    'type': 'send_message_to_client',
-                                    'message': message
-                                }
-                            )
-                        except User.DoesNotExist:
-                            logger.error(f"Player with ID {player_id} not found for slot {slot}.")
-                    else:
-                        logger.error(f"No player assigned to slot {slot}. Skipping this slot.")
+                if all_games_assigned:
+                    # Se tutti i giochi sono stati completati, termina il loop
+                    break
+                else:
+                    logger.warning(f"Attempt {attempt + 1}/{max_attempts} failed to assign all players. Retrying...")
+                    await asyncio.sleep(1)
 
-                # Salva il game dopo aver assegnato tutti i giocatori
+            if not all_games_assigned:
+                logger.error("Failed to assign all players to games after maximum attempts.")
+                return
+
+            # Salva tutti i giochi
+            for game in games:
                 await database_sync_to_async(game.save)()
+                logger.debug(f"Game {game.name} saved with players.")
+
+            # Invia notifiche ai giocatori
+            for idx, game in enumerate(games):
+                for player_idx in range(players_per_game):
+                    player = getattr(game, f"player{player_idx + 1}", None)
+                    if player:
+                        message = {
+                            'type': 'join_game_notification',
+                            'slot': f"{idx * players_per_game + player_idx + 1}",
+                            'username': player.username,
+                            'game_link': f'/api/game/{game.id}/'  # Link per joinare il game
+                        }
+                        await self.channel_layer.group_send(
+                            f"user_{player.username}",
+                            {
+                                'type': 'send_message_to_client',
+                                'message': message
+                            }
+                        )
+                        logger.debug(f"Notification sent to {player.username} for game {game.name}.")
 
             logger.info("Notifications sent to all players to join the game.")
         except Exception as e:
             logger.error(f"Error sending notifications to join game: {e}")
+
 
     async def prepare_next_round(self):
         """

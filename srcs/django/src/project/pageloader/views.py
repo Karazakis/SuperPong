@@ -658,6 +658,8 @@ class JoinAPIView(APIView):
 
                     if tournament.status == 'not_started':
                         # Tornei non iniziati: esegui il normale join
+                        if tournament.players_in_lobby > tournament.nb_players:
+                            return Response({'success': False, 'message': 'Tournament is full'}, status=status.HTTP_400_BAD_REQUEST)
                         if user not in tournament.players.all():
                             tournament.players.add(user)  # Aggiungi il giocatore al torneo
                             tournament.players_in_lobby += 1  # Incrementa il numero di giocatori
@@ -667,9 +669,7 @@ class JoinAPIView(APIView):
                             user_profile.in_tournament_lobby = tournament
                             user_profile.save()
 
-                            return Response({'success': True}, status=status.HTTP_200_OK)
-                        else:
-                            return Response({'success': False, 'message': 'User is already in the tournament'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'success': True}, status=status.HTTP_200_OK)
 
                     elif tournament.status in ['waiting_for_matches', 'in_progress']:
                         # Tornei in corso: logica di re-join

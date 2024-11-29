@@ -241,11 +241,6 @@ function refreshAccessToken() {
     });
 }
 
-// function isAuthenticated() {
-//     const accessToken = localStorage.getItem("accessToken");
-//     return accessToken !== null;
-// }
-
 function loadPage(url) {
     let accessToken = localStorage.getItem("accessToken");
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
@@ -358,12 +353,12 @@ function loadPage(url) {
     }
     
 
-    // Controllo URL per decidere se fare la richiesta pilota
-    if (url !== "api/home/" && url !== "api/login/" && url !== "api/signup/") {
-        checkTokenValidity(url);
-    } else {
+    // // Controllo URL per decidere se fare la richiesta pilota
+    // if (url !== "api/home/" && url !== "api/login/" && url !== "api/signup/") {
+    //     checkTokenValidity(url);
+    // } else {
         performRequest(accessToken, url); // Carica direttamente se è una delle pagine libere
-    }
+    
 }
 
 // Funzione per rinfrescare il token di accesso
@@ -392,53 +387,53 @@ function refreshAccessToken() {
 }
 
 
-function checkUserPermission(page) {
-    const url = page;
-    if (url.includes("game") || url.includes("lobby")) {
+// function checkUserPermission(page) {
+//     const url = page;
+//     if (url.includes("game") || url.includes("lobby")) {
 
-        if ((url.includes("local") || url.includes("single")) && !url.includes("create")) {
-            return false;
-        } else {
-            let storage = window.localStorage;
+//         if ((url.includes("local") || url.includes("single")) && !url.includes("create")) {
+//             return false;
+//         } else {
+//             let storage = window.localStorage;
 
-            if (url.includes("lobby")) {
-                let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+//             if (url.includes("lobby")) {
+//                 let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
 
-                let lobbyId = sanitizedUrl.split("/").pop();
+//                 let lobbyId = sanitizedUrl.split("/").pop();
                 
-                recoverUser(localStorage.getItem("userId")).then((data) => {
-                    if (data) {
-                        let lobby = data.in_game_lobby;
-                        if (lobby == lobbyId) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                });
-            }  else {
-                let gameId = url.split("/").pop();
-                recoverUser(localStorage.getItem("userId")).then((data) => {
-                    if (data) {
-                        let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
-                        let gameId = sanitizedUrl.split("/").pop();
-                        let game = data.game_history;
-                        game.forEach(element => {
-                            if(element.id == gameId) {
-                                if(element.status != "finished" && element.status != "not_started") {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        });
-                    }
-                });
-            }              
-        }
-    }
-    return false;
-}
+//                 recoverUser(localStorage.getItem("userId")).then((data) => {
+//                     if (data) {
+//                         let lobby = data.in_game_lobby;
+//                         if (lobby == lobbyId) {
+//                             return true;
+//                         } else {
+//                             return false;
+//                         }
+//                     }
+//                 });
+//             }  else {
+//                 let gameId = url.split("/").pop();
+//                 recoverUser(localStorage.getItem("userId")).then((data) => {
+//                     if (data) {
+//                         let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+//                         let gameId = sanitizedUrl.split("/").pop();
+//                         let game = data.game_history;
+//                         game.forEach(element => {
+//                             if(element.id == gameId) {
+//                                 if(element.status != "finished" && element.status != "not_started") {
+//                                     return true;
+//                                 } else {
+//                                     return false;
+//                                 }
+//                             }
+//                         });
+//                     }
+//                 });
+//             }              
+//         }
+//     }
+//     return false;
+// }
 
 document.addEventListener("DOMContentLoaded", function() {
     let redirect = localStorage.getItem("redirect");
@@ -479,22 +474,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
             const apiUrl = `api${parts[0]}/?source=${sourcePart}`;
             loadPage(apiUrl);
-        } else if (page.includes("game") || page.includes("lobby")) {
-            if (checkUserPermission(page) === true) {
-                loadPage("api" + page);
-            }
-            else
-            {
-                if (page.includes("game")) {
-                    loadPage("api/forbidden/game/");
-                }
-                else
-                {
-                    loadPage("api/forbidden/lobby/");
-                }
-            }
-
-        }
+        } 
         else
         {
             // Se la stringa non contiene "create", carica la pagina con l'URL standard
