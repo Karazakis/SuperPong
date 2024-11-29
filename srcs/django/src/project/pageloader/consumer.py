@@ -833,17 +833,33 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.accept()
         logger.info("Connection accepted.")
 
-        # # Controlla lo stato del torneo
-        # if self.tournament.status == 'waiting_for_matches':
-        #     logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_matches' state. Generating next round.")
-        #     await self.prepare_next_round()
-        #     self.tournament.status = 'waiting_for_round'
-        #     await database_sync_to_async(self.tournament.save)()
-        #     logger.info(f"Tournament status updated to 'waiting_for_round'.")
+        # Controlla lo stato del torneo
+        self.tournament = await self.get_tournament()
 
-        # if self.tournament.status == 'waiting_for_round':
-        #     logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_round' state. Checking current round games.")
-        #     await self.check_current_round_games()
+        # Se lo stato è 'waiting_for_matches', genera il prossimo round
+        if self.tournament.status == 'waiting_for_matches':
+            logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_matches' state. Generating next round.")
+            try:
+                await self.prepare_next_round()
+                logger.info("Next round prepared successfully.")
+                self.tournament.status = 'waiting_for_round'
+                await database_sync_to_async(self.tournament.save)()
+                logger.info(f"Tournament status updated to 'waiting_for_round'.")
+            except Exception as e:
+                logger.error(f"Error during prepare_next_round: {e}")
+                await self.close()
+                return
+
+        # Se lo stato è 'waiting_for_round', controlla i game del round corrente
+        if self.tournament.status == 'waiting_for_round':
+            logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_round' state. Checking current round games.")
+            try:
+                await self.check_current_round_games()
+                logger.info("Checked current round games successfully.")
+            except Exception as e:
+                logger.error(f"Error during check_current_round_games: {e}")
+                await self.close()
+                return
 
 
     async def disconnect(self, close_code):
