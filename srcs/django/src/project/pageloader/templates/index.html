@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Pong</title>
     <!-- Includi il CSS di Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <!-- Includi jQuery, Popper.js, e il JavaScript di Bootstrap -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/js/lib/jquery.min.js"></script>
+    <script src="/static/js/lib/popper.min.js"></script>
+    <script src="/static/js/lib/bootstrap.min.js"></script>
     
     <!-- Includi Three.js -->
     <script src="/static/js/game/module/three.min.js"></script>    
@@ -47,18 +47,124 @@
     <div id="app">
     </div>
     <script>
+        async function recoverUser(id) {
+            let accessToken = localStorage.getItem("accessToken");
+            const checkAndRefreshToken = async () => {
+                try {
+                    const response = await fetch(`/api/token/refresh/?token=${accessToken}`, {
+                        method: 'GET',
+                    });
+
+                    const data = await response.json();
+
+                    if (data.message === 'Token valido') {
+                        return accessToken;
+                    } else if (data.message === 'Token non valido') {
+                        // Il token non è valido, tentiamo di rinnovarlo
+                        const newAccessToken = await refreshAccessToken();
+                        if (newAccessToken) {
+                            localStorage.setItem('accessToken', newAccessToken);
+                            return newAccessToken;
+                        } else {
+                            console.error('Impossibile rinnovare il token');
+                            return null;
+                        }
+                    } else {
+                        console.error('Errore durante il controllo del token:', data.error);
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('Errore durante la verifica o il rinnovo del token:', error);
+                    return null;
+                }
+            };
+
+            accessToken = await checkAndRefreshToken();
+            if (!accessToken) {
+                return;
+            }
+            try {
+                const response = await fetch(`/api/request_user/${id}/`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+
+                const text = await response.text();  
+
+                if (!response.ok) {
+                    console.error(`Errore nella risposta della rete: ${response.status} ${response.statusText}`);
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = JSON.parse(text);  // Prova a fare il parse del messaggio
+
+                return data; // Modifica questo percorso in base alla struttura della tua risposta
+
+            } catch (error) {
+                console.error('Errore durante il recupero dei dati dell\'utente:', error);
+                throw error;
+            }
+        }
         const url = window.location.href;
         if (url.includes("game") || url.includes("lobby")) {
             console.log("URL contiene 'game' o 'lobby'. Esecuzione comportamento specifico...");
-            if (url.includes("game")) {
-                if (url.includes("local")){
-
-                } else {
-                    console.log("URL contiene 'online'. Esecuzione comportamento specifico...");
-                }
-            } else if (url.includes("lobby")) {
-                console.log("URL contiene 'lobby'. Esecuzione comportamento specifico...");
+            if ((url.includes("local") || url.includes("single")) && !url.includes("create")) {
+                localStorage.setItem("redirect", "tolocal");
+            } else {
+                let storage = window.localStorage;
+                console.log("lo storage", storage);
+                console.log("URL contiene 'online'. Esecuzione comportamento specifico...");
+                if (url.includes("lobby")) {
+                    console.log("URL contiene 'lobby'. Esecuzione comportamento specifico...");
+                    let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+    
+                    let lobbyId = sanitizedUrl.split("/").pop();
+                    
+                    console.log("Lobby ID:", lobbyId);
+                    recoverUser(localStorage.getItem("userId")).then((data) => {
+                        console.log("Dati utente recuperati:", data);
+                        if (data) {
+                            let lobby = data.in_game_lobby;
+                            console.log("lobby", lobby, lobbyId);
+                            if (lobby == lobbyId) {
+                                console.log("Lobby trovata");
+                            } else {
+                                console.log("Lobby non trovata");
+                                localStorage.setItem("redirect", "lobby");
+                            }
+                        }
+                    });
+                }  else {
+                    console.log("URL NON contiene 'lobby'. Esecuzione comportamento specifico...");
+                    let gameId = url.split("/").pop();
+                    let userId = localStorage.getItem("userId");
+                    console.log("Game ID:", userId, gameId);
+                    recoverUser(userId).then((data) => {
+                        console.log("Dati utente recuperati:", data);
+                        if (data) {
+                            let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+                            let gameId = sanitizedUrl.split("/").pop();
+                            console.log("Utente autorizzato a visualizzare la pagina");
+                            let game = data.game_history;
+                            console.log("game", game);
+                            game.forEach(element => {
+                                if(element.id == gameId) {
+                                    console.log("Elemento trovato", element);
+                                    if(element.status != "finished" && element.status != "not_started") {
+                                        console.log("Partita attiva");
+                                    } else {
+                                        console.log("Partita non attiva");
+                                        localStorage.setItem("redirect", "game");
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }              
             }
+            //localStorage.setItem("redirect", "game");
         }
         window.initStarSky = function () {
             window.starScene = new THREE.Scene();

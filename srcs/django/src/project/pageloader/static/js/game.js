@@ -16,8 +16,7 @@ document.addEventListener('cleanupGameEvent', function() {
 });
 
 window.inGame = true;
-function cleanupGame() {
-    
+function cleanupGame() { 
     
     
     window.clearAllScene();
@@ -71,7 +70,7 @@ function cleanupGame() {
     scoreTeam = [20, 20];
     isPaused = false;
     window.removeEventListener('resize', window.onWindowResize, false);
-    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament-game") {
+    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament") {
         window.removeEventListener('keydown', handleKeyDownOnline);
         window.handleKeyDownOnline = null;
         window.removeEventListener('keyup', handleKeyUpOnline);
@@ -183,7 +182,7 @@ export class Pad {
         }
     }
 
-    update(dt) {               
+    update(dt) {             
         const currentTime = Date.now(); // da sistemare        
         if (currentTime - this.lastUpdateTime < this.updateInterval) {
             return;
@@ -396,10 +395,25 @@ endgameOnline() {
                     },
                     body: JSON.stringify(data)
                 });
+                
+                /*let hitPlayer1 = //TO DO vardacreare;
+                let hitPlayer2 = //TO DO vardacreare;
+                let hitData = {
+                    scorePlayer1: hitPlayer1,
+                    scorePlayer2: hitPlayer2,
+                };
+                const hitResponse = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(hitData)
+                });
         
-                if (!response.ok) {
-                    throw new Error('Errore durante il blocco dell\'utente');
-                }
+
+                
+                    */
             } catch (error) {
                 console.error('Errore durante la richiesta:', error);
             }
@@ -426,6 +440,7 @@ function startTimer() {
             }
             // Quando il tempo scade, ferma il timer e chiama endgame()
             if (timeRemaining <= 0) {
+                console.log("Tempo scaduto!");
                 clearInterval(countdownInterval);
                 gameover();
             }
@@ -484,6 +499,7 @@ const clock = new THREE.Clock();
     
 function getPlayerControls(playerId) {
     const playerDiv = document.getElementById(playerId);
+    console.log("il player div", playerDiv);
     if (playerDiv) {
         return {
             left: playerDiv.getAttribute('data-left'),
@@ -503,6 +519,7 @@ export let keyboardState = {};
 let p1Elem, p1Controls, p2Elem, p2Controls, p3Elem, p3Controls, p4Elem, p4Controls;
 
 p1Controls = getPlayerControls("player0");
+console.log("controllo p1", p1Controls);
 export const posit = p1Controls.posit;
 let paddle1 = new Pad(window.gameScene, boundaries, 0, -20, p1Controls.left, p1Controls.right, p1Controls.shoot, p1Controls.boost);
 let paddle2;
@@ -517,7 +534,8 @@ const cornerTotLeft = new Corner(window.gameScene, -21, 21, 0, 5);
 const model3D = new Model3D();
 let ufo = [];
 
-const isOnlineGame = gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament-game";
+const isOnlineGame = gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament";
+console.log("il game mode e il posit", gameSettings.gameMode, posit);
 export const isHost = posit === "p1";
 
 if (gameSettings.gameType == "single-game") {
@@ -545,7 +563,7 @@ if (gameSettings.gameType == "single-game") {
         walls[1] = false; 
         walls[3] = false;
     }
-} else if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament-game") {
+} else if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament") {
     p2Controls = getPlayerControls("player1");
     console.log("controllo p2", p2Controls);
     paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.right, p2Controls.left, p2Controls.shoot, p2Controls.boost);
@@ -602,7 +620,7 @@ function launchBall(n2online = 0, ballId = null) {
     let n2 = Math.floor(Math.random() * 4);
     let x = 0;
     let y = 0;
-    if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament-game") {
+    if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament") {
         if(posit == "p1"){
             n2 = n2online;
         }
@@ -689,7 +707,15 @@ function launchBall(n2online = 0, ballId = null) {
     if (0 <= maxBalls) {
         maxBalls--;
         setTimeout(() => {
-            const ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction, 1, GameSocket, ballId);
+            let ball;
+            console.log("è online?", isOnlineGame);
+            if (isOnlineGame !== false) {
+                 
+                ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction, 1, GameSocket, ballId);
+            } else if (isOnlineGame === false) {
+                console.log("è online no e sta creando", isOnlineGame);
+                ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction,1);
+            }
             BALLS.push(ball);
             ballsUpdate[ballId] = ball;
         }, 500);
@@ -739,12 +765,13 @@ export function gameover(p1 = -1, p2 = -1) {
         scoreP2.innerHTML = p2;
     }
     
+    console.log("nel gameover il posit e il game setting", posit, gameSettings);
     if(gameSettings.gameRules == "time") {
         gameEnded = true;
         populateMatchDetails();
         console.log("il posit e il game mode", posit, gameSettings.gameMode);
         if(gameSettings.gameMode == "1v1") {
-            if (posit == "p1") {
+            if (posit == "p1" || gameSettings.gameType === "local-game" || gameSettings.gameType === "single-game") {
                 if (score[0]  < score[1]) {
                     showModal("You Win!", "Congratulations, Player 1!");
                 } else if (score[0] == score[1]) {
@@ -843,6 +870,7 @@ export function gameover(p1 = -1, p2 = -1) {
 function showModal(title, message) {
     document.getElementById("modal-title").textContent = title;
     document.getElementById("modal-message").textContent = message;
+    console.log("il game over", document.getElementById("gameover-modal"));
     document.getElementById("gameover-modal").style.display = "block";
 }
 
@@ -1374,7 +1402,7 @@ let flagTimer = true;
 
 let gametype = document.getElementById('gametype').innerText;
 
-if(gametype == 'remote-game')
+if(gametype == 'remote-game' || gametype == 'tournament')
 {
     window.handleKeyDownOnline = function(event) {
         if(isInKeyPlayer(event.code) && !keyboardState[event.code])

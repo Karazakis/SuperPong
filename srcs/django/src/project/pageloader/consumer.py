@@ -805,6 +805,636 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
 
+# class TournamentConsumer(AsyncWebsocketConsumer):
+
+#     async def connect(self):
+#         self.tournament_id = self.scope['url_route']['kwargs']['game_id']
+#         self.room_group_name = f'tournament_{self.tournament_id}'
+#         logger.info(f"Connecting to tournament room: {self.room_group_name} with tournament_id: {self.tournament_id}")
+
+#         # Recupera l'utente
+#         self.user = await self.get_user()
+#         if not self.user:
+#             logger.warning("User not found. Closing connection.")
+#             await self.close()
+#             return
+
+#         logger.info(f"User {self.user.username} connected successfully.")
+
+#         # Recupera il round corrente
+#         self.current_round = await self.get_current_round()
+
+#         # Aggiungi il client al gruppo del torneo
+#         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+
+#          # Aggiungi l'utente al proprio gruppo personalizzato
+#         await self.channel_layer.group_add(f"user_{self.user.username}", self.channel_name)
+#         # Accetta la connessione WebSocket
+#         await self.accept()
+#         logger.info("Connection accepted.")
+
+
+#     async def disconnect(self, close_code):
+#         logger.info(f"Disconnecting from tournament room: {self.room_group_name} with close code: {close_code}")
+
+#         # Verifica se l'utente ha già eseguito il leave
+#         if not getattr(self, 'user_left', False):
+#             await self.remove_user_from_lobby()
+#             # Invia aggiornamenti solo se l'utente non ha già lasciato
+            
+
+#         # Rimuovi il client dal gruppo del torneo
+#         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+
+#     async def receive(self, text_data):
+#         """
+#         Gestisce i messaggi ricevuti dai client WebSocket.
+#         A seconda dell'azione richiesta (assign_slot, release_slot, player_ready, etc.),
+#         gestisce la logica corrispondente.
+#         """
+#         data = json.loads(text_data)
+#         action = data.get('action')
+#         logger.info(f"Received message: {data}")
+
+#         try:
+#             # Gestisci assegnazione/rilascio slot
+#             if action in ['assign_slot', 'release_slot']:
+#                 await self.manage_slot_status(data)
+            
+#             # Gestisci stato ready
+#             elif action == 'player_ready':
+#                 await self.manage_ready_status(data)
+
+#             # Gestione messaggi chat
+#             elif action == 'chat_message':
+#                 await self.manage_chat(data['message'], data['username'])
+            
+#             # Gestione team join/leave
+#             elif action in ['join_team', 'leave_team']:
+#                 await self.manage_team(action, data['team'], data['username'])
+
+#             # Gestisci join dell'utente
+#             elif action == 'join':
+#                 await self.add_user_to_lobby()
+#                 await self.send_lobby_update()  # Invia aggiornamento della lobby
+#                 await self.send_slot_status_update_to_group()  # Invia aggiornamento degli slot
+
+#             # Gestisci leave dell'utente
+#             elif action == 'leave':
+#                 await self.remove_user_from_lobby()  # Questo invia già l'aggiornamento della lobby
+#                 # Non c'è bisogno di inviare di nuovo l'aggiornamento della lobby e degli slot
+#                 self.user_left = True  # Segna che l'utente ha lasciato
+#                 # Invia conferma dell'avvenuto leave
+#                 await self.send(text_data=json.dumps({
+#                     'type': 'leave_confirmation'
+#                 }))
+
+#             # Preparazione torneo
+#             elif action == 'start_tournament_preparation':
+#                 await self.start_tournament_flow()
+
+#             elif action == 'countdown_complete':
+#                 await self.notify_players_to_join()
+
+#         except Exception as e:
+#             logger.error(f"Error processing receive message: {e}")
+
+#     async def manage_slot_status(self, data):
+#         action = data['action']
+#         slot = data.get('slot')
+#         username = data.get('username')
+
+#         logger.info(f"Action received: {action}, Slot: {slot}, Username: {username}")
+
+#         # Controllo se l'utente ha già uno slot assegnato
+#         user_slot = next((s for s, info in self.current_round.slots.items() if info['username'] == username), None)
+#         if user_slot:
+#             logger.warning(f"User {username} already has an assigned slot: {user_slot}. Slot change denied.")
+#             return  # Se l'utente ha già uno slot, non permettiamo il cambio
+
+#         await self.update_slot_status_in_round(slot, username if action == 'assign_slot' else None)
+
+#         logger.info(f"Slot status updated successfully for action: {action} on slot: {slot}")
+
+#         # Invia l'aggiornamento a tutti i client connessi
+#         await self.send_slot_status_update_to_group()
+
+
+#     async def manage_ready_status(self, data):
+#         slot = data.get('slot')
+#         username = data.get('username')
+#         ready_status = data.get('status', False)
+
+#         logger.info(f"Ready status received: Slot {slot}, Username: {username}, Ready Status: {ready_status}")
+
+#         # Verifica che l'utente possa modificare il proprio stato ready
+#         current_slot_user = self.current_round.slots.get(str(slot), {}).get('username')
+
+#         if current_slot_user == username:
+#             # Controllo se l'utente è già "ready"
+#             if self.current_round.ready_status.get(str(slot)):
+#                 logger.warning(f"User {username} is already marked as ready. Status change denied.")
+#                 return  # Se l'utente è già "ready", non permettiamo il cambio
+
+#             # Aggiorna solo lo stato ready per lo slot specificato
+#             await self.update_ready_status_in_round(slot, ready_status == 'ready')
+#             # Invia l'aggiornamento dello stato ready a tutti i client connessi
+#             await self.send_ready_status_update_to_group()
+#         else:
+#             logger.warning(f"User {username} is not authorized to change the ready status for slot {slot}")
+
+
+#     async def update_slot_status_in_round(self, slot, username, player_id=None):
+#         """
+#         Aggiorna lo stato degli slot nel round corrente, mantenendo il player_id.
+#         """
+#         try:
+#             await database_sync_to_async(self.current_round.refresh_from_db)()
+#             slots = self.current_round.slots
+#             logger.info(f"Current slot status for round.slots {slots}")
+            
+
+#             # Recupera il player_id direttamente da self.user
+#             player_id = self.user.id if self.user else None
+
+#             # Log per monitorare lo stato attuale e il cambiamento
+#             logger.info(f"Current slot status for all slots {slots}")
+
+
+#             # Verifica se lo slot è già occupato
+#             if slots[str(slot)]['username'] != 'empty' and slots[str(slot)]['username'] != username:
+#                 logger.warning(f"Slot {slot} is already occupied by {slots[str(slot)]['username']}. Cannot reassign.")
+#                 return  # Slot già occupato da un altro utente
+            
+#             # Aggiorna lo slot specificato con il nuovo username e player_id (o 'empty')
+#             if username:
+#                 slots[str(slot)]['username'] = username
+#                 slots[str(slot)]['player_id'] = player_id
+#                 self.current_round.ready_status[str(slot)] = False  # Resetta lo stato ready quando si assegna uno slot
+#             else:
+#                 slots[str(slot)] = {'username': 'empty', 'player_id': None}
+#                 self.current_round.ready_status[str(slot)] = False  # Resetta lo stato ready quando lo slot è vuoto
+
+#             self.current_round.slots = slots
+#             await database_sync_to_async(self.current_round.save)()
+#             logger.info(f"Slot status in round DB updated: {slots}")  # Log per confermare aggiornamento DB
+#         except Exception as e:
+#             logger.error(f"Error updating slot status in round DB: {e}")
+
+
+#     async def update_ready_status_in_round(self, slot, ready_status):
+#         """
+#         Imposta lo stato 'ready' del giocatore nello slot specificato nel round corrente.
+#         """
+#         try:
+#             await database_sync_to_async(self.current_round.refresh_from_db)()
+#             if not self.current_round:
+#                 logger.error("Current round not found.")
+#                 return
+
+#             ready_statuses = self.current_round.ready_status
+
+#             logger.info(f"Ready statuses before update: {ready_statuses}")
+#             # Aggiorna solo lo stato ready per lo slot specificato
+#             ready_statuses[str(slot)] = ready_status
+
+#             logger.info(f"Ready statuses after update: {ready_statuses}")
+
+#             self.current_round.ready_status = ready_statuses
+#             await database_sync_to_async(self.current_round.save)()
+#             logger.info(f"Ready status saved successfully in the round database.")
+
+#         except Exception as e:
+#             logger.error(f"Error setting ready status in round DB: {e}")
+
+#     async def send_slot_status_update_to_group(self):
+#         """
+#         Invia l'aggiornamento dello stato degli slot del round corrente a tutti i client connessi.
+#         """
+#         current_round = await self.get_current_round()
+#         if not self.current_round:
+#             logger.error("Current round not found.")
+#             return
+
+#         slots_status = current_round.slots
+#         message = {
+#             'type': 'update_all_slots',
+#             'slots': slots_status
+#         }
+#         await self.channel_layer.group_send(
+#             self.room_group_name,
+#             {
+#                 'type': 'send_message_to_clients',
+#                 'message': message
+#             }
+#         )
+#         logger.info(f"Slot status update sent to group: {slots_status}")
+
+#     async def send_ready_status_update_to_group(self):
+#         """
+#         Invia l'aggiornamento dello stato 'ready' del round corrente a tutti i client connessi.
+#         """
+#         if not self.current_round:
+#             logger.error("Current round not found.")
+#             return
+
+#         ready_statuses = self.current_round.ready_status
+#         slots_status = self.current_round.slots 
+
+#         logger.info(f"Sending ready status update. Slots: {slots_status}, Ready status: {ready_statuses}")
+
+#         message = {
+#             'type': 'update_ready_status',
+#             'ready_status': ready_statuses,
+#             'slots': slots_status
+#         }
+#         await self.channel_layer.group_send(
+#             self.room_group_name,
+#             {
+#                 'type': 'send_message_to_clients',
+#                 'message': message
+#             }
+#         )
+#         logger.info(f"Ready status update sent to group: {ready_statuses}")
+
+#     async def send_lobby_update(self):
+#         """
+#         Manda la lista aggiornata degli utenti nella lobby insieme allo stato ready.
+#         """
+#         try:
+#             user_list = await self.get_user_list()
+#             slots = self.current_round.slots
+
+#             # Invia l'aggiornamento a tutti i client connessi alla lobby
+#             await self.channel_layer.group_send(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'update_lobby',
+#                     'user_list': user_list,  # Lista degli utenti con stato ready
+#                     'slots': slots, 
+#                     'ready_status': self.current_round.ready_status  # Includi lo stato ready
+#                 }
+#             )
+#         except Exception as e:
+#             logger.error(f"Error sending lobby update: {e}")
+
+
+#     async def update_lobby(self, event):
+#         """
+#         Aggiorna la lobby con i dati ricevuti.
+#         """
+#         user_list = event['user_list']
+#         slots = event['slots']
+#         ready_status = event['ready_status']
+#         try:
+#             await self.send(text_data=json.dumps({
+#                 'type': 'update_lobby',
+#                 'user_list': user_list,
+#                 'slots': slots,
+#                 'ready_status': ready_status
+#             }))
+#         except Exception as e:
+#             logger.error(f"Error updating lobby: {e}")
+
+#     async def send_message_to_clients(self, event):
+#         """
+#         Invia i messaggi a tutti i client connessi.
+#         """
+#         message = event['message']
+#         try:
+#             await self.send(text_data=json.dumps(message))
+#         except Exception as e:
+#             logger.error(f"Error sending message to clients: {e}")
+
+#     async def manage_chat(self, message, username):
+#         """
+#         Gestisce i messaggi di chat nella lobby.
+#         """
+#         try:
+#             await self.channel_layer.group_send(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'send_message_to_clients',
+#                     'message': {
+#                         'type': 'chat_message',
+#                         'message': message,
+#                         'username': username
+#                     }
+#                 }
+#             )
+#             logger.info(f"Chat message sent by {username}: {message}")
+#         except Exception as e:
+#             logger.error(f"Error sending chat message: {e}")
+
+#     async def manage_team(self, action, team, username):
+#         """
+#         Gestisce le azioni di join e leave dei team.
+#         """
+#         try:
+#             message = {
+#                 'type': 'update_team',
+#                 'team': team,
+#                 'username': username,
+#                 'action': action
+#             }
+#             await self.channel_layer.group_send(self.room_group_name, {
+#                 'type': 'send_message_to_clients',
+#                 'message': message
+#             })
+#         except Exception as e:
+#             logger.error(f"Error managing team: {e}")
+
+#     async def add_user_to_lobby(self):
+#         """
+#         Aggiunge l'utente alla lobby tramite WebSocket, ma l'aggiunta al torneo è gestita tramite APIView.
+#         Questa funzione aggiorna solo lo stato della lobby.
+#         """
+#         try:
+#             # Recupera l'utente dalla funzione get_user
+#             user = await self.get_user()
+#             if not user:
+#                 logger.error("User not found, cannot update lobby")
+#                 return
+
+#             tournament = await self.get_tournament()
+#             if not tournament:
+#                 logger.error(f"Tournament {self.tournament_id} does not exist.")
+#                 return
+
+#             logger.info(f"User {user.username} joined lobby via WebSocket.")
+            
+#             # Aggiorna lo stato della lobby e invia gli aggiornamenti sugli slot
+#             await self.send_lobby_update()
+#             await self.send_slot_status_update_to_group()
+            
+#         except Exception as e:
+#             logger.error(f"Error updating lobby: {e}")
+
+
+
+#     async def remove_user_from_lobby(self):
+#         """
+#         Rimuove l'utente dalla lobby e aggiorna lo stato degli slot se l'utente occupava uno slot.
+#         Permette la rimozione solo se il torneo non è ancora iniziato (status = 'not_started').
+#         Se il torneo è già iniziato, rimuove solo lo stato 'ready' e aggiorna la lobby.
+#         """
+#         try:
+#             tournament = await database_sync_to_async(Tournament.objects.get)(id=self.tournament_id)
+#             user = self.user
+
+#             # Controlla lo stato del torneo
+#             if tournament.status == 'not_started':
+#                 # Verifica se l'utente occupava uno slot
+#                 if self.current_round:
+#                     slot_to_release = None
+#                     for slot, slot_data in self.current_round.slots.items():
+#                         if slot_data['username'] == user.username:
+#                             slot_to_release = slot
+#                             break
+
+#                     # Se l'utente occupava uno slot, resettiamo l'eventuale ready
+#                     if slot_to_release:
+#                         await self.update_ready_status_in_round(slot_to_release, False)
+#                         await self.send_ready_status_update_to_group()
+
+#                 # Invia l'aggiornamento della lobby per aggiornare il ready nella lista utenti
+#                 await self.send_lobby_update()
+#                 logger.info(f"Players in lobby before removal: {tournament.players_in_lobby}")
+
+#                 # Rimuovi l'utente dalla lobby solo se esiste nel torneo
+#                 if await database_sync_to_async(tournament.players.filter(id=user.id).exists)():
+#                     await database_sync_to_async(tournament.players.remove)(user)
+#                     tournament.players_in_lobby -= 1
+#                     await database_sync_to_async(tournament.save)()
+
+#                     logger.info(f"User {user.username} removed from tournament and lobby.")
+            
+#             else:
+#                 # Torneo già iniziato: rimuovi solo lo stato ready e aggiorna la lobby
+#                 if self.current_round:
+#                     slot_to_release = None
+#                     for slot, slot_data in self.current_round.slots.items():
+#                         if slot_data['username'] == user.username:
+#                             slot_to_release = slot
+#                             break
+
+#                     # Rimuovi lo stato ready dallo slot, ma non il giocatore
+#                     if slot_to_release:
+#                         await self.update_ready_status_in_round(slot_to_release, False)
+#                         await self.send_ready_status_update_to_group()
+
+#                     logger.info(f"User {user.username} removed from lobby, but still in the tournament.")
+            
+#             # Invia aggiornamento della lobby
+#             await self.send_lobby_update()
+
+#         except Exception as e:
+#             logger.error(f"Error removing user from lobby: {e}")
+
+
+
+#     @database_sync_to_async
+#     def get_user(self):
+#         """
+#         Recupera l'utente corrente dal database.
+#         """
+#         try:
+#             query_string = self.scope['query_string'].decode()
+#             query_params = dict(urllib.parse.parse_qsl(query_string))
+#             user_id = query_params.get('id', None)
+#             if user_id:
+#                 return User.objects.get(id=user_id)
+#             return None
+#         except User.DoesNotExist:
+#             return None
+
+#     @database_sync_to_async
+#     def get_user_list(self):
+#         """
+#         Recupera la lista degli utenti presenti nella lobby.
+#         """
+#         logger.info(f"Attempting to retrieve user list for tournament_id: {self.tournament_id}")
+#         try:
+#             tournament = Tournament.objects.prefetch_related('players').get(id=self.tournament_id)
+#             users = tournament.players.all()
+#             user_list = [{'username': user.username} for user in users]
+#             logger.info(f"User list: {user_list}")
+#             return user_list
+#         except Tournament.DoesNotExist:
+#             logger.error(f"Tournament with id {self.tournament_id} does not exist.")
+#             return []  # Se il torneo non esiste, restituisce una lista vuota
+#         except Exception as e:
+#             logger.error(f"Error getting user list: {e}")
+#             return []
+
+#     @database_sync_to_async
+#     def get_tournament(self):
+#         """
+#         Recupera il torneo corrente dal database.
+#         """
+#         try:
+#             return Tournament.objects.get(id=self.tournament_id)
+#         except Tournament.DoesNotExist:
+#             return None
+
+#     async def get_current_round(self):
+#         """
+#         Recupera il round corrente basato sul torneo.
+#         """
+#         try:
+#             tournament = await self.get_tournament()
+#             return await database_sync_to_async(Round.objects.filter(tournament=tournament, status='not_started').first)()
+#         except Exception as e:
+#             logger.error(f"Error retrieving current round: {e}")
+#             return None
+
+#     async def send_message_to_client(self, event):
+#         """
+#         Metodo per inviare il messaggio al client specifico.
+#         """
+#         message = event['message']
+#         await self.send(text_data=json.dumps(message))
+
+
+#     async def start_tournament_flow(self):
+#         """
+#         Gestisce la preparazione del torneo e l'inizio del round con un countdown sincronizzato.
+#         """
+#         logger.info("Starting tournament flow...")
+
+#         # Ottieni il torneo e imposta lo stato su 'waiting_for_matches'
+#         tournament = await self.get_tournament()
+#         if not tournament:
+#             logger.error(f"Tournament {self.tournament_id} does not exist.")
+#             return
+
+#         logger.info(f"Tournament {tournament.name} found with status {tournament.status}.")
+#         tournament.status = 'waiting_for_matches'
+#         await database_sync_to_async(tournament.save)()
+#         logger.info(f"Tournament status updated to 'waiting_for_matches'.")
+
+#         # Blocca gli slot del round
+#         round = await self.get_current_round()
+#         if not round:
+#             logger.error("Current round not found.")
+#             return
+
+#         slots = round.slots
+#         for slot in slots.values():
+#             if slot['username'] != 'empty':
+#                 slot['locked'] = True
+#         round.slots = slots
+#         await database_sync_to_async(round.save)()
+#         logger.info(f"Slots updated and locked.")
+
+#         # Invia il messaggio di blocco degli slot a tutti i client
+#         await self.channel_layer.group_send(
+#             self.room_group_name,
+#             {
+#                 'type': 'send_message_to_clients',
+#                 'message': {
+#                     'type': 'block_slots',
+#                     'message': 'Slots are now locked, preparing the tournament...'
+#                 }
+#             }
+#         )
+#         # Aspetta il messaggio dal client per confermare la fine del countdown
+#         logger.info("Waiting for countdown to complete on client side...")
+
+
+#     async def notify_players_to_join(self):
+#         """
+#         Invia una notifica a ciascun giocatore per unirsi al game in base agli slot assegnati
+#         e assegna i giocatori ai campi del game.
+#         """
+#         try:
+#             round = self.current_round
+#             if not round:
+#                 logger.error("Current round not found.")
+#                 return
+
+#             logger.info(f"Notifying players for round {round.round_number}.")
+
+#             # Recupera tutti i game associati al round in modo asincrono
+#             games = await database_sync_to_async(list)(round.games.all())
+#             logger.debug(f"Games in round {round.round_number}: {[game.name for game in games]}")
+
+#             # Ordina gli slot per garantire un ordine consistente
+#             slots = round.slots
+#             sorted_slots = sorted(slots.items(), key=lambda x: int(x[0]))  # Ordina per numero di slot
+
+#             # Log per ispezionare gli slot e i loro contenuti
+#             logger.debug(f"Slots content: {sorted_slots}")
+
+#             # Calcola il numero di giocatori per game in base al numero di slot e di game
+#             players_per_game = len(slots) // len(games) if games else 0
+
+#             if players_per_game == 0:
+#                 logger.error("No players per game could be calculated. Check the number of slots and games.")
+#                 return
+
+#             # Assegna i giocatori ai game in base agli slot
+#             for idx, game in enumerate(games):
+#                 # Calcola gli indici degli slot per questo game
+#                 start_idx = idx * players_per_game
+#                 end_idx = start_idx + players_per_game
+#                 game_slots = sorted_slots[start_idx:end_idx]
+
+#                 logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
+
+#                 # Assegna i giocatori ai campi del game in base agli slot
+#                 for player_idx, (slot, slot_data) in enumerate(game_slots):
+#                     player_id = slot_data.get('player_id')
+#                     username = slot_data.get('username')
+
+#                     # Log per ispezionare ogni slot e i suoi contenuti
+#                     logger.debug(f"Slot {slot}: player_id={player_id}, username={username}")
+
+#                     if player_id:
+#                         try:
+#                             # Recupera il giocatore tramite il player_id
+#                             player = await database_sync_to_async(User.objects.get)(id=player_id)
+
+#                             # Assegna il giocatore al campo corretto del game
+#                             if player_idx == 0:
+#                                 game.player1 = player
+#                             elif player_idx == 1:
+#                                 game.player2 = player
+#                             elif player_idx == 2 and game.mode != '1v1':
+#                                 game.player3 = player
+#                             elif player_idx == 3 and game.mode != '1v1':
+#                                 game.player4 = player
+
+#                             logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
+
+#                             # Invia il link per il game al giocatore
+#                             message = {
+#                                 'type': 'join_game_notification',
+#                                 'slot': slot,
+#                                 'username': player.username,
+#                                 'game_link': f'/api/game/{game.id}/'  # Link per joinare il game
+#                             }
+#                             await self.channel_layer.group_send(
+#                                 f"user_{player.username}",
+#                                 {
+#                                     'type': 'send_message_to_client',
+#                                     'message': message
+#                                 }
+#                             )
+#                         except User.DoesNotExist:
+#                             logger.error(f"Player with ID {player_id} not found for slot {slot}.")
+#                     else:
+#                         logger.error(f"No player assigned to slot {slot}. Skipping this slot.")
+
+#                 # Salva il game dopo aver assegnato tutti i giocatori
+#                 await database_sync_to_async(game.save)()
+
+#             logger.info("Notifications sent to all players to join the game.")
+#         except Exception as e:
+#             logger.error(f"Error sending notifications to join game: {e}")
+
+
 class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
@@ -832,6 +1462,34 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # Accetta la connessione WebSocket
         await self.accept()
         logger.info("Connection accepted.")
+
+        # Controlla lo stato del torneo
+        self.tournament = await self.get_tournament()
+
+        # Se lo stato è 'waiting_for_matches', genera il prossimo round
+        if self.tournament.status == 'waiting_for_matches':
+            logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_matches' state. Generating next round.")
+            try:
+                await self.prepare_next_round()
+                logger.info("Next round prepared successfully.")
+                self.tournament.status = 'waiting_for_round'
+                await database_sync_to_async(self.tournament.save)()
+                logger.info(f"Tournament status updated to 'waiting_for_round'.")
+            except Exception as e:
+                logger.error(f"Error during prepare_next_round: {e}")
+                await self.close()
+                return
+
+        # Se lo stato è 'waiting_for_round', controlla i game del round corrente
+        if self.tournament.status == 'waiting_for_round':
+            logger.info(f"Tournament {self.tournament.name} is in 'waiting_for_round' state. Checking current round games.")
+            try:
+                await self.check_current_round_games()
+                logger.info("Checked current round games successfully.")
+            except Exception as e:
+                logger.error(f"Error during check_current_round_games: {e}")
+                await self.close()
+                return
 
 
     async def disconnect(self, close_code):
@@ -1319,14 +1977,23 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if not round:
             logger.error("Current round not found.")
             return
+        
+        # Log dettagliati per verificare gli slot
+        logger.debug(f"Round {round.round_number} retrieved with slots: {round.slots}")
 
+        # Blocca gli slot del round
         slots = round.slots
-        for slot in slots.values():
-            if slot['username'] != 'empty':
-                slot['locked'] = True
+        for slot_key, slot_data in slots.items():
+            logger.debug(f"Processing slot {slot_key}: {slot_data}")
+            if slot_data['username'] != 'empty':
+                slot_data['locked'] = True
+            else:
+                logger.warning(f"Slot {slot_key} is empty and will not be locked.")
+
+        # Aggiorna gli slot nel round
         round.slots = slots
         await database_sync_to_async(round.save)()
-        logger.info(f"Slots updated and locked.")
+        logger.info(f"Slots updated and locked: {round.round_number} retrieved with slots: {round.slots}")
 
         # Invia il messaggio di blocco degli slot a tutti i client
         await self.channel_layer.group_send(
@@ -1349,7 +2016,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         e assegna i giocatori ai campi del game.
         """
         try:
-            round = self.current_round
+            round = await self.get_current_round()
             if not round:
                 logger.error("Current round not found.")
                 return
@@ -1360,76 +2027,257 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             games = await database_sync_to_async(list)(round.games.all())
             logger.debug(f"Games in round {round.round_number}: {[game.name for game in games]}")
 
-            # Ordina gli slot per garantire un ordine consistente
-            slots = round.slots
-            sorted_slots = sorted(slots.items(), key=lambda x: int(x[0]))  # Ordina per numero di slot
-
-            # Log per ispezionare gli slot e i loro contenuti
-            logger.debug(f"Slots content: {sorted_slots}")
-
-            # Calcola il numero di giocatori per game in base al numero di slot e di game
+            # Ottieni gli slot
+            slots = list(round.slots.items())  # Converti in lista ordinata
             players_per_game = len(slots) // len(games) if games else 0
 
             if players_per_game == 0:
                 logger.error("No players per game could be calculated. Check the number of slots and games.")
                 return
 
-            # Assegna i giocatori ai game in base agli slot
-            for idx, game in enumerate(games):
-                # Calcola gli indici degli slot per questo game
-                start_idx = idx * players_per_game
-                end_idx = start_idx + players_per_game
-                game_slots = sorted_slots[start_idx:end_idx]
+            max_attempts = 5  # Numero massimo di tentativi per l'assegnazione
+            for attempt in range(max_attempts):
+                all_games_assigned = True  # Verifica se tutti i giochi sono stati completati
+                for idx, game in enumerate(games):
+                    # Calcola gli indici degli slot per questo game
+                    start_idx = idx * players_per_game
+                    end_idx = start_idx + players_per_game
+                    game_slots = slots[start_idx:end_idx]
 
-                logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
+                    logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
 
-                # Assegna i giocatori ai campi del game in base agli slot
-                for player_idx, (slot, slot_data) in enumerate(game_slots):
-                    player_id = slot_data.get('player_id')
-                    username = slot_data.get('username')
+                    # Assegna i giocatori ai campi del game in base agli slot
+                    for player_idx, (slot, slot_data) in enumerate(game_slots):
+                        player_id = slot_data.get('player_id')
+                        username = slot_data.get('username')
 
-                    # Log per ispezionare ogni slot e i suoi contenuti
-                    logger.debug(f"Slot {slot}: player_id={player_id}, username={username}")
+                        # Log per ispezionare ogni slot e i suoi contenuti
+                        logger.debug(f"Slot {slot}: player_id={player_id}, username={username}")
 
-                    if player_id:
-                        try:
-                            # Recupera il giocatore tramite il player_id
-                            player = await database_sync_to_async(User.objects.get)(id=player_id)
+                        if player_id:
+                            try:
+                                # Recupera il giocatore tramite il player_id
+                                player = await database_sync_to_async(User.objects.get)(id=player_id)
 
-                            # Assegna il giocatore al campo corretto del game
-                            if player_idx == 0:
-                                game.player1 = player
-                            elif player_idx == 1:
-                                game.player2 = player
-                            elif player_idx == 2 and game.mode != '1v1':
-                                game.player3 = player
-                            elif player_idx == 3 and game.mode != '1v1':
-                                game.player4 = player
+                                # Assegna il giocatore al campo corretto del game
+                                if player_idx == 0:
+                                    game.player1 = player
+                                elif player_idx == 1:
+                                    game.player2 = player
+                                elif player_idx == 2 and game.mode != '1v1':
+                                    game.player3 = player
+                                elif player_idx == 3 and game.mode != '1v1':
+                                    game.player4 = player
 
-                            logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
+                                logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
+                            except User.DoesNotExist:
+                                logger.error(f"Player with ID {player_id} not found for slot {slot}.")
+                                all_games_assigned = False
+                        else:
+                            logger.error(f"No player assigned to slot {slot}. Skipping this slot.")
+                            all_games_assigned = False
 
-                            # Invia il link per il game al giocatore
-                            message = {
-                                'type': 'join_game_notification',
-                                'slot': slot,
-                                'username': player.username,
-                                'game_link': f'/api/game/{game.id}/'  # Link per joinare il game
-                            }
-                            await self.channel_layer.group_send(
-                                f"user_{player.username}",
-                                {
-                                    'type': 'send_message_to_client',
-                                    'message': message
-                                }
-                            )
-                        except User.DoesNotExist:
-                            logger.error(f"Player with ID {player_id} not found for slot {slot}.")
-                    else:
-                        logger.error(f"No player assigned to slot {slot}. Skipping this slot.")
+                if all_games_assigned:
+                    # Se tutti i giochi sono stati completati, termina il loop
+                    break
+                else:
+                    logger.warning(f"Attempt {attempt + 1}/{max_attempts} failed to assign all players. Retrying...")
+                    await asyncio.sleep(1)
 
-                # Salva il game dopo aver assegnato tutti i giocatori
+            if not all_games_assigned:
+                logger.error("Failed to assign all players to games after maximum attempts.")
+                return
+
+            # Salva tutti i giochi
+            for game in games:
                 await database_sync_to_async(game.save)()
+                logger.debug(f"Game {game.name} saved with players.")
+
+            # Invia notifiche ai giocatori
+            for idx, game in enumerate(games):
+                for player_idx in range(players_per_game):
+                    player = getattr(game, f"player{player_idx + 1}", None)
+                    if player:
+                        message = {
+                            'type': 'join_game_notification',
+                            'slot': f"{idx * players_per_game + player_idx + 1}",
+                            'username': player.username,
+                            'game_link': f'/api/game/{game.id}/'  # Link per joinare il game
+                        }
+                        await self.channel_layer.group_send(
+                            f"user_{player.username}",
+                            {
+                                'type': 'send_message_to_client',
+                                'message': message
+                            }
+                        )
+                        logger.debug(f"Notification sent to {player.username} for game {game.name}.")
 
             logger.info("Notifications sent to all players to join the game.")
         except Exception as e:
             logger.error(f"Error sending notifications to join game: {e}")
+
+
+    async def prepare_next_round(self):
+        """
+        Prepara il prossimo round
+        """
+        # Controlla se esiste già un round successivo
+        next_round_number = (self.current_round.round_number + 1)
+        next_round_exists = await database_sync_to_async(Round.objects.filter(
+            tournament=self.tournament, round_number=next_round_number).exists)()
+
+        if next_round_exists:
+            logger.info(f"Round {next_round_number} already exists. Skipping round generation.")
+            return
+
+        # Genera il prossimo round
+        message = await database_sync_to_async(self.tournament.generate_next_round)()
+        logger.info(message)
+
+
+    # DA CONTROLLARE BENE
+
+    async def check_current_round_games(self):
+        """
+        Controlla lo stato dei game del round corrente, aggiorna gli slot del round successivo
+        (se esiste) e aggiorna lo stato del round se necessario. Gestisce anche il round finale.
+        """
+        if not self.current_round:
+            logger.warning("No current round found to check games.")
+            return
+
+        # Recupera tutti i game del round corrente
+        logger.info("Attempting to retrieve games for the current round.")
+        games = await database_sync_to_async(list)(self.current_round.games.select_related('winner').all())
+        if not games:
+            logger.warning(f"No games found for round {self.current_round.round_number}.")
+            return
+
+        # Recupera il round successivo (se esiste)
+        logger.info("Attempting to retrieve the next round.")
+        next_round_number = self.current_round.round_number + 1
+        next_round = await database_sync_to_async(Round.objects.filter(
+            tournament=self.tournament, round_number=next_round_number).first)()
+        logger.info(f"Next round retrieval result: {'found' if next_round else 'not found'}.")
+        
+        is_final_round = not next_round  # Se non c'è un round successivo, siamo alla finale
+        if is_final_round:
+            logger.info(f"Final round detected: round {self.current_round.round_number}.")
+
+        all_finished = True  # Assume che tutti i game siano finiti
+        updated_slots = {}  # Accumula gli slot aggiornati per il round successivo
+        tournament_winner = None  # Vincitore del torneo, se siamo alla finale
+
+        # Aggiorna gli slot del round successivo per ogni game finito (se esiste un next_round)
+        for idx, game in enumerate(games):
+            logger.info(f"Processing game {game.name}. Status: {game.status}")
+            if game.status == 'finished':
+                logger.info(f"Game {game.name} is finished. Processing winner for next round slots.")
+                winner = game.winner
+
+                if not winner:
+                    logger.warning(f"Game {game.name} has no winner. Skipping update.")
+                    continue
+
+                 # Se siamo alla finale, impostiamo il vincitore del torneo
+                if is_final_round:
+                    tournament_winner = winner
+                    logger.info(f"Final round winner determined: {winner.username}.")
+
+                if next_round:
+                    # Aggiorna lo slot corretto del round successivo
+                    slot_key = str(idx + 1)
+                    updated_slots[slot_key] = {'player_id': winner.id, 'username': winner.username}
+                    await self.update_next_round_slot(next_round, slot_key, winner)
+            else:
+                all_finished = False
+
+        # Notifica i client con tutti gli slot aggiornati (solo se esiste un next_round e ci sono aggiornamenti)
+        if next_round and updated_slots:
+            logger.info(f"Notifying clients of updated slots: {updated_slots}.")
+            await self.notify_clients_of_slot_updates(next_round_number, updated_slots)
+
+        # Se tutti i game sono completati, marca il round come 'finished'
+        if all_finished:
+            logger.info(f"All games in round {self.current_round.round_number} are finished. Marking round as finished.")
+            await self.mark_round_as_finished()
+
+            # Gestione del round finale
+            if is_final_round:
+                logger.info("Handling tournament end.")
+                await self.handle_tournament_end(tournament_winner)
+
+
+
+    async def update_next_round_slot(self, next_round, slot_key, winner):
+        """
+        Aggiorna lo slot del round successivo con i dati del vincitore.
+        """
+        next_round.slots[slot_key] = {'player_id': winner.id, 'username': winner.username}
+        await database_sync_to_async(next_round.save)()
+        logger.info(f"Updated slot {slot_key} in round {next_round.round_number} with winner {winner.username}.")
+
+
+
+    async def notify_clients_of_slot_updates(self, next_round_number, updated_slots):
+        """
+        Notifica i client con tutti gli slot aggiornati del prossimo round.
+        """
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'send_message_to_clients',
+                'message': {
+                    'type': 'update_next_round_slots',
+                    'round_number': next_round_number,
+                    'slots': updated_slots
+                }
+            }
+        )
+        logger.info(f"Notified clients of updated slots for round {next_round_number}: {updated_slots}.")
+
+
+
+    async def mark_round_as_finished(self):
+        """
+        Marca il round corrente come 'finished' e aggiorna lo stato del torneo.
+        """
+        self.current_round.status = 'finished'
+        await database_sync_to_async(self.current_round.save)()
+        logger.info(f"Round {self.current_round.round_number} marked as finished.")
+
+        # Aggiorna lo stato del torneo
+        self.tournament.status = 'preparing_next_round'
+        await database_sync_to_async(self.tournament.save)()
+        logger.info(f"Tournament status updated to 'preparing_next_round'.")
+
+
+    async def handle_tournament_end(self, tournament_winner):
+        """
+        Gestisce la fine del torneo, aggiornando lo stato e notificando i client.
+        """
+        self.tournament.status = 'finished'
+        self.tournament.winner = tournament_winner
+        await database_sync_to_async(self.tournament.save)()
+        logger.info(f"Tournament {self.tournament.name} marked as finished with winner: {tournament_winner.username if tournament_winner else 'None'}.")
+
+        # Prepara il messaggio per i client
+        message = {
+            'type': 'tournament_finished',
+            'message': f"The tournament '{self.tournament.name}' has concluded!",
+            'winner': {
+                'username': tournament_winner.username if tournament_winner else None,
+                'player_id': tournament_winner.id if tournament_winner else None,
+            } if tournament_winner else None
+        }
+
+        # Notifica i client che il torneo è terminato
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'send_message_to_clients',
+                'message': message
+            }
+        )
+        logger.info(f"Notified clients of tournament conclusion with winner: {tournament_winner.username if tournament_winner else 'None'}.")

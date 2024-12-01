@@ -146,6 +146,8 @@ class Game(models.Model):
     player4 = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='games_player4', default=None, null=True, blank=True)
     player1_status = models.CharField(max_length=100, default='not_ready')
     player2_status = models.CharField(max_length=100, default='not_ready')
+    player1_hit = models.IntegerField(default=0, null=True, blank=True)
+    player2_hit = models.IntegerField(default=0, null=True, blank=True)
     player3_status = models.CharField(max_length=100, default='not_ready')
     player4_status = models.CharField(max_length=100, default='not_ready')
     player1_score = models.IntegerField(default=0, null=True, blank=True)

@@ -14,9 +14,10 @@ function checkCurrentLobbyandDisable(){
     let baseUrl = window.location.origin;
     let url = baseUrl + "/api/request_status/" + userId + "/";
 
-    fetch(url).catch(error => console.error('Errore durante il recupero della pagina:', error))
+    fetch(url).catch(error => console.log('Errore durante il recupero della pagina:', error))
     .then(response => response.json())
     .then(data => {
+        console.log("nel check",data);
         if(data.game !== null)
         {
             disableJoinGameButton();
@@ -49,6 +50,8 @@ function checkCurrentLobbyandDisable(){
                 })
                 .catch(error => console.error('Error:', error));
             };
+
+            console.log("data.game",data.game);
             document.getElementById("rejoin-lobby-btn-leave").dataset.type = "game";
             document.getElementById("rejoin-lobby-btn-leave").dataset.id = data.game.game;
             document.getElementById("rejoin-lobby").style.display = "block";
@@ -72,7 +75,7 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
     const container_app = document.getElementById('app');
 
     // Condizione specifica per l'URL contenente "game"
-    if (url.includes('game')) {
+    if (url.includes('game') && !url.includes('forbidden')) {
         if (container_main !== null) {
             container_main.remove();
         }
@@ -161,7 +164,7 @@ function insertScript(url, src, mode = 'not_logged') {
     clearScripts(url); // Pulisci gli script precedenti
     if(mode === 'logged_nav' || mode === 'dashboard')
     {
-        if (url.includes('game'))
+        if (url.includes('game') && !url.includes('forbidden'))
         {
             const container = document.getElementById('body');
             if(document.getElementById('game-dashboard-base') === null)
@@ -248,6 +251,7 @@ function loadPage(url) {
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
     const refreshUrl = `${window.location.origin}/api/token/refresh/`; // URL per verificare e refreshare il token
     // Funzione per eseguire la richiesta effettiva di caricamento della pagina
+
     if(window.LobbySocket !== undefined)
     {
         window.LobbySocket.close();
@@ -264,6 +268,7 @@ function loadPage(url) {
         }
     }
     const performRequest = (token, url) => {
+        
         if (url === "api/home/" || url == "api/login/" || url === "api/signup/") {   
             fetch(baseUrl)
             .then(response => {
@@ -387,37 +392,119 @@ function refreshAccessToken() {
 }
 
 
-document.addEventListener("DOMContentLoaded", function() {
-    if (window.location.pathname == "/")
-    {
-        loadPage("api/home/");
-    }
-    else
-    {
-        let page = window.location.pathname;
-    
-        if (page.includes("create")) {
-            let parts = page.split("_");
-            let apiUrl = `api${parts[0]}/?source=${parts[1]}`;
-            loadPage(apiUrl);
+function checkUserPermission(page) {
+    const url = page;
+    if (url.includes("game") || url.includes("lobby")) {
+
+        if ((url.includes("local") || url.includes("single")) && !url.includes("create")) {
+            return false;
         } else {
-            loadPage("api" + window.location.pathname);
+            let storage = window.localStorage;
+
+            if (url.includes("lobby")) {
+                if (url.includes("tournament")) {
+                    return true;
+                } else { 
+                    let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+
+                    let lobbyId = sanitizedUrl.split("/").pop();
+                    
+                    recoverUser(localStorage.getItem("userId")).then((data) => {
+                        if (data) {
+                            let lobby = data.in_game_lobby;
+                            if (lobby == lobbyId) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    });
+                }
+            }  else {
+                let gameId = url.split("/").pop();
+                recoverUser(localStorage.getItem("userId")).then((data) => {
+                    if (data) {
+                        let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+                        let gameId = sanitizedUrl.split("/").pop();
+                        let game = data.game_history;
+                        game.forEach(element => {
+                            if(element.id == gameId) {
+                                if(element.status != "finished" && element.status != "not_started") {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                });
+            }              
+        }
+    }
+    return false;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    let redirect = localStorage.getItem("redirect");
+    if (localStorage.getItem("accessToken") === null) {
+        loadPage("api/home/");
+    } else if (localStorage.getItem("redirect") !== null) {
+        const redirect = localStorage.getItem("redirect");
+        localStorage.removeItem("redirect");
+        let url = "api/forbidden/" + redirect + "/";
+        loadPage(url);
+    } else {
+        if (window.location.pathname == "/")
+        {
+            loadPage("api/dashboard/");
+        }
+        else
+        {
+            let page = window.location.pathname;
+        
+            if (page.includes("create")) {
+                let parts = page.split("_");
+                console.log("parts ", parts);
+                const sourcePart = parts[1].replace(/\/$/, "");
+                let apiUrl = `api${parts[0]}/?source=${sourcePart}`;
+                console.log("apiUrl ", apiUrl);
+                loadPage(apiUrl);
+            } else {
+                loadPage("api" + window.location.pathname);
+            }
         }
     }
     
     window.onpopstate = function(event) {
         event.preventDefault();
         let page = event.state.page;
-    
         if (page.includes("create")) {
             const parts = page.split("_");
     
             // Rimuovi eventuali slash finali da parts[1]
             const sourcePart = parts[1].replace(/\/$/, "");
+            console.log("sourcePart ", parts);
     
             const apiUrl = `api${parts[0]}/?source=${sourcePart}`;
             loadPage(apiUrl);
-        } else {
+        } else if (page.includes("game") || page.includes("lobby")) {
+            if (checkUserPermission(page) === true) {
+                loadPage("api" + page);
+            }
+            else
+            {
+                if (page.includes("game")) {
+                    loadPage("api/forbidden/game/");
+                }
+                else
+                {
+                    loadPage("api/forbidden/lobby/");
+                }
+            }
+
+        }
+        else
+        {
             // Se la stringa non contiene "create", carica la pagina con l'URL standard
             loadPage("api" + page);
         }

@@ -26,6 +26,7 @@ export function ballCollision(ball2, ball3){
     if(!ball2 || !ball3 || !ball2.mesh || !ball3.mesh)
         return false;
     if(ball2.r + ball3.r >= ball3.mesh.position.distanceTo(ball2.mesh.position)) {
+        console.log("collision");
         return true;
     }
     else {
@@ -34,7 +35,6 @@ export function ballCollision(ball2, ball3){
 }
 
 export function penetrationDepth(ball2, ball3, isOnlineGame = false, isHost = false){
-
         let dist = ball2.mesh.position.clone().sub(ball3.mesh.position);
         let pen_d = ball2.r + ball3.r - dist.manhattanLength();
         let pen_res = dist.clone().normalize().multiplyScalar(pen_d);

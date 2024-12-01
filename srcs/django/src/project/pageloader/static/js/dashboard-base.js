@@ -37,8 +37,8 @@ document.getElementById('logout').addEventListener('click', function() {
 }
 );
 
-id = localStorage.getItem('userId');
-url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
+//id = localStorage.getItem('userId');
+//url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 var chatSocket;
 function initializeWebSocket() {
 	if (chatSocket) {
@@ -77,38 +77,33 @@ function initializeWebSocket() {
 		const userId = localStorage.getItem("userId");
 	    
 		if (data.type === 'message') {
-		    let messages = document.getElementById('messages');
-		    const actualUserId = localStorage.getItem('userId');
-	    
-		    // Recupera l'utente attuale, compresi gli utenti bloccati
-		    (async function() {
-			try {
-			    const actualUser = await recoverUser(actualUserId);
-			    const blockedUsers = actualUser.blocked_userslist || [];
-			    let isBlocked = false;
-	    
-			    // Verifica se l'utente che ha inviato il messaggio è bloccato
-			    for (const blockedUser of blockedUsers) {
-				if (blockedUser.username === data.player) {
-				    isBlocked = true;
-				    break;
+			let messages = document.getElementById('messages');
+			const actualUserId = localStorage.getItem('userId');
+	
+			(async function() {
+				try {
+					const actualUser = await recoverUser(actualUserId);
+					const blockedUsers = actualUser.blocked_userslist || [];
+					let isBlocked = false;
+	
+					for (const blockedUser of blockedUsers) {
+						if (blockedUser.username === data.player) {
+							isBlocked = true;
+							break;
+						}
+					}
+	
+					if (!isBlocked) {
+						if (data.message.startsWith('@')) {
+							handlePrivateMessage(data, actualUser.username);
+						} else {
+							displayMessage(data, 'black');
+						}
+					}
+				} catch (error) {
+					console.error('Errore nel recupero dell\'utente o degli utenti bloccati:', error);
 				}
-			    }
-	    
-			    // Se l'utente non è bloccato, mostra il messaggio
-			    if (!isBlocked) {
-				if (messages) {
-				    messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2vh;"><span><strong>${data.player}:</strong> ${data.message}</span></div>`);
-				    messages.scrollTop = messages.scrollHeight;
-				} else {
-				    console.error("L'elemento messages non esiste");
-				}
-			    } else {
-			    }
-			} catch (error) {
-			    console.error('Errore nel recupero dell\'utente o degli utenti bloccati:', error);
-			}
-		    })();
+			})();
 		} else if (data.type === 'user_list') {
 		    let listElementId = 'users';
 		    const listElement = document.getElementById(listElementId);
@@ -163,180 +158,164 @@ function initializeWebSocket() {
 			//console.error("L'elemento users non esiste");
 		    }
 		} else if (data.type === 'invite_game') {
-		    // Gestione dell'invito a giocare
-		    let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
-	    
-		    if (invite) {
-			let request_url = `/api/invite_game/${data.request_type}/${data.target_user}/`;
-			let requestData = {
-			    target_user: data.target_user,
-			    requesting_user: data.requesting_user,
-			    request: 'accept',
-			    game: "yes"
-			};
-	    
-			fetch(request_url, {
-			    method: 'POST',
-			    headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${accessToken}`,
-				'X-CSRFToken': csrfToken
-			    },
-			    body: JSON.stringify(requestData)
-			}).then(response => {
-			    if (response.ok) {
-				// Invia la conferma tramite WebSocket
-				chatSocket.send(JSON.stringify({
-				    'pending_request': 'accept',
-				    'request': 'accept',
-				    'type': 'game',
-				    'target_user': data.requesting_user,
-				    'requesting_user': data.target_user,
-				    'request_type': 'game',
-				}));
-	    
-				alert('Hai accettato l\'invito a giocare!');
-			    } else {
-				console.error('Errore durante l\'invio dell\'invito a giocare', response.statusText);
-			    }
-			}).catch(error => {
-			    console.error('Errore durante la fetch:', error);
-			});
-	    
-			let gameListElement = document.getElementById("dashboard-gamelist");
-			if (gameListElement) {
-			    let itemElement = document.createElement('li');
-			    itemElement.id = `player_${data.requesting_user}`;
-			    recoverUser(data.requesting_user).then(item => {
-				itemElement.textContent = item.username;
-				try {
-				    itemElement.dataset.id = data.requesting_user;
-				    itemElement.oncontextmenu = function(event) {
-					event.preventDefault();
-					showGameContextMenu(event, data.requesting_user);
-				    };
-				    gameListElement.appendChild(itemElement);
-				} catch (error) {
-				    console.error('Errore durante l\'impostazione dell\'ID:', error);
-				}
-			    });
-			} else {
-			    console.error("L'elemento dashboard-gamelist non esiste");
-			}
-		    }
+			handleGameInvite(data, accessToken, csrfToken);		    
 		} else if (data.type === 'friend_request') {
-		    let request = confirm(`${data.requesting_user} vuole aggiungerti come amico`);
-	    
-		    if (request) {
-			let request_url = `/api/request/${data.request_type}/${data.target_user}/`;
-			let requestData = {
-			    target_user: data.target_user,
-			    requesting_user: data.requesting_user,
-			    request: 'accept',
-			    true: "no"
-			};
-	    
-			fetch(request_url, {
-			    method: 'POST',
-			    headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${accessToken}`,
-				'X-CSRFToken': csrfToken
-			    },
-			    body: JSON.stringify(requestData)
-			}).then(response => {
-			    if (response.ok) {
-				chatSocket.send(JSON.stringify({
-				    'pending_request': 'accept',
-				    'request': 'accept',
-				    'type': 'accept',
-				    'target_user': data.requesting_user,
-				    'requesting_user': data.target_user,
-				    'request_type': 'accept',
-				}));
-			    } else {
-				console.error('Errore durante l\'invio della richiesta', response.statusText);
-			    }
-			}).catch(error => {
-			    console.error('Errore durante la fetch:', error);
-			});
-	    
-			let friendListElement = document.getElementById("dashboard-friendlist");
-			if (friendListElement) {
-			    let itemElement = document.createElement('li');
-			    itemElement.id = `friend_${data.requesting_user}`;
-			    recoverUser(data.requesting_user).then(item => {
-				itemElement.textContent = item.username;
-				try {
-				    itemElement.dataset.id = data.requesting_user;
-				    itemElement.oncontextmenu = function(event) {
-					event.preventDefault();
-					showFriendContextMenu(event, data.requesting_user);
-				    };
-				    friendListElement.appendChild(itemElement);
-				} catch (error) {
-				    console.error('Errore durante l\'impostazione dell\'ID:', error);
-				}
-			    });
-			} else {
-			    console.error("L'elemento dashboard-friendlist non esiste");
-			}
-		    }
+		    handleFriendRequest(data, accessToken, csrfToken);
 		} else if (data.type === 'accept') {
-		    let friendListElement = document.getElementById("dashboard-friendlist");
-	    
-		    if (friendListElement) {
-			let itemElement = document.createElement('li');
-			itemElement.id = `friend_${data.target_user}`;
-			recoverUser(data.target_user).then(item => {
-			    itemElement.textContent = item.username;
-			    try {
-				itemElement.dataset.id = data.target_user;
-				itemElement.oncontextmenu = function(event) {
-				    event.preventDefault();
-				    showFriendContextMenu(event, data.target_user);
-				};
-				friendListElement.appendChild(itemElement);
-			    } catch (error) {
-				console.error('Errore durante l\'impostazione dell\'ID:', error);
-			    }
-			});
-			alert(`${data.target_user} ha accettato la tua richiesta`);
-		    } else {
-			console.error("L'elemento dashboard-friendlist non esiste");
-		    }
+		    updateFriendshipStatus(data);
 		} else if (data.type === 'remove') {
-		    const friendElement = document.getElementById("friend_" + data.target_user);
-		    if (friendElement) {
-			friendElement.remove();
-			alert(`${data.target_user} ha rimosso l'amicizia`);
-		    }
+		    updateFriendshipStatus(data);
 		} else if (data.type === 'pending_requests') {
-		    let listElementId = 'pending-requests';
-		    const listElement = document.getElementById(listElementId);
-		    if (listElement) {
-			(async function() {
-			    const itemList = data.requests;
-			    for (const elem of itemList) {
-				let itemElement = document.createElement('li');
-				itemElement.id = listElementId.slice(0, -1) + '_' + elem.id;
-				itemElement.textContent = elem.request_type + ' request from ' + elem.requesting_user.username;
-				try {
-				    itemElement.dataset.id = elem.id;
-				    listElement.appendChild(itemElement);
-				} catch (error) {
-				    console.error('Errore durante l\'impostazione dell\'ID:', error);
-				}
-			    }
-			})();
-		    } else {
-			console.error("L'elemento pending-requests non esiste");
-		    }
+		    updateFriendshipStatus(data);
 		}
 	    };
 	}	    
 
 initializeWebSocket();
+
+function handleGameInvite(data, accessToken, csrfToken) {
+    let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
+    if (invite) {
+        processGameInvite('accept', data, accessToken, csrfToken);
+    } else {
+        processGameInvite('decline', data, accessToken, csrfToken);
+    }
+}
+
+function processGameInvite(action, data, accessToken, csrfToken) {
+    let request_url = `/api/request/game/${data.target_user}/`;
+    let requestData = {
+        target_user: data.target_user,
+        requesting_user: data.requesting_user,
+        request: action
+    };
+
+    fetch(request_url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(requestData)
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Hai ${action === 'accept' ? 'accettato' : 'rifiutato'} l'invito a giocare!`);
+            // Invia la conferma o il rifiuto tramite WebSocket
+            chatSocket.send(JSON.stringify({
+                'pending_request': action,
+                'request': action,
+                'type': 'game',
+                'target_user': data.requesting_user,
+                'requesting_user': data.target_user,
+                'request_type': 'game',
+            }));
+        } else {
+            throw new Error('Failed to process game invite: ' + data.error);
+        }
+    }).catch(error => {
+        console.error('Error processing game invite:', error);
+    });
+}
+
+function updateGameInviteStatus(data) {
+    let message;
+    switch (data.type) {
+        case 'accept':
+            message = `${data.target_user} ha accettato l'invito a giocare`;
+            break;
+        case 'decline':
+            message = `${data.target_user} ha rifiutato l'invito a giocare`;
+            break;
+        default:
+            console.error('Unhandled game status update:', data.type);
+            return;
+    }
+    alert(message);
+}
+
+function handleFriendRequest(data, accessToken, csrfToken) {
+    let request = confirm(`${data.requesting_user} vuole aggiungerti come amico`);
+    if (request) {
+        processFriendRequest('accept', data, accessToken, csrfToken);
+    } else {
+        processFriendRequest('decline', data, accessToken, csrfToken);
+    }
+}
+
+function processFriendRequest(action, data, accessToken, csrfToken) {
+    let request_url = `/api/request/friend/${data.target_user}/`;
+    let requestData = {
+        target_user: data.target_user,
+        requesting_user: data.requesting_user,
+        request: action
+    };
+
+    fetch(request_url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(requestData)
+    }).then(response => {
+        if (response.ok) {
+            alert(`Hai ${action === 'accept' ? 'accettato' : 'rifiutato'} la richiesta di amicizia!`);
+        } else {
+            throw new Error('Failed to process friend request');
+        }
+    }).catch(error => {
+        console.error('Error processing friend request:', error);
+    });
+}
+
+function updateFriendshipStatus(data) {
+    let message;
+    switch (data.type) {
+        case 'accept':
+            message = `${data.target_user} ha accettato la tua richiesta`;
+            break;
+        case 'decline':
+            message = `${data.target_user} ha rifiutato la tua richiesta`;
+            break;
+        case 'remove':
+            message = `${data.target_user} ha rimosso l'amicizia`;
+            break;
+        default:
+            console.error('Unhandled status update:', data.type);
+            return;
+    }
+    alert(message);
+}
+
+function handlePrivateMessage(data, currentUsername) {
+    const endOfUsernameIndex = data.message.indexOf(' ');
+    const targetUsername = data.message.substring(1, endOfUsernameIndex);
+    const messageContent = data.message.substring(endOfUsernameIndex + 1);
+
+    // Se l'utente corrente è il destinatario, mostra il messaggio senza il nome del destinatario
+    if (currentUsername === targetUsername) {
+        displayMessage({ player: data.player, message: messageContent }, 'green');
+    }
+    // Se l'utente corrente è il mittente, mostra il messaggio con il nome del destinatario in parentesi
+    if (data.player === currentUsername) {
+        const formattedMessage = `(a ${targetUsername}) ${messageContent}`;
+        displayMessage({ player: data.player, message: formattedMessage }, 'green');
+    }
+}
+
+function displayMessage(data, color) {
+    let messages = document.getElementById('messages');
+    if (messages) {
+        messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2vh;"><span style="color: ${color};"><strong>${data.player}:</strong> ${data.message}</span></div>`);
+        messages.scrollTop = messages.scrollHeight;
+    } else {
+        console.error("L'elemento messages non esiste");
+    }
+}
+
 
 function UpdateFriendList(user) {
 	let friendListElement = document.getElementById("dashboard-friendlist");
@@ -356,7 +335,7 @@ function UpdateFriendList(user) {
 	    }
 	}
 }
-    
+    //asdasdasdasd
 function UpdateRequestList(user) {
 	let listElementId = 'pending-requests';
 	const listElement = document.getElementById(listElementId);
@@ -382,6 +361,7 @@ var form = document.getElementById('dashboard_chat_form');
 form.addEventListener('submit', (e)=> {
     e.preventDefault();
     let message = e.target.message.value;
+	
     username = localStorage.getItem('username');
     chatSocket.send(JSON.stringify({
         'message': message,
@@ -531,8 +511,9 @@ async function recoverUser(id) {
         return data; // Modifica questo percorso in base alla struttura della tua risposta
 
     } catch (error) {
-        console.error('Errore durante il recupero dei dati dell\'utente:', error);
-        throw error;
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
+        //throw error;
     }
 }
 
@@ -715,13 +696,14 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 		    alert(`Errore durante l'invio dell'invito: ${errorMessage.error}`);
 		} else {
 		    alert('Invito a giocare inviato con successo');
+			console.log("request type: ", requestType);
     
 		    // Invia il messaggio tramite WebSocket per aggiornare in tempo reale
 		    chatSocket.send(JSON.stringify({
 			'pending_request': 'send',
 			'target_user': id,
 			'requesting_user': localStorage.getItem('userId'),
-			'type': 'game'
+			'type': requestType
 		    }));
 		}
 	    } catch (error) {
@@ -996,7 +978,8 @@ async function updateUserProfile() {
         }
 
     } catch (error) {
-        console.error('Errore durante il recupero dei dati dell\'utente:', error);
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
     }
 }
 

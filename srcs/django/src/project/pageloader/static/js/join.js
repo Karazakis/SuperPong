@@ -16,7 +16,8 @@ joinButtons.forEach(button => {
 
 var refreshButton = document.getElementById('refresh-btn');
 refreshButton.addEventListener('click', function() {
-    location.reload(); // Ricarica la pagina per ottenere la lista aggiornata
+    var currentUrl = window.location.pathname; // Ottiene l'URL corrente
+    loadPage("api"+currentUrl); // Usa l'URL corrente per caricare la pagina
 });
 
 

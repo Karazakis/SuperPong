@@ -2,7 +2,6 @@
 
 <div id="gameover-modal" class="modal" style="display: none;">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
         <h2 id="modal-title"></h2>
         <p id="modal-message"></p>
         
@@ -82,7 +81,7 @@
                                         data-left="{{ player.controls.left|default:'' }}" 
                                         data-shoot="{{ player.controls.shoot|default:'' }}" 
                                         data-boost="{{ player.controls.boost|default:'' }}"
-                                        {% if game_info.type == 'remote-game' %}
+                                        {% if game_info.type == 'remote-game' or game_info.type == 'tournament' %}
                                             data-keyleft="{{ player.controls.keyleft|default:'' }}"
                                             data-keyright="{{ player.controls.keyright|default:'' }}"
                                             data-keyshoot="{{ player.controls.keyshoot|default:'' }}"
@@ -95,7 +94,7 @@
                                         data-left="{{ player.controls.left|default:'' }}" 
                                         data-shoot="{{ player.controls.shoot|default:'' }}" 
                                         data-boost="{{ player.controls.boost|default:'' }}"
-                                        {% if game_info.type == 'remote-game' %}
+                                        {% if game_info.type == 'remote-game' or game_info.type == 'tournament' %}
                                             data-keyleft="{{ player.controls.keyleft|default:'' }}"
                                             data-keyright="{{ player.controls.keyright|default:'' }}"
                                             data-keyshoot="{{ player.controls.keyshoot|default:'' }}"

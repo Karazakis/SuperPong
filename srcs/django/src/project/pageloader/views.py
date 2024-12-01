@@ -559,7 +559,7 @@ class JoinAPIView(APIView):
                 games = Game.objects.filter(status='not_started', tournament__isnull=True)
             elif 'join_tournament' in current_url:
                 tournaments = Tournament.objects.filter(status='not_started')
-                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'in_progress'], players__in=[user])
+                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'preparing_next_round', 'waiting_for_round'], players__in=[user])
 
             context = {
                 'user': user,
@@ -658,6 +658,8 @@ class JoinAPIView(APIView):
 
                     if tournament.status == 'not_started':
                         # Tornei non iniziati: esegui il normale join
+                        if tournament.players_in_lobby > tournament.nb_players:
+                            return Response({'success': False, 'message': 'Tournament is full'}, status=status.HTTP_400_BAD_REQUEST)
                         if user not in tournament.players.all():
                             tournament.players.add(user)  # Aggiungi il giocatore al torneo
                             tournament.players_in_lobby += 1  # Incrementa il numero di giocatori
@@ -667,11 +669,9 @@ class JoinAPIView(APIView):
                             user_profile.in_tournament_lobby = tournament
                             user_profile.save()
 
-                            return Response({'success': True}, status=status.HTTP_200_OK)
-                        else:
-                            return Response({'success': False, 'message': 'User is already in the tournament'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'success': True}, status=status.HTTP_200_OK)
 
-                    elif tournament.status in ['waiting_for_matches', 'in_progress']:
+                    elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round']:
                         # Tornei in corso: logica di re-join
                         if user in tournament.players.all():
                             # L'utente è già nel torneo, esegui il re-join
@@ -1078,6 +1078,7 @@ class UserInfoAPIView(APIView):
                 'pending_requests': pending_requests,
                 'user_friend_list': user_friend_list,
                 'blocked_userslist': blocked_userslist,
+                'in_game_lobby': user_profile.in_game_lobby.id if user_profile.in_game_lobby else None,
                 'game_history': game_history,
                 'tournament_history': tournament_history,
             }
@@ -1104,8 +1105,7 @@ class UserRequestAPIView(APIView):
         try:
             request_data = request.data
             user = request.user
-
-           
+            logger.debug(f"Request data: {request_data}")
 
             if request_type not in ['friend', 'game', 'tournament']:
                 return Response({'error': 'Tipo di richiesta non valido.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1120,7 +1120,7 @@ class UserRequestAPIView(APIView):
             # Ottieni l'oggetto User per il requesting_user
             if request_data.get('request') == "remove":
                 username = User.objects.get(username=request_data.get('target_user'))
-            elif request_data.get('request') == "accept" or request_data.get('request') == "decline":
+            elif request_data.get('request') in ["accept", "decline"]:
                 if request_data.get('true') == "yes":
                     logger.debug(f"Requesting user: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(username=request_data.get('requesting_user'))
@@ -1139,9 +1139,9 @@ class UserRequestAPIView(APIView):
                 if request_data.get('request') == 'accept':
                     return self.accept_request(request, id, requesting_user)
                 elif request_data.get('request') == 'decline':
-                    return self.decline_request(id, requesting_user)
+                    return self.decline_request(request, id, requesting_user)
                 elif request_data.get('request') == 'remove':
-                    return self.remove_friend(request, id, username)
+                    return self.remove_friend( id, username)
 
                 # Controlla se esiste già una richiesta pendente
                 if PendingRequest.objects.filter(
@@ -1164,34 +1164,34 @@ class UserRequestAPIView(APIView):
                 return Response({'success': 'Richiesta inviata con successo.'}, status=status.HTTP_200_OK)
 
             elif request_type == 'game':
-                try:
-                    # Controlla se esiste già una richiesta pendente di tipo 'game'
-                    if PendingRequest.objects.filter(
-                        target_user=user,
-                        requesting_user=requesting_user,
-                        request_type='game'
-                    ).exists():
-                        return Response({'error': 'L\'invito a giocare è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
+                user_profile = UserProfile.objects.get(user=user)
 
-                    # Creazione di una nuova richiesta di invito a giocare
-                    new_request = PendingRequest.objects.create(
-                        request_type='game',
-                        target_user=user,
-                        requesting_user=requesting_user,
-                        request=request_data.get('request'),
-                    )
+                if request_data.get('request') == 'accept':
+                    return self.accept_game_request(request, id, requesting_user)
+                elif request_data.get('request') == 'decline':
+                    return self.decline_game_request(request, id, requesting_user)
 
-                    # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
-                    target_user_profile = UserProfile.objects.get(user=user)
-                    target_user_profile.pending_requests.add(new_request)
+                # Controlla se esiste già una richiesta pendente di tipo 'game'
+                if PendingRequest.objects.filter(
+                    target_user=user,
+                    requesting_user=requesting_user,
+                    request_type=request_type,
+                ).exists():
+                    return Response({'error': 'La richiesta è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
 
-                    return Response({'success': 'Invito a giocare inviato con successo.'}, status=status.HTTP_200_OK)
+                # Creazione di una nuova richiesta di invito a giocare
+                new_request = PendingRequest.objects.create(
+                    request_type=request_type,
+                    target_user=user,
+                    requesting_user=requesting_user,
+                    request=request_data.get('request'),
+                )
 
-                except Exception as e:
-                    logger.error(f"Errore durante l\'invio dell\'invito a giocare: {e}", exc_info=True)
-                    return Response({'error': 'Errore durante l\'invio dell\'invito a giocare.'}, status=status.HTTP_400_BAD_REQUEST)
+                # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
+                target_user_profile = UserProfile.objects.get(user=user)
+                target_user_profile.pending_requests.add(new_request)
 
-            return Response({'success': 'Richiesta inviata con successo.'}, status=status.HTTP_200_OK)
+                return Response({'success': 'Invito a giocare inviato con successo.'}, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
             logger.error(f"L'utente con username {request_data.get('requesting_user')} non esiste.")
@@ -1205,10 +1205,17 @@ class UserRequestAPIView(APIView):
 
     def accept_game_request(self, request, id, requesting_user):
         try:
+            # Verifica se l'utente è autenticato
+            if not request.user.is_authenticated:
+                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
+
             # Recupera l'utente target
-            target_user = User.objects.get(pk=id)
+            target_user_base = User.objects.get(pk=id)
+            target_user = UserProfile.objects.get(user=target_user_base)
+
+            # Trova tutte le richieste pendenti
             pending_requests = PendingRequest.objects.filter(
-                target_user=target_user,
+                target_user=target_user.user,
                 requesting_user=requesting_user,
                 request_type='game'
             )
@@ -1216,35 +1223,63 @@ class UserRequestAPIView(APIView):
             if not pending_requests.exists():
                 return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
 
-            # Elimina la richiesta pendente e gestisci l'accettazione del game
+            # Elimina tutte le richieste pendenti trovate
             pending_requests.delete()
+            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
 
-            logger.info(f"Invito a giocare accettato da {requesting_user.username} per {target_user.username}")
-            return Response({'success': 'Invito a giocare accettato con successo.'}, status=status.HTTP_200_OK)
+            logger.info(f"Invito accettato tra {requesting_user_profile.user.username} e {target_user.user.username}")
+            return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
+            logger.error(f"L'utente con ID {id} non esiste.")
             return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            logger.error(f"Errore durante l\'accettazione dell\'invito: {e}", exc_info=True)
-            return Response({'error': 'Errore durante l\'accettazione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def decline_game_request(self, id, requesting_user):
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except AttributeError as e:
+            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def decline_game_request(self, request, id, requesting_user):
         try:
-            target_user = User.objects.get(pk=id)
-            pending_request = PendingRequest.objects.get(
-                target_user=target_user,
+            # Verifica se l'utente è autenticato
+            if not request.user.is_authenticated:
+                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Recupera l'utente target
+            target_user_base = User.objects.get(pk=id)
+            target_user = UserProfile.objects.get(user=target_user_base)
+
+            # Trova tutte le richieste pendenti
+            pending_requests = PendingRequest.objects.filter(
+                target_user=target_user.user,
                 requesting_user=requesting_user,
                 request_type='game'
             )
-            pending_request.delete()
-            return Response({'success': 'Invito a giocare rifiutato con successo.'}, status=status.HTTP_200_OK)
+
+            if not pending_requests.exists():
+                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Elimina tutte le richieste pendenti trovate
+            pending_requests.delete()
+            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
+
+            logger.info(f"Richiesta di invito rifiutata {requesting_user_profile.user.username} e {target_user.user.username}")
+            return Response({'success': 'Richiesta rifiutata con successo.'}, status=status.HTTP_200_OK)
+
         except User.DoesNotExist:
+            logger.error(f"L'utente con ID {id} non esiste.")
             return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-        except PendingRequest.DoesNotExist:
-            return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            logger.error(f"Errore durante il rifiuto dell\'invito: {e}", exc_info=True)
-            return Response({'error': 'Errore durante il rifiuto dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except AttributeError as e:
+            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
 
     def accept_request(self, request, id, requesting_user):
         try:
@@ -1285,7 +1320,66 @@ class UserRequestAPIView(APIView):
             return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
 
         except AttributeError as e:
-            logger.error
+            logger.error(f"Errore durante la gestione dell'amicizia: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la gestione dell\'amicizia.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def decline_request(self, request, id, requesting_user):
+        try:
+            # Verifica se l'utente è autenticato
+            if not request.user.is_authenticated:
+                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Recupera l'utente target
+            target_user_base = User.objects.get(pk=id)
+            target_user = UserProfile.objects.get(user=target_user_base)
+
+            # Trova tutte le richieste pendenti
+            pending_requests = PendingRequest.objects.filter(
+                target_user=target_user.user,
+                requesting_user=requesting_user,
+                request_type='friend'
+            )
+
+            if not pending_requests.exists():
+                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Elimina tutte le richieste pendenti trovate
+            pending_requests.delete()
+            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
+
+            logger.info(f"Richiesta di amicizia rifiutata {requesting_user_profile.user.username} e {target_user.user.username}")
+            return Response({'success': 'Richiesta rifiutata con successo.'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            logger.error(f"L'utente con ID {id} non esiste.")
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except AttributeError as e:
+            logger.error(f"Errore durante la gestione dell'amicizia: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la gestione dell\'amicizia.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def remove_friend(self, id, username):
+        try:
+            user = User.objects.get(pk=id)
+            user_profile = UserProfile.objects.get(user=user)
+            friend = User.objects.get(username=username)
+            friend_profile = UserProfile.objects.get(user=friend)
+
+            user_profile.user_friend_list.remove(friend_profile)
+            friend_profile.user_friend_list.remove(user_profile)
+
+            logger.info(f"Amicizia rimossa tra {user.username} e {friend.username}")
+            return Response({'success': 'Amico rimosso con successo.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+        except UserProfile.DoesNotExist:
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': 'Errore durante la rimozione dell\'amico.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserResponseAPIView(APIView):
@@ -1697,6 +1791,7 @@ class GameAPIView(APIView):
             data = request.data
 
             try:
+                
                 # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
                 game = Game.objects.get(id=pk)
 
@@ -1721,5 +1816,29 @@ class GameAPIView(APIView):
         else:
             return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
+class ForbiddenAPIView(APIView):
+    def get(self, request, reason):
+
+        if request.user.is_authenticated:
+            if reason == 'game':
+                html = render_to_string('forbidden-game.html')
+            elif reason == 'tournament':
+                html = render_to_string('forbidden-tournament.html')
+            elif reason == 'lobby':
+                html = render_to_string('forbidden-lobby.html')
     
-            
+            user = User.objects.get(pk=request.user.id)
+            user_profile = UserProfile.objects.get(user=user)
+            context = {
+                'user': user,
+                'userprofile': user_profile,
+            }
+            dash_base = render_to_string('dashboard-base.html', context)
+            data = {
+               'url': 'forbidden/' + reason + '/',
+                'html': html,
+                'dash_base': dash_base,
+                'scripts': 'forbidden.js',
+                'nav_stat': 'logged_nav',
+            }
+            return Response(data)
