@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import JSONField
+import math
 
 
 class Tournament(models.Model):
@@ -22,15 +23,15 @@ class Tournament(models.Model):
     rounds = models.IntegerField(default=0)  # Numero totale di round
 
     def calculate_rounds(self):
-        """Calcola il numero di round in base al numero di giocatori e modalità."""
+        """Calcola il numero di round in base al numero di giocatori."""
         if self.mode == '1v1':
-            return self.nb_players // 2  # Ogni partita ha 2 giocatori
+            return math.ceil(math.log2(self.nb_players))
         elif self.mode == '2v2':
-            return self.nb_players // 4  # Ogni partita ha 4 giocatori
+            return math.ceil(math.log2(self.nb_players // 2))  # Ogni partita ha 4 giocatori
         elif self.mode == '4dm':
-            return self.nb_players // 4  # Per esempio, nel deathmatch con 4 giocatori
+            return math.ceil(math.log2(self.nb_players // 4))  # Supponendo riduzione fino a 4 giocatori
         else:
-            return 1  # Default per altre modalità
+            return 1  # Default per modalità sconosciute
 
     def calculate_games_per_round(self):
         """Calcola il numero di game per round in base alla modalità."""
@@ -56,7 +57,7 @@ class Tournament(models.Model):
         round_instance.generate_initial_slot_status(self)
         round_instance.generate_games(games_per_round, self.mode, self.rules, self.limit, self.balls, self.boost)  # Genera i game all'interno del round
         
-        self.rounds = 1  # Imposta il numero di round attualmente generato
+        self.rounds = self.calculate_rounds()
         self.save()
 
     def generate_next_round(self):

@@ -1518,15 +1518,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             return
 
         # Recupera tutti i game del round corrente
-        games = await database_sync_to_async(list)(self.current_round.games.all())
+        logger.info("Attempting to retrieve games for the current round.")
+        games = await database_sync_to_async(list)(self.current_round.games.select_related('winner').all())
         if not games:
             logger.warning(f"No games found for round {self.current_round.round_number}.")
             return
 
         # Recupera il round successivo (se esiste)
+        logger.info("Attempting to retrieve the next round.")
         next_round_number = self.current_round.round_number + 1
         next_round = await database_sync_to_async(Round.objects.filter(
             tournament=self.tournament, round_number=next_round_number).first)()
+        logger.info(f"Next round retrieval result: {'found' if next_round else 'not found'}.")
         
         is_final_round = not next_round  # Se non c'è un round successivo, siamo alla finale
         if is_final_round:
@@ -1538,6 +1541,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         # Aggiorna gli slot del round successivo per ogni game finito (se esiste un next_round)
         for idx, game in enumerate(games):
+            logger.info(f"Processing game {game.name}. Status: {game.status}")
             if game.status == 'finished':
                 logger.info(f"Game {game.name} is finished. Processing winner for next round slots.")
                 winner = game.winner
@@ -1549,6 +1553,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                  # Se siamo alla finale, impostiamo il vincitore del torneo
                 if is_final_round:
                     tournament_winner = winner
+                    logger.info(f"Final round winner determined: {winner.username}.")
 
                 if next_round:
                     # Aggiorna lo slot corretto del round successivo
@@ -1560,6 +1565,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         # Notifica i client con tutti gli slot aggiornati (solo se esiste un next_round e ci sono aggiornamenti)
         if next_round and updated_slots:
+            logger.info(f"Notifying clients of updated slots: {updated_slots}.")
             await self.notify_clients_of_slot_updates(next_round_number, updated_slots)
 
         # Se tutti i game sono completati, marca il round come 'finished'
@@ -1569,6 +1575,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
             # Gestione del round finale
             if is_final_round:
+                logger.info("Handling tournament end.")
                 await self.handle_tournament_end(tournament_winner)
 
 
