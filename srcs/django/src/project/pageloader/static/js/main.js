@@ -15,8 +15,10 @@ function checkCurrentLobbyandDisable(){
     let url = baseUrl + "/api/request_status/" + userId + "/";
 
     fetch(url).catch(error => console.log('Errore durante il recupero della pagina:', error))
+    fetch(url).catch(error => console.log('Errore durante il recupero della pagina:', error))
     .then(response => response.json())
     .then(data => {
+        console.log("nel check",data);
         console.log("nel check",data);
         if(data.game !== null)
         {
@@ -52,6 +54,8 @@ function checkCurrentLobbyandDisable(){
             };
 
             console.log("data.game",data.game);
+
+            console.log("data.game",data.game);
             document.getElementById("rejoin-lobby-btn-leave").dataset.type = "game";
             document.getElementById("rejoin-lobby-btn-leave").dataset.id = data.game.game;
             document.getElementById("rejoin-lobby").style.display = "block";
@@ -75,6 +79,7 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
     const container_app = document.getElementById('app');
 
     // Condizione specifica per l'URL contenente "game"
+    if (url.includes('game') && !url.includes('forbidden')) {
     if (url.includes('game') && !url.includes('forbidden')) {
         if (container_main !== null) {
             container_main.remove();
@@ -165,6 +170,7 @@ function insertScript(url, src, mode = 'not_logged') {
     if(mode === 'logged_nav' || mode === 'dashboard')
     {
         if (url.includes('game') && !url.includes('forbidden'))
+        if (url.includes('game') && !url.includes('forbidden'))
         {
             const container = document.getElementById('body');
             if(document.getElementById('game-dashboard-base') === null)
@@ -252,6 +258,7 @@ function loadPage(url) {
     const refreshUrl = `${window.location.origin}/api/token/refresh/`; // URL per verificare e refreshare il token
     // Funzione per eseguire la richiesta effettiva di caricamento della pagina
 
+
     if(window.LobbySocket !== undefined)
     {
         window.LobbySocket.close();
@@ -268,6 +275,7 @@ function loadPage(url) {
         }
     }
     const performRequest = (token, url) => {
+        
         
         if (url === "api/home/" || url == "api/login/" || url === "api/signup/") {   
             fetch(baseUrl)
@@ -445,6 +453,8 @@ function checkUserPermission(page) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+    let redirect = localStorage.getItem("redirect");
+    if (localStorage.getItem("accessToken") === null) {
     let redirect = localStorage.getItem("redirect");
     if (localStorage.getItem("accessToken") === null) {
         loadPage("api/home/");

@@ -27,6 +27,7 @@ from .views import BlockUserAPIView
 from .views import InviteGameAPIView
 from .views import InviteTournamentAPIView
 from .views import ForbiddenAPIView
+from .views import ForbiddenAPIView
 
 urlpatterns = [
     path('', index, name='index'),

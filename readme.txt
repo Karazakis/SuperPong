@@ -1,40 +1,22 @@
 roba da fare
-generale:
-finire chat con bloccaggio utenti fatta bene e bug fix
-permessi utenti pagine game, lobby e torneo. se si naviga direttamente un link non permesso (tipo un game che non è il mio io lo joino lo stesso)
 
-pagina profilo:
-mettere statistiche game e tornei
-mettere lista di amici
-nome che cambia nella dashboard al riaggiornamento
+notifiche e aggiunta e rimozione amici
 
-lobby game:
-gestire bene counter utenti in lobby per bug di stanze piene nel join ma in realtà vuote
-mettere kick from lobby
-mettere il rejoin lobby e rejoin game, giocatori già in lobby o in game non possono joinare altre lobby o game
+aggiungere due url uno per il creategame singleplayer e una per il local
 
-create:
-nel time mettere tempi corretti da 2 3 5 min
-sistemare campi in modo definitivo
+nel create quando si preme create in base all'url:
+o si lancia il game con le specifiche tipo i tasti nell'url con ?= 
+o si lancia la lobby
 
-lobby torneo:
-da rivedere e testare per trovare bug
+fare che quando lancia il game dalla lobby setta i socket per i tasti
 
-torneo:
-implementare tournament sistem (vedi codice qui sotto)
+fare pagina join e tournament e tournametcreate e tournament lobby
 
-game generale:
-far aspettare a partire la conta degli score fino a caricamento completo
-gestire end game meglio, pulendo tutta la roba inizializzata, tipo eventlistener e socket e ripristinando il cielo stellato e facendo il banner di resume fatto bene
-i punteggi segnati per bene 
+fare tournament sistem {
+    farlo usando roba sotto, con transaction e web socket
+}
 
-
-game single:
-riguardare bot se va bene per correzione
-
-game remote:
-finire sincronizzazione starting point palline, 
-fare debouncing(o trottling) aggiornamento palline e collisioni 
+sistemare permission view system, (se io non sono in un game non posso accedere a quell'url)
 
 
 //ROBA SOTTO

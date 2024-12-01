@@ -39,6 +39,8 @@ document.getElementById('logout').addEventListener('click', function() {
 
 //id = localStorage.getItem('userId');
 //url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
+//id = localStorage.getItem('userId');
+//url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 var chatSocket;
 function initializeWebSocket() {
 	if (chatSocket) {
@@ -336,6 +338,7 @@ function UpdateFriendList(user) {
 	}
 }
     //asdasdasdasd
+    //asdasdasdasd
 function UpdateRequestList(user) {
 	let listElementId = 'pending-requests';
 	const listElement = document.getElementById(listElementId);
@@ -361,6 +364,7 @@ var form = document.getElementById('dashboard_chat_form');
 form.addEventListener('submit', (e)=> {
     e.preventDefault();
     let message = e.target.message.value;
+	
 	
     username = localStorage.getItem('username');
     chatSocket.send(JSON.stringify({
@@ -511,6 +515,9 @@ async function recoverUser(id) {
         return data; // Modifica questo percorso in base alla struttura della tua risposta
 
     } catch (error) {
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
+        //throw error;
 		recoverUser(id);
         //console.error('Errore durante il recupero dei dati dell\'utente:', error);
         //throw error;
@@ -703,6 +710,7 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 			'pending_request': 'send',
 			'target_user': id,
 			'requesting_user': localStorage.getItem('userId'),
+			'type': requestType
 			'type': requestType
 		    }));
 		}
@@ -978,6 +986,8 @@ async function updateUserProfile() {
         }
 
     } catch (error) {
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
 		recoverUser(id);
         //console.error('Errore durante il recupero dei dati dell\'utente:', error);
     }
