@@ -7,6 +7,20 @@ var slotSelectionLocked = false;
 // Configurazione del WebSocket
 var lobby = `wss://${window.location.host}/wss/tournament/${round_id_lobby}/?id=${userId_lobby}`;
 var LobbySocket = new WebSocket(lobby);
+let isBracketReady = false;
+const pendingSlotUpdates = [];
+
+document.addEventListener('bracketGenerated', () => {
+    console.log('Bracket is ready');
+    isBracketReady = true;
+
+    // Applica gli aggiornamenti in sospeso
+    pendingSlotUpdates.forEach(({ roundNumber, slots }) => {
+        updateNextRoundSlot(roundNumber, slots);
+    });
+    pendingSlotUpdates.length = 0; // Pulisci la coda
+});
+
 onPageLoad();
 
 // Gestione dell'apertura del WebSocket
@@ -47,8 +61,12 @@ LobbySocket.onmessage = function(e) {
             showJoinGamePopup(data.game_link);
             break;
         case 'update_next_round_slots':
-            // Nuova gestione per aggiornare il tabellone
-            updateNextRoundSlot(data.round_number, data.slot, data.winner);
+            if (isBracketReady) {
+                updateNextRoundSlot(data.round_number, data.slots);
+            } else {
+                console.log(`Bracket not ready. Storing update for round ${data.round_number}`);
+                pendingSlotUpdates.push({ roundNumber: data.round_number, slots: data.slots });
+            }
             break;
         default:
             console.log("Unrecognized action:", data.type);
@@ -151,8 +169,10 @@ function generateBracket(tournament) {
     let teamIndex = 1; // Tiene traccia del numero del team progressivo
 
     while (round <= totalRounds) {
+        console.log(`Generating round ${round}`); 
         const roundElement = document.createElement('div');
         roundElement.classList.add('round');
+        roundElement.setAttribute('data-round', round);
         
         // Genera il titolo del round (es. "Semifinali", "Finale")
         let roundName = getRoundName(totalRounds, round, mode);
@@ -265,6 +285,10 @@ function generateBracket(tournament) {
     }
 
     console.log('Bracket generated');
+
+    // Emissione di un evento personalizzato
+    const event = new CustomEvent('bracketGenerated');
+    document.dispatchEvent(event);
 }
 
 // Funzione per ottenere il nome del round
@@ -317,21 +341,35 @@ function updateSlot(slot, slotData) {
     }
 }
 
-function updateNextRoundSlot(roundNumber, slot, winner) {
-    // Seleziona lo slot nel round specifico utilizzando gli attributi di dataset
-    const slotElement = document.querySelector(`.round[data-round="${roundNumber}"] .player-slot[data-slot="${slot}"]`);
-    
-    if (slotElement) {
-        // Aggiorna il contenuto dello slot con il nome del vincitore e segna come occupato
-        slotElement.textContent = winner;
-        slotElement.classList.add('occupied');
-        slotElement.classList.add('locked'); // Blocca ulteriori interazioni
-        slotElement.style.pointerEvents = 'none'; // Disabilita ulteriori clic
-        console.log(`Updated slot ${slot} in round ${roundNumber} with winner: ${winner}`);
-    } else {
-        console.error(`Slot element not found for round ${roundNumber}, slot ${slot}`);
+function updateNextRoundSlot(roundNumber, slots) {
+    console.log(`Updating next round ${roundNumber} slots:`, slots);
+    console.log(`Searching for .round[data-round="${roundNumber}"]`);
+    // Controlla se il round esiste
+    const roundElement = document.querySelector(`.round[data-round="${roundNumber}"]`);
+    if (!roundElement) {
+        console.error(`Round element not found for round ${roundNumber}. Verify HTML generation.`);
+        return;
     }
+
+    // Itera sugli slot ricevuti
+    Object.keys(slots).forEach(slotKey => {
+        const slotData = slots[slotKey];
+        console.log(`Searching for .round[data-round="${roundNumber}"] .player-slot[data-slot="${slotKey}"]`);
+        const slotElement = document.querySelector(`.round[data-round="${roundNumber}"] .player-slot[data-slot="${slotKey}"]`);
+
+        if (slotElement && !slotData.username.toLowerCase().startsWith('winner match')) {
+            // Aggiorna il contenuto dello slot con il nome del vincitore
+            slotElement.textContent = slotData.username || 'Unknown Winner';
+            slotElement.classList.add('occupied', 'locked'); // Blocca lo slot
+            slotElement.style.pointerEvents = 'none'; // Disabilita clic futuri
+            console.log(`Updated slot ${slotKey} in round ${roundNumber} with winner: ${slotData.username}`);
+        } else {
+            console.error(`Slot element not found for round ${roundNumber}, slot ${slotKey}. Verify HTML structure or slot data.`);
+        }
+    });
 }
+
+
 
 
 // Funzione per impostare la selezione degli slot
