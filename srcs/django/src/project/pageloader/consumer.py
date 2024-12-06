@@ -806,6 +806,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
 class TournamentConsumer(AsyncWebsocketConsumer):
+    users_in_lobby = set() # Lista condivisa a livello del WebSocket per tracciare i giocatori nella lobby
 
     async def connect(self):
         self.tournament_id = self.scope['url_route']['kwargs']['game_id']
@@ -824,6 +825,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.tournament = await self.get_tournament()
         # Recupera il round corrente
         self.current_round = await self.get_current_round()
+
+        # Aggiungi il giocatore alla lista
+        self.users_in_lobby.add(self.user.username)
 
         # Aggiungi il client al gruppo del torneo
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -870,6 +874,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         logger.info(f"Disconnecting from tournament room: {self.room_group_name} with close code: {close_code}")
 
+        # Rimuovi il giocatore dalla lista
+        if self.user.username in self.users_in_lobby:
+            self.users_in_lobby.remove(self.user.username)
+
         # Verifica se l'utente ha già eseguito il leave
         if not getattr(self, 'user_left', False):
             await self.remove_user_from_lobby()
@@ -915,6 +923,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
             # Gestisci leave dell'utente
             elif action == 'leave':
+                # Rimuovi l'utente dalla lista locale
+                if self.user.username in self.users_in_lobby:
+                    self.users_in_lobby.remove(self.user.username)
                 await self.remove_user_from_lobby()  # Questo invia già l'aggiornamento della lobby
                 # Non c'è bisogno di inviare di nuovo l'aggiornamento della lobby e degli slot
                 self.user_left = True  # Segna che l'utente ha lasciato
@@ -1041,28 +1052,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             logger.error(f"Error setting ready status in round DB: {e}")
 
-    # async def send_slot_status_update_to_group(self):
-    #     """
-    #     Invia l'aggiornamento dello stato degli slot del round corrente a tutti i client connessi.
-    #     """
-    #     current_round = await self.get_current_round()
-    #     if not self.current_round:
-    #         logger.error("Current round not found.")
-    #         return
-
-    #     slots_status = current_round.slots
-    #     message = {
-    #         'type': 'update_all_slots',
-    #         'slots': slots_status
-    #     }
-    #     await self.channel_layer.group_send(
-    #         self.room_group_name,
-    #         {
-    #             'type': 'send_message_to_clients',
-    #             'message': message
-    #         }
-    #     )
-    #     logger.info(f"Slot status update sent to group: {slots_status}")
 
     async def send_slot_status_update_to_group(self):
         """
@@ -1161,17 +1150,26 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         Manda la lista aggiornata degli utenti nella lobby insieme allo stato ready.
         """
         try:
+            # Recupera la lista completa degli utenti
             user_list = await self.get_user_list()
+
+            # Filtra gli utenti nella lobby usando la lista `users_in_lobby`
+            users_in_lobby = [
+                user for user in user_list if user['username'] in self.users_in_lobby
+            ]
+
+            # Recupera gli slot e lo stato ready dal round corrente
             slots = self.current_round.slots
+            ready_status = self.current_round.ready_status
 
             # Invia l'aggiornamento a tutti i client connessi alla lobby
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'update_lobby',
-                    'user_list': user_list,  # Lista degli utenti con stato ready
+                    'user_list': users_in_lobby,  # Lista degli utenti nella lobby con stato ready
                     'slots': slots, 
-                    'ready_status': self.current_round.ready_status  # Includi lo stato ready
+                    'ready_status': ready_status  # Includi lo stato ready
                 }
             )
         except Exception as e:
@@ -1261,10 +1259,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 return
 
             logger.info(f"User {user.username} joined lobby via WebSocket.")
-            
-            # # Aggiorna lo stato della lobby e invia gli aggiornamenti sugli slot
-            # await self.send_lobby_update()
-            # await self.send_slot_status_update_to_group()
             
         except Exception as e:
             logger.error(f"Error updating lobby: {e}")

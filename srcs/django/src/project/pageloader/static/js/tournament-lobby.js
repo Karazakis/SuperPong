@@ -311,7 +311,7 @@ function updateAllSlots(roundsSlots) {
 function updateSlot(roundNumber, slotKey, slotData) {
     const slotElement = document.querySelector(`.round[data-round="${roundNumber}"] .player-slot[data-slot="${slotKey}"]`);
     if (slotElement) {
-        if (slotData && slotData.username !== 'empty') {
+        if (slotData && slotData.username !== 'empty' && !slotData.username.toLowerCase().includes('winner') ) {
             // Se c'è un utente nello slot, aggiorna l'username e blocca lo slot
             slotElement.classList.add('occupied', 'locked');
             slotElement.textContent = slotData.username;
