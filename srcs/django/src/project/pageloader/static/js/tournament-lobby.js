@@ -10,16 +10,16 @@ var LobbySocket = new WebSocket(lobby);
 var isBracketReady = false;
 var pendingSlotUpdates = [];
 
-document.addEventListener('bracketGenerated', () => {
-    console.log('Bracket is ready');
-    isBracketReady = true;
+// document.addEventListener('bracketGenerated', () => {
+//     console.log('Bracket is ready');
+//     isBracketReady = true;
 
-    // Applica gli aggiornamenti in sospeso
-    pendingSlotUpdates.forEach(({ roundNumber, slots }) => {
-        updateNextRoundSlot(roundNumber, slots);
-    });
-    pendingSlotUpdates.length = 0; // Pulisci la coda
-});
+//     // Applica gli aggiornamenti in sospeso
+//     pendingSlotUpdates.forEach(({ roundNumber, slots }) => {
+//         updateNextRoundSlot(roundNumber, slots);
+//     });
+//     pendingSlotUpdates.length = 0; // Pulisci la coda
+// });
 
 onPageLoad();
 
@@ -60,14 +60,14 @@ LobbySocket.onmessage = function(e) {
             console.log("Join game notification received");
             showJoinGamePopup(data.game_link);
             break;
-        case 'update_next_round_slots':
-            if (isBracketReady) {
-                updateNextRoundSlot(data.round_number, data.slots);
-            } else {
-                console.log(`Bracket not ready. Storing update for round ${data.round_number}`);
-                pendingSlotUpdates.push({ roundNumber: data.round_number, slots: data.slots });
-            }
-            break;
+        // case 'update_next_round_slots':
+        //     if (isBracketReady) {
+        //         updateNextRoundSlot(data.round_number, data.slots);
+        //     } else {
+        //         console.log(`Bracket not ready. Storing update for round ${data.round_number}`);
+        //         pendingSlotUpdates.push({ roundNumber: data.round_number, slots: data.slots });
+        //     }
+        //     break;
         default:
             console.log("Unrecognized action:", data.type);
             break;
@@ -285,10 +285,6 @@ function generateBracket(tournament) {
     }
 
     console.log('Bracket generated');
-
-    // Emissione di un evento personalizzato
-    const event = new CustomEvent('bracketGenerated');
-    document.dispatchEvent(event);
 }
 
 // Funzione per ottenere il nome del round
@@ -305,79 +301,47 @@ function getRoundName(totalRounds, currentRound, mode) {
     }
 }
 
-// Funzione per aggiornare tutti gli slot
-function updateAllSlots(slots) {    
-    Object.keys(slots).forEach(slot => {
-        updateSlot(slot, slots[slot]);
+// Funzione per aggiornare tutti gli slot di più round
+function updateAllSlots(roundsSlots) {
+    console.log('Updating all slots for rounds:', roundsSlots);
 
-        // Controlla se lo slot è assegnato all'utente e aggiorna lo stato del pulsante Ready
-        if (slots[slot].username === username_lobby) {
-            checkUserSlotAndReadyState();
-        }
+    // Itera su ogni round
+    Object.keys(roundsSlots).forEach(roundKey => {
+        const slots = roundsSlots[roundKey];
+        const roundNumber = roundKey.split('_')[1]; // Estrae il numero del round
+
+        console.log(`Updating slots for round ${roundNumber}:`, slots);
+
+        // Itera su ogni slot del round
+        Object.keys(slots).forEach(slotKey => {
+            updateSlot(roundNumber, slotKey, slots[slotKey]);
+        });
     });
+
+    // Controlla lo stato dello slot e aggiorna il pulsante Ready
+    checkUserSlotAndReadyState();
 }
 
 
 // Funzione per aggiornare un singolo slot
-function updateSlot(slot, slotData) {
-    const slotElement = document.querySelector(`.player-slot[data-slot="${slot}"]`);
+function updateSlot(roundNumber, slotKey, slotData) {
+    const slotElement = document.querySelector(`.round[data-round="${roundNumber}"] .player-slot[data-slot="${slotKey}"]`);
     if (slotElement) {
         if (slotData && slotData.username !== 'empty') {
             // Se c'è un utente nello slot, aggiorna l'username e blocca lo slot
-            slotElement.classList.add('occupied');
-            slotElement.classList.add('locked'); // Blocca lo slot
+            slotElement.classList.add('occupied', 'locked');
             slotElement.textContent = slotData.username;
             slotElement.style.pointerEvents = 'none'; // Disabilita ulteriori clic
         } else {
             // Se lo slot è vuoto, ripristina lo stato predefinito
             slotElement.classList.remove('occupied', 'locked');
-            slotElement.textContent = `Player ${slot}`;
-            if (!slotSelectionLocked) {
-                slotElement.style.pointerEvents = ''; // Riabilita i clic
-            }
+            slotElement.textContent = `Player ${slotKey}`;
+            slotElement.style.pointerEvents = ''; // Riabilita i clic
         }
+        console.log(`Updated slot ${slotKey} in round ${roundNumber} with data:`, slotData);
     } else {
-        console.error("Slot element not found for slot:", slot);
+        console.error(`Slot element not found for round ${roundNumber}, slot ${slotKey}. Verify HTML structure.`);
     }
-}
-
-function updateNextRoundSlot(roundNumber, slots) {
-    console.log(`Updating next round ${roundNumber} slots:`, slots);
-    console.log(`Searching for .round[data-round="${roundNumber}"]`);
-
-    // Trova il round
-    const roundElement = document.querySelector(`.round[data-round="${roundNumber}"]`);
-    if (!roundElement) {
-        console.error(`Round element not found for round ${roundNumber}. Verify HTML generation.`);
-        return;
-    }
-
-    // Log degli slot nel round
-    const allSlots = roundElement.querySelectorAll('.player-slot');
-    console.log(`Found ${allSlots.length} player slots in round ${roundNumber}`);
-    allSlots.forEach(slot => {
-        console.log(`Slot: data-slot="${slot.dataset.slot}", content="${slot.textContent}"`);
-    });
-
-    // Itera sugli slot ricevuti
-    Object.keys(slots).forEach(slotKey => {
-        const slotData = slots[slotKey];
-        console.log(`Searching for .player-slot[data-slot="${slotKey}"] in round ${roundNumber}`);
-
-        // Trova lo slot specifico
-        const slotElement = roundElement.querySelector(`.player-slot[data-slot="${slotKey}"]`);
-        if (slotElement) {
-            // Aggiorna il contenuto dello slot
-            slotElement.textContent = slotData.username || 'Unknown Winner';
-            if (slotData.username && !slotData.username.toLowerCase().startsWith('winner match')) {
-                slotElement.classList.add('occupied', 'locked');
-                slotElement.style.pointerEvents = 'none';
-                console.log(`Updated slot ${slotKey} in round ${roundNumber} with winner: ${slotData.username}`);
-            }
-        } else {
-            console.error(`Slot element not found for round ${roundNumber}, slot ${slotKey}. Verify HTML structure or slot data.`);
-        }
-    });
 }
 
 
@@ -605,37 +569,51 @@ form_lobby.addEventListener('submit', (e) => {
 var readyButton = document.getElementById('ready');
 if (readyButton !== null) {
     readyButton.addEventListener('click', (e) => {
-        // Trova lo slot assegnato all'utente
+        // Trova lo slot assegnato all'utente nel round più alto
         let userSlot = null;
-        const playerSlots = document.querySelectorAll('.player-slot.first-round');
-    
-        playerSlots.forEach(slot => {
-            if (slot.classList.contains('occupied') && slot.textContent === username_lobby) {
-                userSlot = slot.dataset.slot;
-            }
+        let maxRoundNumber = -1;
+
+        // Trova tutti i round nel DOM
+        const rounds = document.querySelectorAll('.round[data-round]');
+        if (!rounds.length) {
+            console.error('No rounds found');
+            return;
+        }
+
+        rounds.forEach(round => {
+            const roundNumber = parseInt(round.dataset.round, 10);
+            const playerSlots = round.querySelectorAll('.player-slot');
+
+            playerSlots.forEach(slot => {
+                if (slot.classList.contains('occupied') && slot.textContent === username_lobby && roundNumber > maxRoundNumber) {
+                    userSlot = slot.dataset.slot;
+                    maxRoundNumber = roundNumber; // Aggiorna il round maggiore trovato
+                }
+            });
         });
-    
+
         if (!userSlot) {
             console.error('No slot assigned to user');
             return;
         }
-    
+
         // Chiedi conferma prima di impostare lo stato ready
         if (confirm('Vuoi confermare di essere pronto? Una volta confermato, non potrai più cambiare lo stato.')) {
             // Invia il cambio di stato ready
             const message = {
                 action: 'player_ready',
-                slot: userSlot,  // Aggiungi lo slot al messaggio
+                slot: userSlot, // Slot corretto trovato
                 username: username_lobby,
                 status: readyButton.textContent === 'Ready' ? 'ready' : 'not_ready'
             };
             LobbySocket.send(JSON.stringify(message));
-    
+
             // Blocca il pulsante ready per evitare ulteriori modifiche
             readyButton.disabled = true;
         }
     });
-}    
+}
+ 
 
 
 // Gestione del pulsante di eliminazione della lobby
@@ -694,8 +672,75 @@ if (leaveButton) {
 
 
 
-function updateReadyStatusInUserList(slots, readyStatus) {
+// function updateReadyStatusInUserList(slots, readyStatus) {
 
+//     if (!slots || Object.keys(slots).length === 0) {
+//         console.error("No slots data available");
+//         return;
+//     }
+
+//     const userList = document.getElementById('users_in_lobby');
+//     const userItems = userList.getElementsByTagName('li');
+//     const currentUser = username_lobby;
+
+//     // Itera su ogni utente nella lista e aggiorna lo stato ready
+//     Array.from(userItems).forEach(item => {
+//         const username = item.id.replace('user_', '');
+//         const slot = Object.keys(slots).find(key => slots[key].username === username);
+
+//         if (slot) {
+//             if (readyStatus[slot] !== undefined) {
+//                 if (readyStatus[slot]) {
+//                     item.innerHTML = `${username} ✔️`;
+//                 } else {
+//                     item.innerHTML = username;
+//                 }
+//             }
+//         }
+//     });
+
+//     // Aggiorna lo stato del pulsante "Ready" per l'utente corrente
+//     const readyButton = document.getElementById('ready');
+//     if (readyButton) {
+//         const currentUserSlot = Object.keys(slots).find(slot => slots[slot].username === currentUser);
+//         if (currentUserSlot) {
+//             if (readyStatus[currentUserSlot]) {
+//                 // Se l'utente è pronto, disabilita il pulsante
+//                 readyButton.disabled = true;
+//             } else {
+//                 // Se l'utente non è pronto, abilita il pulsante
+//                 readyButton.disabled = false;
+//             }
+//         } else {
+//             // Se l'utente non ha uno slot, disabilita il pulsante
+//             readyButton.disabled = true;
+//         }
+//     }
+
+//     // Verifica se tutti sono pronti e gli slot sono occupati per abilitare il pulsante "Start" per l'owner
+//     let allReady = true;
+//     let allOccupied = true;
+
+//     Object.keys(slots).forEach(slot => {
+//         if (slots[slot].username === 'empty') {
+//             allOccupied = false;
+//         }
+//         if (slots[slot].username !== 'empty' && !readyStatus[slot]) {
+//             allReady = false;
+//         }
+//     });
+
+//     const tournamentOwner = document.getElementById('tournament-data').dataset.owner;
+
+//     if (currentUser === tournamentOwner) {
+//         const startButton = document.getElementById('start');
+//         if (startButton) {
+//             startButton.disabled = !(allOccupied && allReady);
+//         }
+//     }
+// }
+
+function updateReadyStatusInUserList(slots, readyStatus) {
     if (!slots || Object.keys(slots).length === 0) {
         console.error("No slots data available");
         return;
@@ -705,62 +750,65 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     const userItems = userList.getElementsByTagName('li');
     const currentUser = username_lobby;
 
-    // Itera su ogni utente nella lista e aggiorna lo stato ready
+    console.log("Slots received:", slots);
+    console.log("Ready status received:", readyStatus);
+
+    // Itera sugli utenti nella lista e aggiorna lo stato "ready"
     Array.from(userItems).forEach(item => {
         const username = item.id.replace('user_', '');
-        const slot = Object.keys(slots).find(key => slots[key].username === username);
+        const slotKey = Object.keys(slots).find(key => slots[key].username === username);
 
-        if (slot) {
-            if (readyStatus[slot] !== undefined) {
-                if (readyStatus[slot]) {
-                    item.innerHTML = `${username} ✔️`;
-                } else {
-                    item.innerHTML = username;
-                }
+        if (slotKey && readyStatus[slotKey] !== undefined) {
+            // Aggiorna lo stato di "ready" nella lista utenti
+            if (readyStatus[slotKey]) {
+                item.innerHTML = `${username} ✔️`; // Segna come pronto
+            } else {
+                item.innerHTML = username; // Non pronto
             }
+        } else {
+            item.innerHTML = username; // Nessuno slot assegnato
         }
     });
 
-    // Aggiorna lo stato del pulsante "Ready" per l'utente corrente
+    // Aggiorna il pulsante "Ready" per l'utente corrente
     const readyButton = document.getElementById('ready');
     if (readyButton) {
-        const currentUserSlot = Object.keys(slots).find(slot => slots[slot].username === currentUser);
+        const currentUserSlot = Object.keys(slots).find(slotKey => slots[slotKey].username === currentUser);
         if (currentUserSlot) {
-            if (readyStatus[currentUserSlot]) {
-                // Se l'utente è pronto, disabilita il pulsante
-                readyButton.disabled = true;
-            } else {
-                // Se l'utente non è pronto, abilita il pulsante
-                readyButton.disabled = false;
-            }
+            readyButton.disabled = readyStatus[currentUserSlot] || false; // Disabilita se pronto
         } else {
-            // Se l'utente non ha uno slot, disabilita il pulsante
-            readyButton.disabled = true;
+            readyButton.disabled = true; // Disabilita se nessuno slot assegnato
         }
     }
 
-    // Verifica se tutti sono pronti e gli slot sono occupati per abilitare il pulsante "Start" per l'owner
-    let allReady = true;
-    let allOccupied = true;
+    // Controlla se tutti gli slot occupati sono pronti
+    const allReady = Object.keys(slots).every(slotKey => 
+        slots[slotKey].username !== "empty" && readyStatus[slotKey]
+    );
 
-    Object.keys(slots).forEach(slot => {
-        if (slots[slot].username === 'empty') {
-            allOccupied = false;
-        }
-        if (slots[slot].username !== 'empty' && !readyStatus[slot]) {
-            allReady = false;
-        }
-    });
+    const allOccupied = Object.keys(slots).every(slotKey => 
+        slots[slotKey].username !== "empty"
+    );
 
+    // Controlla se l'owner è attivo
     const tournamentOwner = document.getElementById('tournament-data').dataset.owner;
+    const startButton = document.getElementById('start');
+    const activeUsernames = Object.values(slots)
+        .map(slot => slot.username)
+        .filter(username => username !== "empty");
 
-    if (currentUser === tournamentOwner) {
-        const startButton = document.getElementById('start');
-        if (startButton) {
+    if (startButton) {
+        const ownerInGame = activeUsernames.includes(tournamentOwner);
+        if (ownerInGame) {
             startButton.disabled = !(allOccupied && allReady);
+        } else {
+            console.log("Owner not in game. Automatically triggering start logic.");
+            startTournamentLogic(); // Avvia direttamente la logica
         }
     }
 }
+
+
 
 
 // Funzione per disabilitare i pulsanti e bloccare gli slot
@@ -780,42 +828,50 @@ var startTournament = document.getElementById("start");
 if (startTournament) {
     startTournament.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log("Starting the tournament...");
-
-        // Invio del messaggio per iniziare il processo di round
-        LobbySocket.send(JSON.stringify({
-            action: 'start_tournament_preparation'
-        }));
-
-        startTournament.disabled = true;
-        var leaveTournament = document.getElementById("leave");
-        leaveTournament.disabled = true;
-
-        // Countdown lato client inviato come messaggi di chat
-        var countdown = 10; // Countdown di 10 secondi
-        var countdownInterval = setInterval(function() {
-            countdown--;
-
-            // Invio del messaggio di chat con "SYSTEM" come username
-            const message = {
-                action: 'chat_message',
-                username: 'SYSTEM',
-                message: `Round starting in ${countdown} seconds...`
-            };
-            LobbySocket.send(JSON.stringify(message));
-
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                console.log("Countdown finished. Tournament is starting!");
-
-                // Invia il messaggio per confermare che il countdown è terminato
-                LobbySocket.send(JSON.stringify({
-                    action: 'countdown_complete'
-                }));
-            }
-        }, 1000); // Aggiorna il countdown ogni secondo
+        startTournamentLogic(); // Richiama la funzione incapsulata
     });
 }
+
+
+function startTournamentLogic() {
+    console.log("Starting the tournament...");
+
+    // Disabilita i pulsanti
+    const startTournament = document.getElementById("start");
+    const leaveTournament = document.getElementById("leave");
+    if (startTournament) startTournament.disabled = true;
+    if (leaveTournament) leaveTournament.disabled = true;
+
+    // Invio del messaggio per iniziare il processo di round
+    LobbySocket.send(JSON.stringify({
+        action: 'start_tournament_preparation'
+    }));
+
+    // Countdown lato client inviato come messaggi di chat
+    let countdown = 10; // Countdown di 10 secondi
+    const countdownInterval = setInterval(function () {
+        countdown--;
+
+        // Invio del messaggio di chat con "SYSTEM" come username
+        const message = {
+            action: 'chat_message',
+            username: 'SYSTEM',
+            message: `Round starting in ${countdown} seconds...`
+        };
+        LobbySocket.send(JSON.stringify(message));
+
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            console.log("Countdown finished. Tournament is starting!");
+
+            // Invia il messaggio per confermare che il countdown è terminato
+            LobbySocket.send(JSON.stringify({
+                action: 'countdown_complete'
+            }));
+        }
+    }, 1000); // Aggiorna il countdown ogni secondo
+}
+
 
 // Funzione per mostrare il popup per joinare il game
 function showJoinGamePopup(gameLink) {
