@@ -859,6 +859,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 logger.error(f"Error during check_current_round_games: {e}")
                 await self.close()
                 return
+            
+        if self.tournament.status == 'finished':
+            tournament_winner = self.tournament.winner
+            await self.notify_tournament_end(self.tournament.name, tournament_winner)
+            logger.info(f"Notified client of tournament conclusion during connect for tournament: {self.tournament.name}.")
+            return
 
 
     async def disconnect(self, close_code):
@@ -1663,8 +1669,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     tournament_winner = final_game.winner
                     logger.info(f"Final game finished. Tournament winner: {tournament_winner.username}.")
                     await self.handle_tournament_end(tournament_winner)
+                    return
                 else:
                     logger.warning("Final game is not finished or has no winner.")
+                    logger.debug(f"Final game status: {final_game.status}")
+                    logger.debug(f"Final game winner: {final_game.winner}")
+
             else:
                 logger.error("Unexpected number of games in final round. Check tournament configuration.")
 
@@ -1739,17 +1749,21 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await database_sync_to_async(self.tournament.save)()
         logger.info(f"Tournament {self.tournament.name} marked as finished with winner: {tournament_winner.username if tournament_winner else 'None'}.")
 
-        # Prepara il messaggio per i client
+
+    async def notify_tournament_end(self, tournament_name, tournament_winner):
+        """
+        Prepara e invia un messaggio ai client per notificare la fine del torneo.
+        """
         message = {
             'type': 'tournament_finished',
-            'message': f"The tournament '{self.tournament.name}' has concluded!",
+            'message': f"The tournament '{tournament_name}' has concluded!",
             'winner': {
                 'username': tournament_winner.username if tournament_winner else None,
                 'player_id': tournament_winner.id if tournament_winner else None,
             } if tournament_winner else None
         }
 
-        # Notifica i client che il torneo è terminato
+        # Notifica i client tramite WebSocket
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -1758,3 +1772,4 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             }
         )
         logger.info(f"Notified clients of tournament conclusion with winner: {tournament_winner.username if tournament_winner else 'None'}.")
+

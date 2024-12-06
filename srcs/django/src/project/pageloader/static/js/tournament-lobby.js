@@ -7,19 +7,7 @@ var slotSelectionLocked = false;
 // Configurazione del WebSocket
 var lobby = `wss://${window.location.host}/wss/tournament/${round_id_lobby}/?id=${userId_lobby}`;
 var LobbySocket = new WebSocket(lobby);
-var isBracketReady = false;
-var pendingSlotUpdates = [];
 
-// document.addEventListener('bracketGenerated', () => {
-//     console.log('Bracket is ready');
-//     isBracketReady = true;
-
-//     // Applica gli aggiornamenti in sospeso
-//     pendingSlotUpdates.forEach(({ roundNumber, slots }) => {
-//         updateNextRoundSlot(roundNumber, slots);
-//     });
-//     pendingSlotUpdates.length = 0; // Pulisci la coda
-// });
 
 onPageLoad();
 
@@ -60,14 +48,10 @@ LobbySocket.onmessage = function(e) {
             console.log("Join game notification received");
             showJoinGamePopup(data.game_link);
             break;
-        // case 'update_next_round_slots':
-        //     if (isBracketReady) {
-        //         updateNextRoundSlot(data.round_number, data.slots);
-        //     } else {
-        //         console.log(`Bracket not ready. Storing update for round ${data.round_number}`);
-        //         pendingSlotUpdates.push({ roundNumber: data.round_number, slots: data.slots });
-        //     }
-        //     break;
+        case 'tournament_finished':
+            console.log("Tournament finished!");
+            showWinnerPopup(data.winner);
+            break;
         default:
             console.log("Unrecognized action:", data.type);
             break;
@@ -910,4 +894,47 @@ function showJoinGamePopup(gameLink) {
         loadPage(gameLink);  // Usa loadPage per caricare la pagina
     });
 }
+
+function showWinnerPopup(winner) {
+    console.log("Showing winner popup for:", winner); // Log per controllare che la funzione venga chiamata correttamente
+
+    // Creazione del popup
+    const popup = document.createElement('div');
+    popup.classList.add('popup');
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h2>Congratulations!</h2>
+            <p>The tournament has concluded.</p>
+            <h3>Winner: ${winner.username}</h3>
+            <button id="close-popup-btn" class="btn btn-primary">Close</button>
+        </div>
+    `;
+
+    // Trova il contenitore in cui appenderlo. Assicurati che esista o creane uno.
+    const container = document.getElementById('main-container'); // Usa un container specifico se esiste
+    if (!container) {
+        console.error("Main container not found. Popup cannot be displayed.");
+        return;
+    }
+    container.appendChild(popup);
+    console.log("Winner popup created and appended to the DOM"); // Verifica che il popup sia stato aggiunto al DOM
+
+    // Aggiungi uno stile di base per il popup (puoi migliorarlo con CSS)
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = '#fff';
+    popup.style.padding = '20px';
+    popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+    popup.style.zIndex = '9999'; // Assicura che il popup sia in cima a tutti gli altri elementi
+    popup.style.textAlign = 'center'; // Per centratura del testo
+
+    // Aggiungi un gestore di eventi al pulsante di chiusura
+    document.getElementById('close-popup-btn').addEventListener('click', function() {
+        console.log("Close button clicked. Removing popup."); // Log per verificare che il pulsante sia stato cliccato
+        container.removeChild(popup); // Rimuove il popup
+    });
+}
+
 
