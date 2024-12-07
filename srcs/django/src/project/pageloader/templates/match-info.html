@@ -1,0 +1,13 @@
+<div>
+    <h1>Game Info: {{ game.name }}</h1>
+    <p>Mode: {{ game.mode }}</p>
+    <p>Status: {{ game.status }}</p>
+    <p>Team 1 Score: {{ game.team1_score }}</p>
+    <p>Team 2 Score: {{ game.team2_score }}</p>
+    <p>Players: {{ game.players|join:", " }}</p>
+    <!-- Go back button -->
+    <div class="row justify-content-center my-3">
+        <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
+    </div>
+
+</div>

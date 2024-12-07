@@ -1,0 +1,11 @@
+<div>
+    <h1>Tournament Info: {{ tournament.name }}</h1>
+    <p>Mode: {{ tournament.mode }}</p>
+    <p>Status: {{ tournament.status }}</p>
+    <p>Players in Lobby: {{ tournament.players_in_lobby }}</p>
+    <p>Players: {{ tournament.players|join:", " }}</p>
+    <div class="row justify-content-center my-3">
+        <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
+    </div>
+
+</div>

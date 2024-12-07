@@ -170,3 +170,25 @@ font-weight: 700;
 .user-blocked {
 	color: red !important;
 }
+
+#user-stats-chart {
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+    max-width: 500px; /* Limita la larghezza massima */
+    height: auto;
+}
+.card-footer {
+    padding: 20px;
+    text-align: center;
+}
+
+#stat-values {
+    font-size: 1.1em; /* Leggermente più grande */
+}
+
+.text-large {
+    font-size: 1.2em; /* Etichette più grandi */
+    font-weight: bold;
+}

@@ -1,6 +1,73 @@
 var chatSocket;
 
 
+async function recoverUser(id) {
+    let accessToken = localStorage.getItem("accessToken");
+	const checkAndRefreshToken = async () => {
+        try {
+            const response = await fetch(`/api/token/refresh/?token=${accessToken}`, {
+                method: 'GET',
+            });
+
+            const data = await response.json();
+
+            if (data.message === 'Token valido') {
+                // Il token è valido, procedi con la richiesta
+                return accessToken;
+            } else if (data.message === 'Token non valido') {
+                // Il token non è valido, tentiamo di rinnovarlo
+                const newAccessToken = await refreshAccessToken();
+                if (newAccessToken) {
+                    localStorage.setItem('accessToken', newAccessToken);
+                    return newAccessToken;
+                } else {
+                    console.error('Impossibile rinnovare il token');
+                    return null;
+                }
+            } else {
+                console.error('Errore durante il controllo del token:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('Errore durante la verifica o il rinnovo del token:', error);
+            return null;
+        }
+    };
+
+    // Verifica la validità del token e procedi con la richiesta se tutto è in ordine
+    accessToken = await checkAndRefreshToken();
+    if (!accessToken) {
+        // Se non è possibile ottenere un token valido, esci
+        return;
+    }
+    try {
+        // La funzione fetch ritorna una promessa, quindi puoi usare await qui
+        const response = await fetch(`/api/request_user/${id}/`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+
+        const text = await response.text();  // Otteniamo il testo grezzo della risposta
+
+        if (!response.ok) {
+            console.error(`Errore nella risposta della rete: ${response.status} ${response.statusText}`);
+            throw new Error('Network response was not ok');
+        }
+
+        const data = JSON.parse(text);  // Prova a fare il parse del messaggio
+
+        return data; // Modifica questo percorso in base alla struttura della tua risposta
+
+    } catch (error) {
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
+        //throw error;
+    }
+}
+
+
 function disableJoinGameButton(){
     let joinGameBtn = document.getElementsByClassName("join-btn");
     for (let i = 0; i < joinGameBtn.length; i++) {
@@ -241,6 +308,11 @@ function refreshAccessToken() {
     });
 }
 
+// function isAuthenticated() {
+//     const accessToken = localStorage.getItem("accessToken");
+//     return accessToken !== null;
+// }
+
 function loadPage(url) {
     let accessToken = localStorage.getItem("accessToken");
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
@@ -353,12 +425,12 @@ function loadPage(url) {
     }
     
 
-    // // Controllo URL per decidere se fare la richiesta pilota
-    // if (url !== "api/home/" && url !== "api/login/" && url !== "api/signup/") {
-    //     checkTokenValidity(url);
-    // } else {
+    // Controllo URL per decidere se fare la richiesta pilota
+    if (url !== "api/home/" && url !== "api/login/" && url !== "api/signup/") {
+        checkTokenValidity(url);
+    } else {
         performRequest(accessToken, url); // Carica direttamente se è una delle pagine libere
-    
+    }
 }
 
 // Funzione per rinfrescare il token di accesso
@@ -387,81 +459,82 @@ function refreshAccessToken() {
 }
 
 
-// function checkUserPermission(page) {
-//     const url = page;
-//     if (url.includes("game") || url.includes("lobby")) {
+async function checkUserPermission(page) {
+    const url = page;
 
-//         if ((url.includes("local") || url.includes("single")) && !url.includes("create")) {
-//             return false;
-//         } else {
-//             let storage = window.localStorage;
-
-//             if (url.includes("lobby")) {
-//                 let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
-
-//                 let lobbyId = sanitizedUrl.split("/").pop();
-                
-//                 recoverUser(localStorage.getItem("userId")).then((data) => {
-//                     if (data) {
-//                         let lobby = data.in_game_lobby;
-//                         if (lobby == lobbyId) {
-//                             return true;
-//                         } else {
-//                             return false;
-//                         }
-//                     }
-//                 });
-//             }  else {
-//                 let gameId = url.split("/").pop();
-//                 recoverUser(localStorage.getItem("userId")).then((data) => {
-//                     if (data) {
-//                         let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
-//                         let gameId = sanitizedUrl.split("/").pop();
-//                         let game = data.game_history;
-//                         game.forEach(element => {
-//                             if(element.id == gameId) {
-//                                 if(element.status != "finished" && element.status != "not_started") {
-//                                     return true;
-//                                 } else {
-//                                     return false;
-//                                 }
-//                             }
-//                         });
-//                     }
-//                 });
-//             }              
-//         }
-//     }
-//     return false;
-// }
-
-document.addEventListener("DOMContentLoaded", function() {
-    let redirect = localStorage.getItem("redirect");
-    if (localStorage.getItem("accessToken") === null) {
-        loadPage("api/home/");
-    } else if (localStorage.getItem("redirect") !== null) {
-        const redirect = localStorage.getItem("redirect");
-        localStorage.removeItem("redirect");
-        let url = "api/forbidden/" + redirect + "/";
-        loadPage(url);
+    if ((url.includes("local") || url.includes("single")) && !url.includes("create")) {
+        return false;
     } else {
-        if (window.location.pathname == "/")
-        {
-            loadPage("api/dashboard/");
-        }
-        else
-        {
-            let page = window.location.pathname;
-        
-            if (page.includes("create")) {
-                let parts = page.split("_");
-                let apiUrl = `api${parts[0]}/?source=${parts[1]}`;
-                loadPage(apiUrl);
+        if (url.includes("lobby")) {
+            if (url.includes("tournament")) {
+                return true;
             } else {
-                loadPage("api" + window.location.pathname);
+                let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+                let lobbyId = parseInt(sanitizedUrl.split("/").pop());
+
+                let data = await recoverUser(localStorage.getItem("userId"));
+                if (data) {
+                    let lobby = data.in_game_lobby;
+                    console.log("data ", data);
+                    console.log("lobbyId ", lobbyId);
+                    console.log("lobby ", lobby);
+                    return lobby === lobbyId;
+                }
+            }
+        } else {
+            let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+            let gameId = sanitizedUrl.split("/").pop();
+
+            let data = await recoverUser(localStorage.getItem("userId"));
+            if (data) {
+                let game = data.game_history;
+                for (let element of game) {
+                    if (element.id == gameId) {
+                        if (element.status != "finished" && element.status != "not_started") {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
             }
         }
     }
+    return false;
+}
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    let page = window.location.pathname;
+    checkUserPermission(page).then((check) => {
+        console.log("check ", check, "page ", page);
+        
+        if (localStorage.getItem("accessToken") === null) {
+            loadPage("api/home/");
+        } else if ((page.includes("game") || page.includes("lobby")) && check === false) {
+            console.log("page ", page);
+            if (page.includes("game")) {
+                loadPage("api/forbidden/game/");
+            } else {
+                loadPage("api/forbidden/lobby/");
+            }
+        } else {
+            if (window.location.pathname == "/") {
+                loadPage("api/dashboard/");
+            } else {
+                if (page.includes("create")) {
+                    let parts = page.split("_");
+                    console.log("parts ", parts);
+                    const sourcePart = parts[1].replace(/\/$/, "");
+                    let apiUrl = `api${parts[0]}/?source=${sourcePart}`;
+                    console.log("apiUrl ", apiUrl);
+                    loadPage(apiUrl);
+                } else {
+                    loadPage("api" + window.location.pathname);
+                }
+            }
+        }
+    });
     
     window.onpopstate = function(event) {
         event.preventDefault();
@@ -471,10 +544,26 @@ document.addEventListener("DOMContentLoaded", function() {
     
             // Rimuovi eventuali slash finali da parts[1]
             const sourcePart = parts[1].replace(/\/$/, "");
+            console.log("sourcePart ", parts);
     
             const apiUrl = `api${parts[0]}/?source=${sourcePart}`;
             loadPage(apiUrl);
-        } 
+        } else if (page.includes("game") || page.includes("lobby")) {
+            if (checkUserPermission(page) == true) {
+                loadPage("api" + page);
+            }
+            else
+            {
+                if (page.includes("game")) {
+                    loadPage("api/forbidden/game/");
+                }
+                else
+                {
+                    loadPage("api/forbidden/lobby/");
+                }
+            }
+
+        }
         else
         {
             // Se la stringa non contiene "create", carica la pagina con l'URL standard

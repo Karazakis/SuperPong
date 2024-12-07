@@ -16,10 +16,8 @@ document.addEventListener('cleanupGameEvent', function() {
 });
 
 window.inGame = true;
-function cleanupGame() {
-    
-    
-    
+function cleanupGame() {      
+    window.inGame = false;
     window.clearAllScene();
     if (window.animationFrameId !== null && window.animationFrameId !== undefined) {
         cancelAnimationFrame(window.animationFrameId);
@@ -28,7 +26,6 @@ function cleanupGame() {
     BALLS.forEach(ball => ball.destroy());
     BALLS = [];
     ufo = [];
-    window.inGame = false;
     if (paddle1) {
         paddle1.destroy();
     }
@@ -71,6 +68,13 @@ function cleanupGame() {
     scoreTeam = [20, 20];
     isPaused = false;
     window.removeEventListener('resize', window.onWindowResize, false);
+    cornerBotLeft.destroy();
+
+    cornerBotRight.destroy();
+    cornerTopRight.destroy();
+    cornerTotLeft.destroy();
+
+const model3D = new Model3D();
     if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament") {
         window.removeEventListener('keydown', handleKeyDownOnline);
         window.handleKeyDownOnline = null;
@@ -89,6 +93,7 @@ function cleanupGame() {
     }
     if (renderer) {
         renderer.dispose();
+        renderer = null;
     }
 }
 
@@ -137,7 +142,7 @@ const TURBO_MATERIAL = new THREE.MeshBasicMaterial({ color: 0x00ff0000, transpar
 
 export class Pad { 
 
-    constructor(scene, boundaries, spawnX, spawnY ,left, right, shoot, turbo) {
+    constructor(scene, boundaries, spawnX, spawnY ,left, right, shoot, turbo, id) {
         this.scene = scene;
         this.geometry = GEOMETRY;
         this.material = MATERIAL;
@@ -169,6 +174,10 @@ export class Pad {
         this.mesh.previousPositionX = this.mesh.position.x;
         this.lastUpdateTime = 0;
         this.updateInterval = 15;
+        this.hit = 0;
+        this.id = id;
+        this.keyPressCount = 0;
+        this.keyPressedFlag = {right: false, left: false, shoot: false, turbo: false};
         this.scene.add(this.mesh);
     }
 
@@ -183,33 +192,40 @@ export class Pad {
         }
     }
 
-    update(dt) {               
-        const currentTime = Date.now(); // da sistemare        
+    update(dt) {
+        const currentTime = Date.now();
+
         if (currentTime - this.lastUpdateTime < this.updateInterval) {
             return;
         }
+
         let moved = false;
-        if (keyboardState[this.mesh.right]) { // movimento pad
+
+        if (keyboardState[this.mesh.right]) {
             if (this.mesh.position.x < this.boundaries.x - 7) {
                 this.mesh.position.x += dt * this.mesh.speed;
                 moved = true;
             }
-        } 
+            this.handleKeyPress('right');
+        } else {
+            this.keyPressedFlag.right = false;
+        }
         if (keyboardState[this.mesh.left]) {
             if (this.mesh.position.x > -this.boundaries.x + 7) {
                 this.mesh.position.x -= dt * this.mesh.speed;
                 moved = true;
             }
-        } 
-        if (moved && this.mesh.position.x !== this.previousPositionX) {
-            this.previousPositionX = this.mesh.position.x;
-            this.lastUpdateTime = currentTime;
-            for (let j = 0; j < this.mesh.attachedBalls.length; j++) {
-                if (this.mesh.attachedBalls[j]) {
-                    this.mesh.attachedBalls[j].mesh.position.x = this.mesh.position.x + this.ballSlots[j].x;
-                    this.mesh.attachedBalls[j].mesh.position.y = this.mesh.position.y + this.ballSlots[j].y;
-                }
-            }
+            this.handleKeyPress('left');
+        } else {
+            this.keyPressedFlag.left = false;
+        }
+        this.lastUpdateTime = currentTime;
+    }
+
+    handleKeyPress(key) {
+        if (!this.keyPressedFlag[key]) {
+            this.keyPressCount++;
+            this.keyPressedFlag[key] = true;
         }
     }
 
@@ -351,6 +367,7 @@ endgameOnline() {
 	const csrfToken = getCookie('csrftoken');
     let gameId = window.location.pathname.split("/");
     let url = "/api/game/" + gameId[2]  + "/";
+    document.getElementById('game-details').dataset.gameStatus = "finished";
     async function checkTokenValidity(url) {
 		try {
 			const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
@@ -383,9 +400,18 @@ endgameOnline() {
             try {
                 let scorePlayer1 = document.getElementById('player0score').textContent;
                 let scorePlayer2 = document.getElementById('player1score').textContent;
+                let hitPlayer1 = paddle1.hit;
+                let hitPlayer2 = paddle2.hit;
+                let keyCountPlayer1 = paddle1.keyCount;
+                let keyCountPlayer2 = paddle2.keyCount;
                 let data = {
                     scorePlayer1: scorePlayer1,
                     scorePlayer2: scorePlayer2,
+                    hitPlayer1: hitPlayer1,
+                    hitPlayer2: hitPlayer2,
+                    keyCountPlayer1: keyCountPlayer1,
+                    keyCountPlayer2: keyCountPlayer2,
+                    ballCount: ballCount,
                     gameStatus: "finished"
                 };
                 const response = await fetch(url, {
@@ -395,17 +421,17 @@ endgameOnline() {
                         "Authorization": `Bearer ${token}`
                     },
                     body: JSON.stringify(data)
-                });
-        
-                if (!response.ok) {
-                    throw new Error('Errore durante il blocco dell\'utente');
-                }
+                });            
+            
             } catch (error) {
                 console.error('Errore durante la richiesta:', error);
             }
 		}
 		checkTokenValidity(url);
 }
+
+window.endgameOnline = endgameOnline;
+
 function startTimer() {
     // Inizializza il timer del gioco
     const timerElement = document.getElementById('game-timer');
@@ -426,6 +452,7 @@ function startTimer() {
             }
             // Quando il tempo scade, ferma il timer e chiama endgame()
             if (timeRemaining <= 0) {
+                console.log("Tempo scaduto!");
                 clearInterval(countdownInterval);
                 gameover();
             }
@@ -436,9 +463,9 @@ function startTimer() {
 }
 
 function startTimerOnline() {
-    const timerElement = document.getElementById('game-timer');
-    const countdownElement = document.getElementById('countdown');
-    const timerValue = parseInt(timerElement.getAttribute('data-timer'), 10);
+    let timerElement = document.getElementById('game-timer');
+    let countdownElement = document.getElementById('countdown');
+    let timerValue = parseInt(timerElement.getAttribute('data-timer'), 10);
 
     if (typeof GameSocket === 'undefined' || GameSocket === null) {
         console.error("GameSocket non è definito.");
@@ -446,7 +473,7 @@ function startTimerOnline() {
     }
 
     if (!isNaN(timerValue) && timerValue > 0) {
-        let timeRemaining = timerValue * 60;
+        let timeRemaining = timerValue;
 
         countdownElement.textContent = timeRemaining;
         GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
@@ -456,8 +483,10 @@ function startTimerOnline() {
                 clearInterval(countdownInterval);
                 return;
             }
-            timeRemaining--;
-            GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
+            if (gamePaused === false && gameIsStarting === false) {
+                timeRemaining--;
+                GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
+            }
 
             if (timeRemaining <= 0) {
                 clearInterval(countdownInterval);
@@ -484,6 +513,7 @@ const clock = new THREE.Clock();
     
 function getPlayerControls(playerId) {
     const playerDiv = document.getElementById(playerId);
+    console.log("il player div", playerDiv);
     if (playerDiv) {
         return {
             left: playerDiv.getAttribute('data-left'),
@@ -503,8 +533,9 @@ export let keyboardState = {};
 let p1Elem, p1Controls, p2Elem, p2Controls, p3Elem, p3Controls, p4Elem, p4Controls;
 
 p1Controls = getPlayerControls("player0");
+console.log("controllo p1", p1Controls);
 export const posit = p1Controls.posit;
-let paddle1 = new Pad(window.gameScene, boundaries, 0, -20, p1Controls.left, p1Controls.right, p1Controls.shoot, p1Controls.boost);
+let paddle1 = new Pad(window.gameScene, boundaries, 0, -20, p1Controls.left, p1Controls.right, p1Controls.shoot, p1Controls.boost, 1);
 let paddle2;
 let paddle3;
 let paddle4;
@@ -521,6 +552,8 @@ const isOnlineGame = gameSettings.gameType === "remote-game" || gameSettings.gam
 console.log("il game mode e il posit", gameSettings.gameMode, posit);
 export const isHost = posit === "p1";
 
+document.getElementById('leavegame').dataset.posit = posit;
+
 if (gameSettings.gameType == "single-game") {
     bot = new BotTop(window.gameScene, new THREE.Vector3(0, 20, 0), new THREE.Vector2(20, 20));
     if (gameSettings.gameMode == "2v2" || gameSettings.gameMode == "4dm") {
@@ -531,17 +564,17 @@ if (gameSettings.gameType == "single-game") {
     }
 } else if (gameSettings.gameType == "local-game") {
     p2Controls = getPlayerControls("player1");
-    paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.left, p2Controls.right, p2Controls.shoot, p2Controls.boost);
+    paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.left, p2Controls.right, p2Controls.shoot, p2Controls.boost, 2);
     if(gameSettings.gameMode == "1v1") {
     }
     else if (gameSettings.gameMode == "2v2" || gameSettings.gameMode == "4dm") {
         p3Controls = getPlayerControls("player2");
         p4Controls = getPlayerControls("player3");
         if (p3Controls) {
-            paddle3 = new Pad(window.gameScene, boundaries, 20, 0, p3Controls.left, p3Controls.right, p3Controls.shoot, p3Controls.boost, "vertical");
+            paddle3 = new Pad(window.gameScene, boundaries, 20, 0, p3Controls.left, p3Controls.right, p3Controls.shoot, p3Controls.boost, 3, "vertical");
         }
         if (p4Controls) {
-            paddle4 = new Pad(window.gameScene, boundaries, -20, 0, p4Controls.left, p4Controls.right, p4Controls.shoot, p4Controls.boost, "vertical");
+            paddle4 = new Pad(window.gameScene, boundaries, -20, 0, p4Controls.left, p4Controls.right, p4Controls.shoot, p4Controls.boost, 4, "vertical");
         }
         walls[1] = false; 
         walls[3] = false;
@@ -549,17 +582,17 @@ if (gameSettings.gameType == "single-game") {
 } else if (gameSettings.gameType == "remote-game" || gameSettings.gameType == "tournament") {
     p2Controls = getPlayerControls("player1");
     console.log("controllo p2", p2Controls);
-    paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.right, p2Controls.left, p2Controls.shoot, p2Controls.boost);
+    paddle2 = new Pad(window.gameScene, boundaries, 0, 20, p2Controls.right, p2Controls.left, p2Controls.shoot, p2Controls.boost, 2);
     if(gameSettings.gameMode == "1v1") {
     }
     else if (gameSettings.gameMode == "2v2" || gameSettings.gameMode == "4dm") {
         p3Controls = getPlayerControls("player2");
         p4Controls = getPlayerControls("player3");
         if (p3Controls) {
-            paddle3 = new Pad(window.gameScene, boundaries, 20, 0, p3Controls.left, p3Controls.right, p3Controls.shoot, p3Controls.boost, "vertical");
+            paddle3 = new Pad(window.gameScene, boundaries, 20, 0, p3Controls.left, p3Controls.right, p3Controls.shoot, p3Controls.boost, 3, "vertical");
         }
         if (p4Controls) {
-            paddle4 = new Pad(window.gameScene, boundaries, -20, 0, p4Controls.left, p4Controls.right, p4Controls.shoot, p4Controls.boost, "vertical");
+            paddle4 = new Pad(window.gameScene, boundaries, -20, 0, p4Controls.left, p4Controls.right, p4Controls.shoot, p4Controls.boost, 4, "vertical");
         }
         walls[1] = false; 
         walls[3] = false;
@@ -581,6 +614,7 @@ let corners = [cornerBotLeft, cornerBotRight, cornerTopRight, cornerTotLeft];
 let interval = 2;
 let timer = 0;
 let timer2 = 0;
+let gamePaused = true;
 
 function arrow (position, angle) {
     const geometry = new THREE.ConeGeometry(0.5, 5, 20, 20);
@@ -596,6 +630,7 @@ function arrow (position, angle) {
 }
 
 let maxBalls = gameSettings.gameBalls;
+let ballCount = 0;
 
 function launchBall(n2online = 0, ballId = null) {
     let direction;
@@ -690,9 +725,18 @@ function launchBall(n2online = 0, ballId = null) {
     if (0 <= maxBalls) {
         maxBalls--;
         setTimeout(() => {
-            const ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction, 1, GameSocket, ballId);
+            let ball;
+            console.log("è online?", isOnlineGame);
+            if (isOnlineGame !== false) {
+                 
+                ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction, 1, GameSocket, ballId);
+            } else if (isOnlineGame === false) {
+                console.log("è online no e sta creando", isOnlineGame);
+                ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction,1);
+            }
             BALLS.push(ball);
             ballsUpdate[ballId] = ball;
+            ballCount += 1;
         }, 500);
     }
 }
@@ -740,12 +784,13 @@ export function gameover(p1 = -1, p2 = -1) {
         scoreP2.innerHTML = p2;
     }
     
+    console.log("nel gameover il posit e il game setting", posit, gameSettings);
     if(gameSettings.gameRules == "time") {
         gameEnded = true;
         populateMatchDetails();
         console.log("il posit e il game mode", posit, gameSettings.gameMode);
         if(gameSettings.gameMode == "1v1") {
-            if (posit == "p1") {
+            if (posit == "p1" || gameSettings.gameType === "local-game" || gameSettings.gameType === "single-game") {
                 if (score[0]  < score[1]) {
                     showModal("You Win!", "Congratulations, Player 1!");
                 } else if (score[0] == score[1]) {
@@ -797,7 +842,7 @@ export function gameover(p1 = -1, p2 = -1) {
             console.log("il posit e lo score", score , posit);
             gameEnded = true;
             populateMatchDetails();
-            if (posit == "p1") {
+            if (posit == "p1" || gameSettings.gameType === "local-game" || gameSettings.gameType === "single-game") {
                 if (score[0] > 0 && score[0] > score[1]) {
                     showModal("You Win!", "Congratulations, Player 1!");
                 }else if (score[0] == score[1]){
@@ -844,6 +889,7 @@ export function gameover(p1 = -1, p2 = -1) {
 function showModal(title, message) {
     document.getElementById("modal-title").textContent = title;
     document.getElementById("modal-message").textContent = message;
+    console.log("il game over", document.getElementById("gameover-modal"));
     document.getElementById("gameover-modal").style.display = "block";
 }
 
@@ -1165,7 +1211,27 @@ export class Ball2 {
         this.GameSocket = GameSocket;
         this.ballId = ballId;
         this.debounceTimer = 0;
+        this.coeffs = this.getCoefficients(posit);
     }
+
+    getCoefficients(posit) {
+        let coefficients = { x: 1, y: 1, z: 1 };
+
+        switch (posit) {
+            case "p2": 
+                coefficients = { x: -1, y: -1, z: 1 };
+                break;
+            case "p3": 
+                coefficients = { x: -1, y: 1, z: 1 };  
+                break;
+            case "p4": 
+                coefficients = { x: 1, y: -1, z: 1 };  
+                break;
+        }
+
+        return coefficients;
+    }
+
 
     destroy(){
         this.scene.remove(this.mesh);
@@ -1202,47 +1268,52 @@ export class Ball2 {
                 if (isHost == true)
                 {
                     this.debounceTimer += dt;
-                    if (this.debounceTimer < 0.05) return;
+                    if (this.debounceTimer < 0.03) return;
                     this.debounceTimer = 0;
                     GameSocket.send(JSON.stringify({ action: "ball_update", ballId: this.ballId, position: this.mesh.position, velocity: this.mesh.velocity }));
                 }
         }
         else if(isHost === false && isOnlineGame === true)
         {
-            function getCoefficients(posit) {
-                let coefficients = { x: 1, y: 1, z: 1 };
-        
-                switch (posit) {
-                    case "p2": 
-                        coefficients = { x: -1, y: -1, z: 1 };
-                        break;
-                    case "p3": 
-                        coefficients = { x: -1, y: 1, z: 1 };  
-                        break;
-                    case "p4": 
-                        coefficients = { x: 1, y: -1, z: 1 };  
-                        break;
-                }
-        
-                return coefficients;
-            }
-        
-            const coeffs = getCoefficients(posit);
-
             try {
                 if(ballsUpdate[this.ballId] !== undefined && ballsUpdate[this.ballId] !== null && ballsUpdate[this.ballId].position !== undefined && ballsUpdate[this.ballId].velocity !== undefined)
                 {
                     this.mesh.position.set(
-                        ballsUpdate[this.ballId].position.x * coeffs.x,
-                        ballsUpdate[this.ballId].position.y * coeffs.y,
-                        ballsUpdate[this.ballId].position.z * coeffs.z
+                        ballsUpdate[this.ballId].position.x * this.coeffs.x,
+                        ballsUpdate[this.ballId].position.y * this.coeffs.y,
+                        ballsUpdate[this.ballId].position.z * this.coeffs.z
                     );
             
                     this.mesh.velocity.set(
-                        ballsUpdate[this.ballId].velocity.x * coeffs.x,
-                        ballsUpdate[this.ballId].velocity.y * coeffs.y,
-                        ballsUpdate[this.ballId].velocity.z * coeffs.z
+                        ballsUpdate[this.ballId].velocity.x * this.coeffs.x,
+                        ballsUpdate[this.ballId].velocity.y * this.coeffs.y,
+                        ballsUpdate[this.ballId].velocity.z * this.coeffs.z
                     );
+                }
+                else
+                {
+                    console.log("ballId non trovato o move vecchiaOOOOOOO ", this.ballId);
+                    const s = this.mesh.velocity.clone().multiplyScalar(dt);
+                    const tPos = this.mesh.position.clone().add(s);
+                    this.mesh.position.copy(tPos);                
+        
+                    if(walls[0] && this.mesh.position.y < -this.boundaries.y)
+                    {
+                        this.mesh.position.y = -this.boundaries.y;
+                        this.mesh.velocity.y *= -1;
+                    }
+                    else if(walls[1] && this.mesh.position.x < -this.boundaries.x){
+                        this.mesh.position.x = -this.boundaries.x;
+                        this.mesh.velocity.x *= -1;
+                    }
+                    else if(walls[2] && this.mesh.position.y > this.boundaries.y){
+                        this.mesh.position.y = this.boundaries.y;
+                        this.mesh.velocity.y *= -1;            
+                    }
+                    else if(walls[3] && this.mesh.position.x > this.boundaries.x){
+                        this.mesh.position.x = this.boundaries.x;
+                        this.mesh.velocity.x *= -1;
+                    }
                 }
             }
             catch (e) {
@@ -1286,7 +1357,7 @@ export function updateBall(ballId, position, velocity) {
     if(!ballsUpdate[ballId]) {
         ballsUpdate[ballId] = { };
     }
-
+    
     ballsUpdate[ballId] = { ballId: ballId, position: position, velocity: velocity };
 }
 
@@ -1441,6 +1512,53 @@ if(gametype == 'remote-game' || gametype == 'tournament')
                 scoreTeam2.innerText = data.team2;
             }
         }
+        else if (data.action === 'leave')
+        {
+            gameEnded = true;
+            if (isHost === true) {
+                endgameOnline();
+            }
+            gameover();
+            console.log("leave", data);
+        }
+        else if (data.action === 'player_leave')
+        {
+            gamePaused = true;
+            BALLS.forEach(ball => { ball.destroy(); });
+            ballToRemove.clear();
+            ballToRemoveHost.clear();
+            ballCounter = 0;
+            ball_is_ready = false;
+            collision_is_ready = false;
+            collisionMap = {};
+            ballsUpdate = {};
+            
+            document.getElementById("wait-modal").style.display = "block";
+
+        }
+        else if (data.action === 'player_rejoin')
+        {
+            gamePaused = false;
+            gameIsStarting = true;
+            firstTimer = true;
+            //document.getElementById("wait-modal").style.display = "none";
+        }
+        else if (data.action === 'join')
+        {
+            gamePaused = false;
+            if (isHost === false && data.username !== username_game)
+            {
+                GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
+            }
+
+        }
+        else if (data.action === 'start_game')
+        {
+            gamePaused = false;
+            gameIsStarting = false;
+            document.getElementById("wait-modal").style.display = "none";
+        }
+        console.log("data NEL SOCKET GAME", data);
     }
 } else {
     window.handleKeyDown = function(event) {
@@ -1458,7 +1576,71 @@ if(gametype == 'remote-game' || gametype == 'tournament')
     window.addEventListener('keyup', window.handleKeyUp);
 }
 
+function startCountdown() {
+    let countdown = -10;
+    let countdownElement = document.getElementById('countdown');
+    window.timer = document.getElementById('countdown').textContent;
+    let interval = setInterval(() => {
+        countdownElement.innerText = countdown;
+        countdown++;
+        GameSocket.send(JSON.stringify({ action: "time_update", time: countdown }));
+        if (countdown == 0) {
+            clearInterval(interval);
+            GameSocket.send(JSON.stringify({ action: "start_game" }));
+            if (gameSettings.gameRules == "time") {
+                gameIsStarting = false;
+                document.getElementById('countdown').textContent = window.timer;
+                window.timer = null;
+            }
+        }
+    }, 1000);
+}
+
+function launchReadyInterval() {
+    let interval = setInterval(() => {
+        console.log("sending join");
+        GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
+        if (gamePaused === false) {
+            clearInterval(interval);
+        }
+    }, 1000);
+}
+
+let firstTimer = true;
+let gameIsStarting = true;
+let firstTimerBanner = true;
+
+
 function animateonline(){
+    if (firstTimerBanner === true) {
+        document.getElementById("wait-modal").style.display = "block";
+        firstTimerBanner = false;
+    }
+    if (gameEnded === true) {
+        return 0;
+    }
+    if (gamePaused === true) {
+        console.log("game paused", gamePaused);
+        if (isHost === false && firstTimer === true) {
+            launchReadyInterval();
+            firstTimer = false;
+        } 
+        requestAnimationFrame(animateonline);
+        return;
+    }
+
+    if (gameIsStarting === true) {
+        if (isHost === true && firstTimer === true) {
+            startCountdown();
+        }
+        document.getElementById('countdown').display = "block";
+        if (firstTimer === true) {
+            firstTimer = false;
+        }
+        console.log("game is starting", gameIsStarting);
+        requestAnimationFrame(animateonline);
+        return;
+    } 
     if(gameSettings.gameRules == "time" && flagTimer == true && isHost == true){ 
         flagTimer = false;
         setTimeout(() => {            

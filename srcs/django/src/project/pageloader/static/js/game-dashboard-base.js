@@ -22,10 +22,22 @@ function joinTournament(tournamentId) {
 
 document.getElementById('leavegame').addEventListener('click', function() {
     // Emissione dell'evento custom
+    gameEnded = true;
+    new Promise(resolve => {
+        setTimeout(resolve, 10);
+    });
+
+    
+    if (document.getElementById('game-details').dataset.gameStatus !== 'finished' && document.getElementById('gametype').textContent !== 'local-game') {
+        if (this.dataset.posit === "p1") {
+            endgameOnline();
+        }
+        window.GameSocket.send(JSON.stringify({ action: "leave" }));
+    }
+    
     const event = new Event('cleanupGameEvent');
     document.dispatchEvent(event);
     let gameType = document.getElementById('gametype').textContent;
-
     if (gameType === 'tournament') {
         let tournament_id = document.getElementById('gametype').dataset.tournament;
         window.joinTournament(tournament_id);
