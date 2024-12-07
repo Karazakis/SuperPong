@@ -1,0 +1,6 @@
+# Ignora le cartelle di cache di Python
+__pycache__/
+*.pyc
+
+# Ignora file di log
+debug.log
