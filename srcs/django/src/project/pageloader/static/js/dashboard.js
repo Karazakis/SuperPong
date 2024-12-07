@@ -1,10 +1,10 @@
-
-document.getElementById('singleplayer').addEventListener('click', function() {    
-    loadPage("api/create/?source=single");
+document.getElementById('localgame').addEventListener('click', function() {    
+    loadPage("api/create/?source=local");
 }
 );
 
-document.getElementById('multiplayer').addEventListener('click', function() {
-    loadPage("api/multiplayer/");
+document.getElementById('remotegame').addEventListener('click', function() {
+    loadPage("api/remote/");
 }
 );
+

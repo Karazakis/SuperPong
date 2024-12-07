@@ -199,6 +199,9 @@ class Game(models.Model):
     player2_status = models.CharField(max_length=100, default='not_ready')
     player1_hit = models.IntegerField(default=0, null=True, blank=True)
     player2_hit = models.IntegerField(default=0, null=True, blank=True)
+    player1_keyPressCount = models.IntegerField(default=0, null=True, blank=True)
+    player2_keyPressCount = models.IntegerField(default=0, null=True, blank=True)
+    ballCount = models.IntegerField(default=0, null=True, blank=True)
     player3_status = models.CharField(max_length=100, default='not_ready')
     player4_status = models.CharField(max_length=100, default='not_ready')
     player1_score = models.IntegerField(default=0, null=True, blank=True)
@@ -207,6 +210,7 @@ class Game(models.Model):
     player4_score = models.IntegerField(default=0, null=True, blank=True)
     team1_score = models.IntegerField(default=0, null=True, blank=True)
     team2_score = models.IntegerField(default=0, null=True, blank=True)
+    time_left = models.IntegerField(default=0, null=True, blank=True)
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_winner', default=None, null=True, blank=True)
     status = models.CharField(max_length=100, default='not_started')
 

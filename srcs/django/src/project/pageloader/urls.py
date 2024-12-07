@@ -28,6 +28,7 @@ from .views import InviteGameAPIView
 from .views import InviteTournamentAPIView
 from .views import ForbiddenAPIView
 from .views import ForbiddenAPIView
+from .views import StatsAPIView
 
 urlpatterns = [
     path('', index, name='index'),
@@ -63,7 +64,8 @@ urlpatterns = [
     path('api/invite_tournament/<int:user_id>/', InviteTournamentAPIView.as_view(), name='invite_tournament'),
     path('api/forbidden/<str:reason>/', ForbiddenAPIView.as_view(), name='forbidden'),
     path('api/forbidden/', ForbiddenAPIView.as_view(), name='forbidden'),
-
+    path('api/matchinfo/<int:game_id>/', StatsAPIView.as_view(), name='match_info'),
+    path('api/tournamentinfo/<int:tournament_id>/', StatsAPIView.as_view(), name='tournament_info'),
     # Altre configurazioni URL...
     re_path(r'^.*$', index),  # Questo catturerà tutte le altre richieste
 ]

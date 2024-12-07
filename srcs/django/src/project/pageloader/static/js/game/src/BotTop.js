@@ -166,7 +166,7 @@ export class BotTop {
 
     AI(balls, closestBall, gameBoosts) {
         count++;
-        console.log("AI lanciata" + count);
+        //console.log("AI lanciata" + count);
         let newClosestBall = closestBall; // controllo la palla piú vicina
         let oldClosestBall;
         for (let i = 0; i < balls.length; i++) { 

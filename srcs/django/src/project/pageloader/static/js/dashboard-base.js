@@ -39,8 +39,6 @@ document.getElementById('logout').addEventListener('click', function() {
 
 //id = localStorage.getItem('userId');
 //url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
-//id = localStorage.getItem('userId');
-//url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 var chatSocket;
 function initializeWebSocket() {
 	if (chatSocket) {
@@ -84,7 +82,11 @@ function initializeWebSocket() {
 	
 			(async function() {
 				try {
-					const actualUser = await recoverUser(actualUserId);
+					let actualUser = null;
+					actualUser = await recoverUser(actualUserId);
+					if (!actualUser) {
+						throw new Error('Errore durante il recupero dell\'utente');
+					}
 					const blockedUsers = actualUser.blocked_userslist || [];
 					let isBlocked = false;
 	
@@ -121,34 +123,34 @@ function initializeWebSocket() {
 			    const blockedUsers = actualUser.blocked_userslist || [];
 	    
 			    for (const id of itemList) {
-				const itemElementId = listElementId.slice(0, -1) + '_' + id;
-	    
-				// Controlla se l'elemento con l'ID specifico esiste già
-				if (!existingIds.has(itemElementId) && !document.getElementById(itemElementId)) {
-				    let itemElement = document.createElement('li');
-				    itemElement.id = itemElementId;
-	    
-				    try {
-					const item = await recoverUser(id);
-					let isblocked = blockedUsers.some(blockedUser => blockedUser.id == id);
-	    
-					if (isblocked) {
-					    itemElement.classList.add('user-blocked');
+					const itemElementId = listElementId.slice(0, -1) + '_' + id;
+			
+					// Controlla se l'elemento con l'ID specifico esiste già
+					if (!existingIds.has(itemElementId) && !document.getElementById(itemElementId)) {
+						let itemElement = document.createElement('li');
+						itemElement.id = itemElementId;
+			
+						try {
+							const item = await recoverUser(id);
+							let isblocked = blockedUsers.some(blockedUser => blockedUser.id == id);
+				
+							if (isblocked) {
+								itemElement.classList.add('user-blocked');
+							}
+							console.log("item: ", item);
+							itemElement.textContent = item.username;
+							itemElement.dataset.id = id;
+							itemElement.oncontextmenu = function(event) {
+								event.preventDefault();
+								showContextMenu(event, id, isblocked);
+							};
+							elementsToAdd.push(itemElement);
+							existingIds.add(itemElementId);
+						} catch (error) {
+							console.error(`Errore durante il recupero dell'utente con ID ${id}:`, error);
+						}
+					} else {
 					}
-	    
-					itemElement.textContent = item.username;
-					itemElement.dataset.id = id;
-					itemElement.oncontextmenu = function(event) {
-					    event.preventDefault();
-					    showContextMenu(event, id, isblocked);
-					};
-					elementsToAdd.push(itemElement);
-					existingIds.add(itemElementId);
-				    } catch (error) {
-					console.error(`Errore durante il recupero dell'utente con ID ${id}:`, error);
-				    }
-				} else {
-				}
 			    }
 	    
 			    // Appendi tutti gli elementi alla fine
@@ -338,7 +340,6 @@ function UpdateFriendList(user) {
 	}
 }
     //asdasdasdasd
-    //asdasdasdasd
 function UpdateRequestList(user) {
 	let listElementId = 'pending-requests';
 	const listElement = document.getElementById(listElementId);
@@ -364,7 +365,6 @@ var form = document.getElementById('dashboard_chat_form');
 form.addEventListener('submit', (e)=> {
     e.preventDefault();
     let message = e.target.message.value;
-	
 	
     username = localStorage.getItem('username');
     chatSocket.send(JSON.stringify({
@@ -475,7 +475,8 @@ async function recoverUser(id) {
                     localStorage.setItem('accessToken', newAccessToken);
                     return newAccessToken;
                 } else {
-                    console.error('Impossibile rinnovare il token');
+					accessToken = localStorage.getItem("accessToken");
+					checkAndRefreshToken();
                     return null;
                 }
             } else {
@@ -515,9 +516,6 @@ async function recoverUser(id) {
         return data; // Modifica questo percorso in base alla struttura della tua risposta
 
     } catch (error) {
-		recoverUser(id);
-        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
-        //throw error;
 		recoverUser(id);
         //console.error('Errore durante il recupero dei dati dell\'utente:', error);
         //throw error;
@@ -710,7 +708,6 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 			'pending_request': 'send',
 			'target_user': id,
 			'requesting_user': localStorage.getItem('userId'),
-			'type': requestType
 			'type': requestType
 		    }));
 		}
@@ -986,8 +983,6 @@ async function updateUserProfile() {
         }
 
     } catch (error) {
-		recoverUser(id);
-        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
 		recoverUser(id);
         //console.error('Errore durante il recupero dei dati dell\'utente:', error);
     }

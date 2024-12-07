@@ -26,6 +26,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.core.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
+from django.db.models import Avg, Sum, Count
 import re
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -262,13 +263,130 @@ class DashboardAPIView(APIView):
                 'nav_stat': 'not_logged',
             }
             return Response(data)
-    
+
+
+def clamp(value):
+    if value < 0:
+        return 0
+    if value > 5:
+        return 5
+    return value
+
+def normalize_statistics(individual_stats, global_stats):
+    normalized_stats = {}
+    for key in individual_stats.keys():
+        if global_stats[key] > 0:  # Evitiamo divisioni per zero
+            normalized_value = (individual_stats[key] / global_stats[key]) * 5
+            normalized_stats[key] = round(clamp(normalized_value), 2)  # Applichiamo il clamp
+        else:
+            normalized_stats[key] = 1  # Se la statistica globale è 0, restituisci il minimo
+    return normalized_stats
+
+def calculate_global_game_statistics():
+    total_games = Game.objects.count()
+    if total_games == 0:
+        return {
+            'precision': 1,  # Evitiamo divisione per zero
+            'reactivity': 1,
+            'luck': 1,
+            'madness': 1,
+            'leadership': 1,
+            'intensity': 1,
+        }
+
+    precision = Game.objects.aggregate(
+        avg_precision=(Avg('player1_score') + Avg('player2_score')) / 2
+    )['avg_precision'] or 1
+
+    reactivity = Game.objects.aggregate(
+        avg_reactivity=(Avg('player1_hit') + Avg('player2_hit')) / 2
+    )['avg_reactivity'] or 1
+
+    luck = Game.objects.filter(boost=True).count() / total_games * 5
+
+    madness = Game.objects.aggregate(
+        avg_madness=Avg('balls')
+    )['avg_madness'] or 1
+
+    leadership = (
+        Game.objects.filter(winner__isnull=False).count() / total_games * 5
+    )
+
+    intensity = Game.objects.aggregate(
+        avg_intensity=(Avg('player1_keyPressCount') + Avg('player2_keyPressCount')) / 2
+    )['avg_intensity'] or 1
+
+    return {
+        'precision': round(precision, 2),
+        'reactivity': round(reactivity, 2),
+        'luck': round(luck, 2),
+        'madness': round(madness, 2),
+        'leadership': round(leadership, 2),
+        'intensity': round(intensity, 2),
+    }
+
+def calculate_individual_game_statistics(user_profile):
+    match_history = user_profile.game_played.all()
+    total_games = match_history.count()
+    if total_games == 0:
+        return {
+            'precision': 0,
+            'reactivity': 0,
+            'luck': 0,
+            'madness': 0,
+            'leadership': 0,
+            'intensity': 0,
+        }
+
+    precision = sum(
+        match.player1_score + match.player2_score
+        for match in match_history
+        if match.player1_score and match.player2_score
+    ) / total_games
+
+    reactivity = sum(
+        match.player1_hit + match.player2_hit
+        for match in match_history
+        if match.player1_hit and match.player2_hit
+    ) / total_games
+
+    luck = sum(1 for match in match_history if match.boost) / total_games * 5
+
+    madness = sum(match.balls for match in match_history if match.balls) / total_games
+
+    leadership = sum(
+        1 for match in match_history if match.winner == user_profile.user
+    ) / total_games * 5
+
+    intensity = sum(
+        match.player1_keyPressCount + match.player2_keyPressCount
+        for match in match_history
+        if match.player1_keyPressCount and match.player2_keyPressCount
+    ) / total_games
+
+    return {
+        'precision': round(precision, 2),
+        'reactivity': round(reactivity, 2),
+        'luck': round(luck, 2),
+        'madness': round(madness, 2),
+        'leadership': round(leadership, 2),
+        'intensity': round(intensity, 2),
+    }
+
+def calculate_relative_statistics(individual_stats, global_stats):
+    relative_stats = {}
+    for key in individual_stats.keys():
+        if global_stats[key] != 0:  # Evita la divisione per zero
+            relative_stats[key] = round((individual_stats[key] / global_stats[key]) * 100, 2)
+        else:
+            relative_stats[key] = 0
+    return relative_stats
+
 
 class ProfileAPIView(APIView):
 
     def get(self, request, pk):
         try:
-            print(' diahane ')
             user = User.objects.get(pk=pk)
             user_profile = UserProfile.objects.get(user=user)
 
@@ -291,6 +409,13 @@ class ProfileAPIView(APIView):
             tournament_draws = user_profile.tournament_draw
             tournament_abandons = user_profile.tournament_abandon
 
+            # Calcola statistiche globali, individuali e normalizzate
+            global_game_statistics = calculate_global_game_statistics()
+            individual_game_statistics = calculate_individual_game_statistics(user_profile)
+            normalized_game_statistics = normalize_statistics(
+                individual_game_statistics, global_game_statistics
+            )
+
             context = {
                 'user': user,
                 'userprofile': user_profile,
@@ -305,6 +430,7 @@ class ProfileAPIView(APIView):
                 'tournament_losses': tournament_losses,
                 'tournament_draws': tournament_draws,
                 'tournament_abandons': tournament_abandons,
+                'relative_game_statistics': normalized_game_statistics,  # Normalizzate
             }
             html = render_to_string('profile.html', context)
             dash_base = render_to_string('dashboard-base.html', context)
@@ -322,7 +448,6 @@ class ProfileAPIView(APIView):
             return Response({"error": "Profilo utente non trovato."}, status=404)
 
 
-      
 class SettingsAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
@@ -792,14 +917,16 @@ class CreateAPIView(APIView):
                 tournament.generate_initial_rounds()
                 return Response({'success': tournament.id}, status=status.HTTP_201_CREATED)
             else:
-                
+                if request.data.get('rules', '') == 'time':
+                    timelimit = int(request.data.get('limit', 0)) * 60
                 game = Game.objects.create(
                     name=request.data.get('name', ''),
                     mode=request.data.get('mode', ''),
                     rules=request.data.get('rules', ''),
                     limit=int(request.data.get('limit', 0)),
                     balls=int(request.data.get('balls', 1)),
-                    boost=request.data.get('boost', False)
+                    boost=request.data.get('boost', False),
+                    time_left=timelimit,
                 )
                 if request.data.get('mode', '') == '1v1':
                     game.player_limit = 2
@@ -1105,7 +1232,7 @@ class UserRequestAPIView(APIView):
         try:
             request_data = request.data
             user = request.user
-            logger.debug(f"Request data: {request_data}")
+            logger.debug(f"Request data: {request_data}, Request type: {request_type}, ID: {id}")
 
             if request_type not in ['friend', 'game', 'tournament']:
                 return Response({'error': 'Tipo di richiesta non valido.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1470,7 +1597,7 @@ class GameAPIView(APIView):
             }
             if 'single' in current_url or 'local' in current_url:
                 game_info = request.GET.dict()
-                
+                game_info['time'] = int(game_info['limit'])
                 if 'single' in current_url:
                     if '1v1' in  game_info['mode']:
                         players = [
@@ -1618,6 +1745,9 @@ class GameAPIView(APIView):
                             'limit': game.limit,
                             'balls': game.balls,
                             'boost': game.boost,
+                            'time': game.time_left,
+                            'player1_score': game.player1_score,
+                            'player2_score': game.player2_score,
                             'tournament_id': game.tournament.id,
                         }
                         context.update({
@@ -1758,6 +1888,9 @@ class GameAPIView(APIView):
                         'limit': game.limit,
                         'balls': game.balls,
                         'boost': game.boost,
+                        'time': game.time_left,
+                        'player1_score': game.player1_score,
+                        'player2_score': game.player2_score,
                     }
                     context.update({
                         'players': players,
@@ -1794,14 +1927,31 @@ class GameAPIView(APIView):
                 
                 # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
                 game = Game.objects.get(id=pk)
+                player1 = UserProfile.objects.get(user=game.player1)
+                player2 = UserProfile.objects.get(user=game.player2)
 
+            
                 # Aggiorna i campi solo se i dati sono presenti
                 game.player1_score = data.get('scorePlayer1', game.player1_score)
                 game.player2_score = data.get('scorePlayer2', game.player2_score)
+                game.player1_hit = data.get('hitPlayer1', game.player1_hit)
+                game.player2_hit = data.get('hitPlayer2', game.player2_hit)
+                game.player1_keyPressCount = data.get('keyCountPlayer1', game.player1_keyPressCount)
+                game.player2_keyPressCount = data.get('keyCountPlayer2', game.player2_keyPressCount)
+                game.ballCount = data.get('ballCount', game.ballCount)
+
                 if game.player1_score > game.player2_score:
+                    player1.game_win += 1
+                    player2.game_lose += 1
                     game.winner = game.player1
                 elif game.player2_score > game.player1_score:
+                    player2.game_win += 1
+                    player1.game_lose += 1
                     game.winner = game.player2
+                else:
+                    player1.game_draw += 1
+                    player2.game_draw += 1
+                    game.winner = None
                 game.status = data.get('gameStatus')
                 logger.debug(f"NEL GAME status fa: {game.status}")
                 logger.debug(f"NEL GAME madonna fa: {game}")
@@ -1842,3 +1992,86 @@ class ForbiddenAPIView(APIView):
                 'nav_stat': 'logged_nav',
             }
             return Response(data)
+
+
+class StatsAPIView(APIView):
+    def get(self, request, game_id=None, tournament_id=None):
+        if not request.user.is_authenticated:
+            html = render_to_string('login.html')
+            data = {
+                'url': 'login/',
+                'html': html,
+                'scripts': 'login.js',
+                'nav_stat': 'not_logged',
+            }
+            return Response(data)
+
+        user = request.user
+        user_profile = get_object_or_404(UserProfile, user=user)
+
+        if game_id:
+            # Recupera i dettagli del gioco
+            game = get_object_or_404(Game, pk=game_id)
+            context = {
+                'user': user,
+                'userprofile': user_profile,
+                'game': {
+                    'id': game.id,
+                    'name': game.name,
+                    'mode': game.mode,
+                    'rules': game.rules,
+                    'limit': game.limit,
+                    'balls': game.balls,
+                    'boost': game.boost,
+                    'status': game.status,
+                    'team1_score': game.team1_score,
+                    'team2_score': game.team2_score,
+                    'winner': game.winner.username if game.winner else None,
+                    'players': [player.username for player in game.players.all()],
+                },
+            }
+            html = render_to_string('match-info.html', context)
+            dash_base = render_to_string('dashboard-base.html', context)
+            data = {
+                'url': f'matchinfo/{game_id}/',
+                'html': html,
+                'dash_base': dash_base,
+                'scripts': 'match-info.js',
+                'nav_stat': 'logged_nav',
+            }
+            return Response(data)
+
+        if tournament_id:
+            # Recupera i dettagli del torneo
+            tournament = get_object_or_404(Tournament, pk=tournament_id)
+            context = {
+                'user': user,
+                'userprofile': user_profile,
+                'tournament': {
+                    'id': tournament.id,
+                    'name': tournament.name,
+                    'mode': tournament.mode,
+                    'rules': tournament.rules,
+                    'limit': tournament.limit,
+                    'balls': tournament.balls,
+                    'boost': tournament.boost,
+                    'status': tournament.status,
+                    'nb_players': tournament.nb_players,
+                    'players_in_lobby': tournament.players_in_lobby,
+                    'owner': tournament.owner.username if tournament.owner else None,
+                    'winner': tournament.winner.username if tournament.winner else None,
+                    'players': [player.username for player in tournament.players.all()],
+                },
+            }
+            html = render_to_string('tournament-info.html', context)
+            dash_base = render_to_string('dashboard-base.html', context)
+            data = {
+                'url': f'tournamentinfo/{tournament_id}/',
+                'html': html,
+                'dash_base': dash_base,
+                'scripts': 'tournament-info.js',
+                'nav_stat': 'logged_nav',
+            }
+            return Response(data)
+
+        return Response(data)

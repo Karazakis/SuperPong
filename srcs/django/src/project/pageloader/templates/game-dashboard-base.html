@@ -1,5 +1,9 @@
 {% load static %}
-
+<div id="wait-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Waiting for other players...</h2>
+    </div>
+</div>
 <div id="gameover-modal" class="modal" style="display: none;">
     <div class="modal-content">
         <h2 id="modal-title"></h2>
@@ -34,7 +38,7 @@
         <button id="logout" class="btn btn-danger btn-sm mb-1">Log Out</button>
     </div>
     <div class="col-8 text-center">
-        <div id="game-timer" data-timer="{{game_info.limit}}">
+        <div id="game-timer" data-timer="{{game_info.time}}">
             <span id="countdown"></span>
         </div>
         <h6>Players score:</h6>
@@ -102,7 +106,15 @@
                                             data-posit="{{ player.player_posit|default:'' }}"
                                         {% endif %}>
                                 {% endif %}
-                                        <div><strong id="player{{ counter }}score" style="font-size: 1.5em;">0</strong> </div>
+                                        <div>
+                                            <strong id="player{{ counter }}score" style="font-size: 1.5em;">
+                                                {% if counter == 0 %}
+                                                    {{ game_info.player1_score }}
+                                                {% else %}
+                                                    {{ game_info.player2_score }}
+                                                {% endif %}
+                                            </strong>
+                                        </div>
                                         {% if player.name == 'Bot 1' or player.name == 'Bot 2' or player.name == 'Bot 3' %}
                                             <img src="{% static 'media/profiles/bot.png' %}" alt="player-pic" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 2px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
                                         {% else %}
@@ -111,14 +123,14 @@
                                         <div class="dash_username"><h5>{{ player.name }}</h5></div>
                                     </div>
                             {% endif %}
-                        {% endwith %}
+                        {% endwith %} 
                     {% endfor %}
                 {% endif %}
             </div>
     </div>
     <div class="col-2 text-left">
         <button id="leavegame" class="btn btn-danger btn-sm mb-3 mt-2">Leave Game</button>
-        <h6>Game Details</h6>
+        <h6 id="game-details">Game Details</h6>
         <div class="row">
             <div class="col">
                 <div class="small">Game: <strong>{{ game_info.name }}</strong></div>

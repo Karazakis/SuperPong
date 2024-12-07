@@ -149,3 +149,51 @@ INFO 2024-12-01 15:13:18,573 consumer Slot status update sent to group: {'1': {'
 INFO 2024-12-01 15:13:18,573 consumer Attempting to retrieve user list for tournament_id: 15
 INFO 2024-12-01 15:13:18,577 consumer User list: [{'username': 'luca'}, {'username': 'marco'}, {'username': 'giovanni'}, {'username': 'test'}]
 INFO 2024-12-01 15:13:18,584 consumer Slot status update sent to group: {'1': {'username': 'luca', 'player_id': 1}, '2': {'username': 'giovanni', 'player_id': 3}}
+INFO 2024-12-01 17:31:00,175 autoreload Watching for file changes with StatReloader
+INFO 2024-12-01 17:39:53,282 autoreload Watching for file changes with StatReloader
+INFO 2024-12-01 17:40:06,346 autoreload Watching for file changes with StatReloader
+INFO 2024-12-01 17:42:16,378 autoreload /django/pageloader/migrations/0001_initial.py changed, reloading.
+INFO 2024-12-01 17:42:17,614 autoreload Watching for file changes with StatReloader
+ERROR 2024-12-01 17:42:31,819 exception Invalid HTTP_HOST header: '51.75.18.18'. You may need to add '51.75.18.18' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/usr/local/lib/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '51.75.18.18'. You may need to add '51.75.18.18' to ALLOWED_HOSTS.
+WARNING 2024-12-01 17:42:31,865 log Bad Request: /multiplayer/
+WARNING 2024-12-01 17:42:31,867 runserver HTTP GET /multiplayer/ 400 [0.05, 172.19.0.4:33976]
+ERROR 2024-12-01 17:42:33,335 exception Invalid HTTP_HOST header: '51.75.18.18'. You may need to add '51.75.18.18' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 518, in thread_handler
+    raise exc_info[1]
+  File "/usr/local/lib/python3.9/site-packages/django/core/handlers/exception.py", line 42, in inner
+    response = await get_response(request)
+  File "/usr/local/lib/python3.9/site-packages/django/utils/deprecation.py", line 146, in __acall__
+    response = await sync_to_async(
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 468, in __call__
+    ret = await asyncio.shield(exec_coro)
+  File "/usr/local/lib/python3.9/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/usr/local/lib/python3.9/site-packages/asgiref/sync.py", line 522, in thread_handler
+    return func(*args, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/usr/local/lib/python3.9/site-packages/django/http/request.py", line 150, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '51.75.18.18'. You may need to add '51.75.18.18' to ALLOWED_HOSTS.
+WARNING 2024-12-01 17:42:33,372 log Bad Request: /favicon.ico
+WARNING 2024-12-01 17:42:33,374 runserver HTTP GET /favicon.ico 400 [0.04, 172.19.0.4:54952]
+INFO 2024-12-01 17:45:12,280 autoreload /django/superpong/settings.py changed, reloading.

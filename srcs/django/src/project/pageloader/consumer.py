@@ -610,18 +610,50 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.game_id = self.scope['url_route']['kwargs']['game_id']
         self.room_group_name = f'game_{self.game_id}'
 
+        # Aggiungi il canale al gruppo
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
 
+        # Accetta la connessione WebSocket
         await self.accept()
 
+        # Invia un messaggio di "player_rejoin"
+        username = self.scope['user'].username if self.scope['user'].is_authenticated else "Anonymous"
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'player_status',
+                'action': 'player_rejoin',
+                'username': username
+            }
+        )
+
     async def disconnect(self, close_code):
+        # Rimuovi il canale dal gruppo
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
+
+        # Invia un messaggio di "player_leave"
+        username = self.scope['user'].username if self.scope['user'].is_authenticated else "Anonymous"
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'player_status',
+                'action': 'player_leave',
+                'username': username
+            }
+        )
+
+    async def player_status(self, event):
+        # Invia il messaggio ai client
+        await self.send(text_data=json.dumps({
+            'action': event['action'],
+            'username': event['username']
+        }))
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -642,12 +674,18 @@ class GameConsumer(AsyncWebsocketConsumer):
             p1 = data.get('p1')
             p2 = data.get('p2')
             await self.game_over(p1, p2)
-        elif action == 'game_start':
+        elif action == 'start_game':
             await self.game_start()
         elif action == 'time_update':
             await self.time_update(data.get('time'))
+            await self.time_update_db(data.get('time'))
         elif action == 'score_update':
             await self.score_update(data.get('score'))
+            await self.score_update_db(data.get('score'))
+        elif action == 'leave':
+            await self.leave_game(username)
+        elif action == 'join':
+            await self.join_game(username)
 
     async def game_chat(self, message, username):
         await self.channel_layer.group_send(
@@ -786,6 +824,12 @@ class GameConsumer(AsyncWebsocketConsumer):
             'time': time
         }))
 
+    @database_sync_to_async
+    def time_update_db(self, time):
+        game = Game.objects.get(id=self.game_id)
+        game.time_left = time
+        game.save()
+
     async def score_update(self, score):
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -801,9 +845,48 @@ class GameConsumer(AsyncWebsocketConsumer):
             'action': 'score_update',
             'score': score
         }))
+    
+    @database_sync_to_async
+    def score_update_db(self, score):
+        game = Game.objects.get(id=self.game_id)
+        game.player1_score = score['p1']
+        game.player2_score = score['p2']
+        game.save()
 
+    async def leave_game(self, username):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'handle_leave',
+                'action': 'leave',
+                'username': username
+            }
+        )
 
+    async def handle_leave(self, event):
+        username = event['username']
+        await self.send(text_data=json.dumps({
+            'action': 'leave',
+            'username': username
+        }))
 
+    async def join_game(self, username):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'handle_join',
+                'action': 'join',
+                'username': username
+            }
+        )
+    
+    async def handle_join(self, event):
+        username = event['username']
+        await self.send(text_data=json.dumps({
+            'action': 'join',
+            'username': username
+        }))
+    
 
 # class TournamentConsumer(AsyncWebsocketConsumer):
 

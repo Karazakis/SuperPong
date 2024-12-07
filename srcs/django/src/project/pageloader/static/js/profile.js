@@ -123,9 +123,8 @@ async function fetchUserStatistics(userId) {
     }
 }
 
-// Funzione per aggiornare il DOM con i dati statistici dell'utente
 function updateProfileStats(data) {
-    // Aggiorna le statistiche delle partite
+    // Aggiorna le statistiche dei giochi
     document.getElementById("game-wins").textContent = data.game_history.filter(game => game.status === "win").length;
     document.getElementById("game-losses").textContent = data.game_history.filter(game => game.status === "loss").length;
     document.getElementById("game-draws").textContent = data.game_history.filter(game => game.status === "draw").length;
@@ -139,11 +138,20 @@ function updateProfileStats(data) {
         data.game_history.forEach(match => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${match.name}</td>
+                <td><a href="#" class="game-link" data-id="${match.id}">${match.name}</a></td>
                 <td>${match.mode}</td>
                 <td>${match.status === "win" ? "Win" : "Loss"}</td>
             `;
             matchTableBody.appendChild(row);
+        });
+
+        // Aggiungi event listener ai link delle partite
+        document.querySelectorAll(".game-link").forEach(link => {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                const gameId = this.getAttribute("data-id");
+                loadPage(`api/matchinfo/${gameId}/`);
+            });
         });
     } else {
         matchTableBody.innerHTML = `<tr><td colspan="3" class="text-center">No game history available</td></tr>`;
@@ -163,12 +171,21 @@ function updateProfileStats(data) {
         data.tournament_history.forEach(tournament => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${tournament.name}</td>
+                <td><span class="tournament-link" data-id="${tournament.id}">${tournament.name}</span></td>
                 <td>${tournament.mode}</td>
                 <td>${tournament.status}</td>
                 <td>${tournament.status === "win" ? "Winner" : "Loss"}</td>
             `;
             tournamentTableBody.appendChild(row);
+        });
+
+        // Aggiungi event listener ai link dei tornei
+        document.querySelectorAll(".tournament-link").forEach(link => {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                const tournamentId = this.getAttribute("data-id");
+                loadPage(`api/tournamentinfo/${tournamentId}/`);
+            });
         });
     } else {
         tournamentTableBody.innerHTML = `<tr><td colspan="4" class="text-center">No tournament history available</td></tr>`;
@@ -177,5 +194,102 @@ function updateProfileStats(data) {
 
 
 
+
 // Esegui la funzione per ottenere le statistiche
 fetchUserStatistics(userId);
+
+function initializeChart() {
+    const canvas = document.getElementById("user-stats-chart");
+    if (!canvas) return; // Evita errori se il canvas non è ancora presente
+
+    const ctx = canvas.getContext("2d");
+
+    // Imposta le dimensioni del canvas dinamicamente
+    const containerWidth = canvas.parentElement.offsetWidth;
+    canvas.width = 500; // Usa il 90% dello spazio disponibile
+    canvas.height = 500; // Mantieni il canvas quadrato
+
+    // Dati delle statistiche
+    let precision = document.getElementById("precision").textContent;
+    let reactivity = document.getElementById("reactivity").textContent;
+    let luck = document.getElementById("luck").textContent;
+    let madness = document.getElementById("madness").textContent;
+    let leadership = document.getElementById("leadership").textContent;
+
+    const stats = {
+        "Precision": precision,
+        "Reactivity": reactivity,
+        "Luck": luck,
+        "Madness": madness,
+        "Leadership": leadership
+    };
+
+    // Configurazione
+    const maxStatValue = 5; // Valore massimo per ogni statistica
+    const statNames = Object.keys(stats);
+    const statValues = Object.values(stats);
+    const padding = Math.min(canvas.width, canvas.height) * 0.1; // Calcola il padding dinamicamente
+    const radius = Math.min(canvas.width, canvas.height) / 2 - padding;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    // Funzione per disegnare il grafico
+    function drawChart() {
+        // Cancella il canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Disegna i raggi
+        ctx.beginPath();
+        ctx.strokeStyle = "#ddd";
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i < statNames.length; i++) {
+            const angle = (Math.PI * 2 * i) / statNames.length;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.closePath();
+
+        // Disegna il poligono delle statistiche
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(0, 123, 255, 0.5)";
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 2;
+
+        for (let i = 0; i < statValues.length; i++) {
+            const angle = (Math.PI * 2 * i) / statValues.length;
+            const valueRadius = (statValues[i] / maxStatValue) * radius;
+            const x = centerX + valueRadius * Math.cos(angle);
+            const y = centerY + valueRadius * Math.sin(angle);
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Disegna le etichette
+        ctx.fillStyle = "#000";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "bold 18px Arial";
+
+        for (let i = 0; i < statNames.length; i++) {
+            const angle = (Math.PI * 2 * i) / statNames.length;
+            const x = centerX + (radius + padding * 0.5) * Math.cos(angle);
+            const y = centerY + (radius + padding * 0.5) * Math.sin(angle);
+            ctx.fillText(statNames[i], x, y);
+        }
+    }
+
+    drawChart();
+}
+
+// Chiamata manuale quando la SPA carica questa sezione
+initializeChart();

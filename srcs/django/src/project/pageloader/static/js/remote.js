@@ -16,6 +16,6 @@ document.getElementById('tournaments').addEventListener('click', function() {
 var goBackBtn = document.getElementById('go-back-btn');
 if (goBackBtn) {
     goBackBtn.addEventListener('click', function() {
-        loadPage("api/multiplayer/");
+        loadPage("api/dashboard/");
     });
 }

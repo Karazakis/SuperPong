@@ -1,30 +1,4 @@
-// Funzione per aggiornare le opzioni del numero di giocatori in base alla modalità selezionata
-function updatePlayerOptions() {
-    const modeSelect = document.getElementById('mode');
-    const nbPlayersSelect = document.getElementById('nb_players');
 
-    // Rimuovi tutte le opzioni attuali
-    nbPlayersSelect.innerHTML = '';
-
-    // Aggiungi opzioni basate sulla modalità selezionata
-    if (modeSelect.value === '1v1') {
-        nbPlayersSelect.innerHTML = `
-            <option value="4">4</option>
-            <option value="8">8</option>
-        `;
-    } else if (modeSelect.value === '2v2') {
-        nbPlayersSelect.innerHTML = `
-            <option value="8">8 (4 teams)</option>
-            <option value="16">16 (8 teams)</option>
-        `;
-    } else if (modeSelect.value === '4dm') {
-        nbPlayersSelect.innerHTML = `
-            <option value="16">16</option>
-        `;
-    }
-}
-
-document.getElementById('mode').addEventListener('change', updatePlayerOptions);
 
 function toggleRuleInput() {
     const ruleSelect = document.getElementById('rule');
@@ -52,7 +26,7 @@ if (goBackBtn) {
     } else if (actual_url.includes('create_tournament')) {
         loadPage("api/tournaments/");
     } else {
-        loadPage("api/multiplayer/");
+        loadPage("api/dashboard/");
     }
 });
 }
@@ -80,7 +54,7 @@ document.getElementById('create').addEventListener('click', function(event) {
     const data = {
         name: document.getElementById('name').value,
         type: Type,
-        mode: document.getElementById('mode').value,
+        mode: '1v1',
         rules: document.getElementById('rule').value,
         limit: limit,
         balls: parseInt(document.getElementById('balls').value, 10) || 1,

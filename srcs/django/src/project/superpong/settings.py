@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-o(!uw1@f8ols%3v*e7n_93my8@k4hv0twn&*1*yah3$3s-934v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['51.75.18.18']
 
 
 # Application definition
@@ -190,34 +190,17 @@ LOGGING = {
             '()': IgnoreStaticFilesFilter,
         },
     },
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
     'handlers': {
         'console': {
-            'level': 'DEBUG',  # Modifica il livello a 'DEBUG' per log dettagliati
+            'level': 'WARNING',  # Modifica il livello a 'WARNING'
             'class': 'logging.StreamHandler',
-            'filters': ['ignore_static'],
-            'formatter': 'verbose',  # Usa il formatter dettagliato per i log in console
-        },
-        'file': {
-            'level': 'DEBUG',  # Salva log dettagliati nel file
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'),  # Salva il file di log nella directory di base
-            'formatter': 'verbose',  # Usa il formatter dettagliato per i log nel file
+            'filters': ['ignore_static'],  # Applica il filtro personalizzato
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',  # Puoi usare 'DEBUG' per avere più dettagli
+            'handlers': ['console'],
+            'level': 'WARNING',
             'propagate': True,
         },
         'django.server': {
@@ -230,14 +213,8 @@ LOGGING = {
             'level': 'WARNING',
             'propagate': False,
         },
-        'pageloader': {  # Logger dedicato alla tua app
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
     },
 }
-
 
 
 

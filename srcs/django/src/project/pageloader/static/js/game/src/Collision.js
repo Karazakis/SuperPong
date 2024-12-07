@@ -23,10 +23,9 @@ export function penetrationDepthCorner2(ball, corner, isOnlineGame = false, isHo
 //       ******    BALL    ******
 
 export function ballCollision(ball2, ball3){
-    if(!ball2 || !ball3 || !ball2.mesh || !ball3.mesh)
+    if(!ball2 || !ball3 || !ball2.mesh || !ball3.mesh || ball2 === ball3)
         return false;
     if(ball2.r + ball3.r >= ball3.mesh.position.distanceTo(ball2.mesh.position)) {
-        console.log("collision");
         return true;
     }
     else {
@@ -53,11 +52,27 @@ export function collisionResponse(ball2, ball3, isOnlineGame = false, isHost = f
 }
 
 export function ballPadCollisionResponse(ball, pad, isOnlineGame = false, isHost = false) {
-
         let normal = ball.mesh.position.clone().sub(pad.mesh.position).normalize();
         let velocityAlongNormal = ball.mesh.velocity.clone().dot(normal);
         let velocityAlongNormalVec = normal.multiplyScalar(velocityAlongNormal);
         let velocityTangentialVec = ball.mesh.velocity.clone().sub(velocityAlongNormalVec);
         let newVelocityAlongNormalVec = velocityAlongNormalVec.multiplyScalar(-1);
         ball.mesh.velocity = velocityTangentialVec.add(newVelocityAlongNormalVec);
+        if(pad.id == 1) {
+            pad.hit += 1;
+            console.log("id: " + pad.id + " hit: " + pad.hit);
+        }
+        else if(pad.id == 2) {
+            pad.hit += 1;
+            console.log("id: " + pad.id + " hit: " + pad.hit);
+        }
+        else if(pad.id == 3) {
+            pad.hit += 1;
+            console.log("id: " + pad.id + " hit: " + pad.hit);
+        }
+        else if(pad.id == 4) {
+            pad.hit += 1;
+            console.log("id: " + pad.id + " hit: " + pad.hit);
+        }
+        
 }
