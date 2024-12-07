@@ -1,6 +1,6 @@
 # Ignora le cartelle di cache di Python
-__pycache__/
-__pycache__/*.pyc
+# __pycache__/
+# __pycache__/*.pyc
 
 # Ignora file di log
 srcs/django/src/project/debug.log
