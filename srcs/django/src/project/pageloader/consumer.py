@@ -1050,6 +1050,33 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
             # Preparazione torneo
             elif action == 'start_tournament_preparation':
+                tournament = await self.get_tournament()
+                if not tournament:
+                    # Torneo non trovato
+                    await self.send(text_data=json.dumps({
+                        'type': 'error',
+                        'message': 'Tournament not found.'
+                    }))
+                    return
+                
+                if tournament.status == 'finished':
+                    # Torneo già terminato
+                    await self.send(text_data=json.dumps({
+                        'type': 'tournament_status',
+                        'status': 'finished',
+                        'message': 'The tournament has already finished. Cannot start.'
+                    }))
+                    return
+                
+                # if tournament.status != 'ready':
+                #     # Torneo non pronto per iniziare
+                #     await self.send(text_data=json.dumps({
+                #         'type': 'tournament_status',
+                #         'status': 'not_ready',
+                #         'message': 'The tournament is not ready to start yet.'
+                #     }))
+                #     return
+                
                 await self.start_tournament_flow()
 
             elif action == 'countdown_complete':
@@ -1086,8 +1113,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         logger.info(f"Ready status received: Slot {slot}, Username: {username}, Ready Status: {ready_status}")
 
+        # Recupera il round corrente
+        current_round = await self.get_current_round()
+        if not current_round:
+            logger.error("Current round not found.")
+            return
+
+        logger.debug(f"Current round slots: {current_round.slots}")
+
         # Verifica che l'utente possa modificare il proprio stato ready
-        current_slot_user = self.current_round.slots.get(str(slot), {}).get('username')
+        current_slot_user = current_round.slots.get(str(slot), {}).get('username')
 
         if current_slot_user == username:
             # Controllo se l'utente è già "ready"
@@ -1146,25 +1181,31 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         Imposta lo stato 'ready' del giocatore nello slot specificato nel round corrente.
         """
         try:
-            await database_sync_to_async(self.current_round.refresh_from_db)()
-            if not self.current_round:
+            # Assicurati di lavorare solo con il round corrente
+            current_round = await self.get_current_round()
+            if not current_round:
                 logger.error("Current round not found.")
                 return
 
-            ready_statuses = self.current_round.ready_status
+            ready_statuses = current_round.ready_status
 
             logger.info(f"Ready statuses before update: {ready_statuses}")
             # Aggiorna solo lo stato ready per lo slot specificato
-            ready_statuses[str(slot)] = ready_status
+            if str(slot) in ready_statuses:
+                ready_statuses[str(slot)] = ready_status
+            else:
+                logger.warning(f"Slot {slot} not found in current round ready statuses.")
 
             logger.info(f"Ready statuses after update: {ready_statuses}")
 
-            self.current_round.ready_status = ready_statuses
-            await database_sync_to_async(self.current_round.save)()
-            logger.info(f"Ready status saved successfully in the round database.")
+            # Salva solo i dati del round corrente
+            current_round.ready_status = ready_statuses
+            await database_sync_to_async(current_round.save)()
+            logger.info(f"Ready status saved successfully in the current round database.")
 
         except Exception as e:
             logger.error(f"Error setting ready status in round DB: {e}")
+
 
 
     async def send_slot_status_update_to_group(self):
@@ -1236,28 +1277,34 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         """
         Invia l'aggiornamento dello stato 'ready' del round corrente a tutti i client connessi.
         """
-        if not self.current_round:
-            logger.error("Current round not found.")
-            return
+        try:
+            # Recupera il round corrente per assicurarsi di lavorare sui dati aggiornati
+            current_round = await self.get_current_round()
+            if not current_round:
+                logger.error("Current round not found.")
+                return
 
-        ready_statuses = self.current_round.ready_status
-        slots_status = self.current_round.slots 
+            ready_statuses = current_round.ready_status
+            slots_status = current_round.slots
 
-        logger.info(f"Sending ready status update. Slots: {slots_status}, Ready status: {ready_statuses}")
+            logger.info(f"Sending ready status update. Slots: {slots_status}, Ready status: {ready_statuses}")
 
-        message = {
-            'type': 'update_ready_status',
-            'ready_status': ready_statuses,
-            'slots': slots_status
-        }
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'send_message_to_clients',
-                'message': message
+            message = {
+                'type': 'update_ready_status',
+                'ready_status': ready_statuses,
+                'slots': slots_status
             }
-        )
-        logger.info(f"Ready status update sent to group: {ready_statuses}")
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_message_to_clients',
+                    'message': message
+                }
+            )
+            logger.info(f"Ready status update sent to group: {ready_statuses}")
+        except Exception as e:
+            logger.error(f"Error in send_ready_status_update_to_group: {e}")
+
 
     async def send_lobby_update(self):
         """
@@ -1549,12 +1596,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # Log dettagliati per verificare gli slot
         logger.debug(f"Round {round.round_number} retrieved with slots: {round.slots}")
 
-        # Blocca gli slot del round
+        # Blocca gli slot del round per i giocatori che sono negli slot
         slots = round.slots
+        players_to_block = []
+        first_slot_user = None  # Variabile per salvare l'utente del primo slot
         for slot_key, slot_data in slots.items():
             logger.debug(f"Processing slot {slot_key}: {slot_data}")
-            if slot_data['username'] != 'empty':
+            if slot_data['player_id'] is not None:
                 slot_data['locked'] = True
+                players_to_block.append(slot_data['player_id'])
+                if not first_slot_user:
+                    first_slot_user = slot_data['username']
             else:
                 logger.warning(f"Slot {slot_key} is empty and will not be locked.")
 
@@ -1570,10 +1622,28 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 'type': 'send_message_to_clients',
                 'message': {
                     'type': 'block_slots',
-                    'message': 'Slots are now locked, preparing the tournament...'
+                    'message': 'Slots are now locked, preparing the tournament...',
+                    'players_to_block': players_to_block
                 }
             }
         )
+        logger.info(f"Players to block sent to clients: {players_to_block}")
+
+        # Autorizza il primo utente nel primo slot ad avviare il countdown
+        if first_slot_user:
+            logger.info(f"Authorizing {first_slot_user} to start the countdown.")
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_message_to_clients',
+                    'message': {
+                        'type': 'start_countdown',
+                        'authorized_client': first_slot_user  # Username del primo slot
+                    }
+                }
+            )
+        else:
+            logger.warning("No user found in the first slot to start the countdown.")
         # Aspetta il messaggio dal client per confermare la fine del countdown
         logger.info("Waiting for countdown to complete on client side...")
 
@@ -1782,6 +1852,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     logger.warning("Final game is not finished or has no winner.")
                     logger.debug(f"Final game status: {final_game.status}")
                     logger.debug(f"Final game winner: {final_game.winner}")
+                    return
 
             else:
                 logger.error("Unexpected number of games in final round. Check tournament configuration.")

@@ -42,7 +42,7 @@ LobbySocket.onmessage = function(e) {
             break;
         case 'block_slots':
             console.log("Blocking slots and disabling buttons");
-            disableButtonsAndSlots();
+            disableButtonsAndSlots(data.players_to_block);
             break;
         case 'join_game_notification':
             console.log("Join game notification received");
@@ -51,6 +51,13 @@ LobbySocket.onmessage = function(e) {
         case 'tournament_finished':
             console.log("Tournament finished!");
             showWinnerPopup(data.winner);
+            break;
+        case 'start_countdown':
+            if (data.authorized_client === username_lobby) {
+                // Solo il client autorizzato esegue il countdown
+                console.log("You are authorized to start the countdown.");
+                startTournamentCountdown();
+            }
             break;
         default:
             console.log("Unrecognized action:", data.type);
@@ -91,37 +98,81 @@ function onPageLoad() {
     checkUserSlotAndReadyState();
 }
 
-function checkUserSlotAndReadyState() {
-    const slots = document.querySelectorAll('.player-slot');
+function checkUserSlotAndReadyState(roundsSlots) {
     const readyButton = document.getElementById('ready');
+    const userList = document.getElementById('users_in_lobby');
+
     let userSlotAssigned = false;
     let userIsReady = false;
+    let allSlotsValid = true; // Flag per verificare se tutti gli slot sono validi
 
-    slots.forEach(slot => {
-        // Controlla se lo slot è occupato dall'utente
-        if (slot.classList.contains('occupied') && slot.textContent === username_lobby) {
+    // Verifica che roundsSlots sia definito e non vuoto
+    if (!roundsSlots || Object.keys(roundsSlots).length === 0) {
+        console.error("No rounds available in roundsSlots.");
+        readyButton.disabled = true;
+        return;
+    }
+
+    // Determina il round massimo
+    const roundKeys = Object.keys(roundsSlots).filter(key => roundsSlots[key]); // Filtra solo i round definiti
+    const maxRoundKey = roundKeys.reduce((max, key) => {
+        const roundNumber = parseInt(key.split('_')[1], 10);
+        return (!max || roundNumber > parseInt(max.split('_')[1], 10)) ? key : max;
+    }, null);
+
+    if (!maxRoundKey) {
+        console.error("No valid round found in roundsSlots.");
+        readyButton.disabled = true;
+        return;
+    }
+
+    console.log(`Max round detected: ${maxRoundKey}`);
+
+    // Recupera gli slot del round massimo
+    const maxRoundSlots = roundsSlots[maxRoundKey];
+    if (!maxRoundSlots || Object.keys(maxRoundSlots).length === 0) {
+        console.error(`No slots available for max round: ${maxRoundKey}`);
+        readyButton.disabled = true;
+        return;
+    }
+    console.log(`Slots for max round (${maxRoundKey}):`, maxRoundSlots);
+
+    // Verifica se tutti gli slot del round massimo sono validi
+    Object.values(maxRoundSlots).forEach(slot => {
+        if (!slot || slot.username === 'empty' || slot.player_id === null) {
+            allSlotsValid = false; // Se uno slot non è valido, flagga come non valido
+        }
+        if (slot && slot.username === username_lobby) {
             userSlotAssigned = true;
         }
     });
 
-    // Verifica lo stato ready dell'utente
-    const userList = document.getElementById('users_in_lobby');
-    const userItems = userList.getElementsByTagName('li');
-    
+    // Se non tutti gli slot sono validi, disabilita il pulsante "Ready"
+    if (!allSlotsValid) {
+        console.warn("Not all slots in the max round are valid.");
+        readyButton.disabled = true;
+        return;
+    }
+
+    // Verifica lo stato "ready" dell'utente nella lista
+    const userItems = userList ? userList.getElementsByTagName('li') : [];
     Array.from(userItems).forEach(item => {
-        const username = item.id.replace('user_', '');
+        const username = item.id.replace('user_', '').trim();
         if (username === username_lobby && item.innerHTML.includes('✔️')) {
             userIsReady = true;
         }
     });
 
-    // Abilita il pulsante "Ready" solo se l'utente ha uno slot assegnato e non è già pronto
-    if (userSlotAssigned && !userIsReady) {
+    // Abilita il pulsante "Ready" solo se l'utente ha uno slot assegnato, tutti gli slot sono validi, e non è già pronto
+    if (userSlotAssigned && allSlotsValid && !userIsReady) {
         readyButton.disabled = false;
     } else {
         readyButton.disabled = true;
     }
 }
+
+
+
 
 
 // Funzione per generare il tabellone del torneo
@@ -303,7 +354,7 @@ function updateAllSlots(roundsSlots) {
     });
 
     // Controlla lo stato dello slot e aggiorna il pulsante Ready
-    checkUserSlotAndReadyState();
+    checkUserSlotAndReadyState(roundsSlots);
 }
 
 
@@ -781,17 +832,20 @@ function updateReadyStatusInUserList(slots, readyStatus) {
 
 
 
-// Funzione per disabilitare i pulsanti e bloccare gli slot
-function disableButtonsAndSlots() {
-    // Disabilita i pulsanti ready e leave per tutti i giocatori
-    document.querySelectorAll('.lobby-ready, .lobby-leave').forEach(button => {
-        button.disabled = true;
-    });
-    // Blocca gli slot dei giocatori (aggiunge una classe 'blocked' agli slot)
+function disableButtonsAndSlots(playersToBlock) {
+    // Disabilita i pulsanti ready e leave solo per i giocatori specificati
     document.querySelectorAll('.player-slot').forEach(slot => {
-        slot.classList.add('blocked');
+        const playerId = slot.getAttribute('data-player-id'); // Supponiamo che ogni slot abbia un attributo data-player-id
+        if (playersToBlock.includes(Number(playerId))) { // Controlla se il playerId è nella lista
+            slot.classList.add('blocked'); // Blocca lo slot
+            const readyButton = slot.querySelector('.lobby-ready');
+            const leaveButton = slot.querySelector('.lobby-leave');
+            if (readyButton) readyButton.disabled = true;
+            if (leaveButton) leaveButton.disabled = true;
+        }
     });
 }
+
 
 // Listener per il pulsante "Start Round"
 var startTournament = document.getElementById("start");
@@ -816,7 +870,9 @@ function startTournamentLogic() {
     LobbySocket.send(JSON.stringify({
         action: 'start_tournament_preparation'
     }));
+}
 
+function startTournamentCountdown() {
     // Countdown lato client inviato come messaggi di chat
     let countdown = 10; // Countdown di 10 secondi
     const countdownInterval = setInterval(function () {
