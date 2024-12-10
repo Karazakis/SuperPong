@@ -624,105 +624,91 @@ if (deleteButton) {
     });
 }
 
-// Gestione del pulsante di uscita dalla lobby (POST PRATICAMENTE INUTILE)
 var leaveButton = document.getElementById('leave');
 if (leaveButton) {
-    leaveButton.addEventListener('click', (e) => {
+    leaveButton.addEventListener('click', async (e) => {
         e.preventDefault();
 
         let accessToken = localStorage.getItem("accessToken");
 
-        fetch(`/api/tournament_lobby/${round_id_lobby}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${accessToken}`,
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ action: 'leave' })
-        })
-        .then(response => {
+        // Funzione per verificare la validità del token
+        async function checkTokenValidity() {
+            try {
+                const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
+                    method: "GET"
+                });
+                const data = await response.json();
+
+                if (data.message === 'Token valido') {
+                    return accessToken; // Token ancora valido
+                } else if (data.message === 'Token non valido') {
+                    // Prova a rinfrescare il token
+                    const newAccessToken = await refreshAccessToken();
+                    if (newAccessToken) {
+                        localStorage.setItem("accessToken", newAccessToken);
+                        return newAccessToken; // Restituisci il nuovo token
+                    } else {
+                        throw new Error("Token non valido e impossibile da rinfrescare");
+                    }
+                } else {
+                    throw new Error("Errore durante la verifica del token");
+                }
+            } catch (error) {
+                console.error('Errore durante la verifica del token:', error);
+                loadPage("/api/login/"); // Reindirizza alla pagina di login
+            }
+        }
+
+        // Funzione per rinfrescare il token
+        async function refreshAccessToken() {
+            try {
+                const response = await fetch(`${window.location.origin}/api/token/refresh/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: accessToken })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.access; // Restituisci il nuovo token
+                } else {
+                    throw new Error("Impossibile rinfrescare il token");
+                }
+            } catch (error) {
+                console.error("Errore durante il refresh del token:", error);
+                return null; // Fallimento del refresh
+            }
+        }
+
+        try {
+            // Verifica e ottieni un token valido
+            accessToken = await checkTokenValidity();
+
+            // Effettua la richiesta solo se il token è valido
+            const response = await fetch(`/api/tournament_lobby/${round_id_lobby}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`,
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ action: 'leave' })
+            });
+
             if (response.ok) {
                 LobbySocket.send(JSON.stringify({ action: 'leave', username: username_lobby }));
                 LobbySocket.close();
                 loadPage('/api/tournaments/');
             } else {
-                return response.json().then(data => { throw new Error(data.error); });
+                const errorData = await response.json();
+                throw new Error(errorData.error);
             }
-        })
-        .catch(error => console.error('Error:', error));
+        } catch (error) {
+            console.error('Errore durante la richiesta di uscita:', error);
+        }
     });
 }
-
-
-
-// function updateReadyStatusInUserList(slots, readyStatus) {
-
-//     if (!slots || Object.keys(slots).length === 0) {
-//         console.error("No slots data available");
-//         return;
-//     }
-
-//     const userList = document.getElementById('users_in_lobby');
-//     const userItems = userList.getElementsByTagName('li');
-//     const currentUser = username_lobby;
-
-//     // Itera su ogni utente nella lista e aggiorna lo stato ready
-//     Array.from(userItems).forEach(item => {
-//         const username = item.id.replace('user_', '');
-//         const slot = Object.keys(slots).find(key => slots[key].username === username);
-
-//         if (slot) {
-//             if (readyStatus[slot] !== undefined) {
-//                 if (readyStatus[slot]) {
-//                     item.innerHTML = `${username} ✔️`;
-//                 } else {
-//                     item.innerHTML = username;
-//                 }
-//             }
-//         }
-//     });
-
-//     // Aggiorna lo stato del pulsante "Ready" per l'utente corrente
-//     const readyButton = document.getElementById('ready');
-//     if (readyButton) {
-//         const currentUserSlot = Object.keys(slots).find(slot => slots[slot].username === currentUser);
-//         if (currentUserSlot) {
-//             if (readyStatus[currentUserSlot]) {
-//                 // Se l'utente è pronto, disabilita il pulsante
-//                 readyButton.disabled = true;
-//             } else {
-//                 // Se l'utente non è pronto, abilita il pulsante
-//                 readyButton.disabled = false;
-//             }
-//         } else {
-//             // Se l'utente non ha uno slot, disabilita il pulsante
-//             readyButton.disabled = true;
-//         }
-//     }
-
-//     // Verifica se tutti sono pronti e gli slot sono occupati per abilitare il pulsante "Start" per l'owner
-//     let allReady = true;
-//     let allOccupied = true;
-
-//     Object.keys(slots).forEach(slot => {
-//         if (slots[slot].username === 'empty') {
-//             allOccupied = false;
-//         }
-//         if (slots[slot].username !== 'empty' && !readyStatus[slot]) {
-//             allReady = false;
-//         }
-//     });
-
-//     const tournamentOwner = document.getElementById('tournament-data').dataset.owner;
-
-//     if (currentUser === tournamentOwner) {
-//         const startButton = document.getElementById('start');
-//         if (startButton) {
-//             startButton.disabled = !(allOccupied && allReady);
-//         }
-//     }
-// }
 
 function updateReadyStatusInUserList(slots, readyStatus) {
     if (!slots || Object.keys(slots).length === 0) {
