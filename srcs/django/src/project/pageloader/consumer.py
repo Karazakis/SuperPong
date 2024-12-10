@@ -51,6 +51,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send_user_list()
 
     async def receive(self, text_data):
+        logger.info(f'Received message: {text_data}')
         data = json.loads(text_data)
         message = data.get('message')
         list_users = data.get('user_list')
@@ -147,16 +148,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif data['pending_request'] == 'send':
             recipient = data['target_user']
             recipient_channel = user_channel_mapping.get(recipient)
+            logger.info(f'Sending request to {recipient}')
             if recipient_channel:
-                await self.channel_layer.send(recipient_channel, {
-                    'type': 'pending_request',
-                    'message': {
-                        'request': data['pending_request'],
-                        'target_user': data['target_user'],
-                        'requesting_user': data['requesting_user'],
-                        'request_type': data['type'],
-                    }
-                })
+                logger.debug(f'Sending request data ++++++ {data}')
+                targetLobby = data.get('target_lobby')
+                logger.debug(f'targetLobby ---------------: {targetLobby}')
+                if targetLobby:  # Controllo se 'target_lobby' è numerico
+                    await self.channel_layer.send(recipient_channel, {
+                        'type': 'pending_request',
+                        'message': {
+                            'request': data.get('pending_request'),
+                            'target_user': data.get('target_user'),
+                            'requesting_user': data.get('requesting_user'),
+                            'request_type': data.get('type'),
+                            'target_lobby': data.get('target_lobby'),
+                        }
+                    })
+                else:
+                    logger.warning("Invalid target_lobby value: Not numeric")  # Aggiunto un log di warning
+                    await self.channel_layer.send(recipient_channel, {
+                        'type': 'pending_request',
+                        'message': {
+                            'request': data.get('pending_request'),
+                            'target_user': data.get('target_user'),
+                            'requesting_user': data.get('requesting_user'),
+                            'request_type': data.get('type'),
+                        }
+                    })
+
             else:
                 print('User not found')
         elif data['pending_request'] == 'accept':
@@ -194,13 +213,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def pending_request(self, event):
         message = event['message']
-        await self.send(text_data=json.dumps({
-            'type': 'friend_request',
-            'request': message['request'],
-            'target_user': message['target_user'],
-            'requesting_user': message['requesting_user'],
-            'request_type': message['request_type'],
-        }))
+        logger.info(f'Pending request:asdasdasdzxccx<<<< {message}')
+        if message['target_lobby']:
+            await self.send(text_data=json.dumps({
+                'type': 'pending_request',
+                'request': message['request'],
+                'target_user': message['target_user'],
+                'requesting_user': message['requesting_user'],
+                'request_type': message['request_type'],
+                'target_lobby': message['target_lobby'],
+            }))
+        else:
+            await self.send(text_data=json.dumps({
+                'type': 'pending_request',
+                'request': message['request'],
+                'target_user': message['target_user'],
+                'requesting_user': message['requesting_user'],
+                'request_type': message['request_type'],
+            }))
 
     async def accept_request(self, event):
         message = event['message']

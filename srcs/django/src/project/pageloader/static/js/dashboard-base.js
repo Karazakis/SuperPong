@@ -75,7 +75,7 @@ function initializeWebSocket() {
 		const accessToken = localStorage.getItem("accessToken");
 		const csrfToken = getCookie('csrftoken');
 		const userId = localStorage.getItem("userId");
-	    
+	    console.log("data ricevuti nel socket: ", data);
 		if (data.type === 'message') {
 			let messages = document.getElementById('messages');
 			const actualUserId = localStorage.getItem('userId');
@@ -164,64 +164,59 @@ function initializeWebSocket() {
 		} else if (data.type === 'invite_game') {
 			handleGameInvite(data, accessToken, csrfToken);		    
 		} else if (data.type === 'friend_request') {
-		    handleFriendRequest(data, accessToken, csrfToken);
 		} else if (data.type === 'accept') {
-		    updateFriendshipStatus(data);
+			updateFriendshipStatus(data);
 		} else if (data.type === 'remove') {
-		    updateFriendshipStatus(data);
-		} else if (data.type === 'pending_requests') {
-		    updateFriendshipStatus(data);
+			updateFriendshipStatus(data);
+		} else if (data.type === 'pending_request') {
+			if (data.request_type === 'game') {
+			    handleGameInvite(data);
+			} else if (data.request_type === 'friend') {
+				handleFriendRequest(data, accessToken, csrfToken);
+			}
 		}
 	    };
-	}	    
+	}
 
 initializeWebSocket();
 
 function handleGameInvite(data, accessToken, csrfToken) {
+	function joinGame(gameId) {
+		console.log('Joining game:', gameId);
+		let accessToken = localStorage.getItem('accessToken');
+		fetch(`/api/join_lobby/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				"Authorization": `Bearer ${accessToken}`
+			},
+			body: JSON.stringify({ user_id: localStorage.getItem('userId'), game_id: gameId }),
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				loadPage(`/api/lobby/${gameId}/`);
+			} else {
+				alert(data.message);
+			}
+		})
+		.catch(error => console.error('Error joining game:', error));
+	}
+	
     let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
     if (invite) {
-        processGameInvite('accept', data, accessToken, csrfToken);
+		joinGame(data.target_lobby);
     } else {
-        processGameInvite('decline', data, accessToken, csrfToken);
+		chatSocket.send(JSON.stringify({
+			'type': 'remove',
+			'pending_request': 'remove',
+			'target_user': data.requesting_user,
+			'requesting_user': data.target_user,
+			'lobby_id': data.target_lobby
+		}));
     }
 }
 
-function processGameInvite(action, data, accessToken, csrfToken) {
-    let request_url = `/api/request/game/${data.target_user}/`;
-    let requestData = {
-        target_user: data.target_user,
-        requesting_user: data.requesting_user,
-        request: action
-    };
-
-    fetch(request_url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify(requestData)
-    }).then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(`Hai ${action === 'accept' ? 'accettato' : 'rifiutato'} l'invito a giocare!`);
-            // Invia la conferma o il rifiuto tramite WebSocket
-            chatSocket.send(JSON.stringify({
-                'pending_request': action,
-                'request': action,
-                'type': 'game',
-                'target_user': data.requesting_user,
-                'requesting_user': data.target_user,
-                'request_type': 'game',
-            }));
-        } else {
-            throw new Error('Failed to process game invite: ' + data.error);
-        }
-    }).catch(error => {
-        console.error('Error processing game invite:', error);
-    });
-}
 
 function updateGameInviteStatus(data) {
     let message;
@@ -243,18 +238,56 @@ function handleFriendRequest(data, accessToken, csrfToken) {
     let request = confirm(`${data.requesting_user} vuole aggiungerti come amico`);
     if (request) {
         processFriendRequest('accept', data, accessToken, csrfToken);
+		updateFriendListFromServer();
     } else {
         processFriendRequest('decline', data, accessToken, csrfToken);
     }
 }
 
-function processFriendRequest(action, data, accessToken, csrfToken) {
-    let request_url = `/api/request/friend/${data.target_user}/`;
-    let requestData = {
+async function processFriendRequest(action, data, accessToken, csrfToken) {
+	
+	const requestData = {
         target_user: data.target_user,
         requesting_user: data.requesting_user,
         request: action
     };
+	
+	
+	try {
+	    const response = await fetch(`/api/request/friend/${data.target_user}/`, {
+		method: 'POST',
+		headers: {
+		    'Content-Type': 'application/json',
+		    'Authorization': `Bearer ${accessToken}`,
+		    'X-CSRFToken': csrfToken
+		},
+		body: JSON.stringify(requestData)
+	    });
+	
+	    if (!response.ok) {
+		const errorMessage = await response.json();
+		console.error('Errore durante l\'invio della risposta:', errorMessage);
+		alert(`Errore durante l'invio della risposta: ${errorMessage.error}`);
+	    } else {
+		alert('risposta inviata con successo');
+	
+		chatSocket.send(JSON.stringify({
+			'type': action,
+			'pending_request': action,
+			'target_user': data.requesting_user,
+			'requesting_user': data.target_user,
+		}));
+	    }
+	} catch (error) {
+	    console.error('Errore durante la fetch:', error);
+	    alert('Errore durante la fetch: ' + error.message);
+	}
+
+
+
+	/* 
+    let request_url = `/api/request/friend/${data.target_user}/`;
+    
 
     fetch(request_url, {
         method: 'POST',
@@ -265,6 +298,12 @@ function processFriendRequest(action, data, accessToken, csrfToken) {
         },
         body: JSON.stringify(requestData)
     }).then(response => {
+		chatSocket.send(JSON.stringify({
+			'type': action,
+			'pending_request': action,
+			'target_user': data.requesting_user,
+			'requesting_user': data.target_user,
+		}));
         if (response.ok) {
             alert(`Hai ${action === 'accept' ? 'accettato' : 'rifiutato'} la richiesta di amicizia!`);
         } else {
@@ -272,7 +311,7 @@ function processFriendRequest(action, data, accessToken, csrfToken) {
         }
     }).catch(error => {
         console.error('Error processing friend request:', error);
-    });
+    }); */
 }
 
 function updateFriendshipStatus(data) {
@@ -292,7 +331,50 @@ function updateFriendshipStatus(data) {
             return;
     }
     alert(message);
+
+    // Aggiorna la lista degli amici dopo l'aggiornamento dello stato dell'amicizia
+    updateFriendListFromServer();
 }
+
+
+async function updateFriendListFromServer() {
+    const userId = localStorage.getItem('userId');
+    try {
+        const user = await recoverUser(userId); // Recupera l'utente aggiornato dal server
+        if (!user) {
+            throw new Error('Errore durante il recupero dei dati utente');
+        }
+        let friendListElement = document.getElementById("dashboard-friendlist");
+        if (!friendListElement) {
+            console.error("Elemento della lista amici non trovato");
+            return;
+        }
+
+        // Svuota la lista amici
+        friendListElement.innerHTML = '';
+
+        // Aggiorna la lista amici
+        for (let friend of user.user_friend_list) {
+            let itemElement = document.createElement('li');
+            itemElement.id = `friend_${friend.id}`;
+            itemElement.textContent = friend.username;
+            try {
+                itemElement.dataset.id = friend.id;
+                itemElement.oncontextmenu = function(event) {
+                    event.preventDefault();
+                    showFriendContextMenu(event, friend.id, friend.username);
+                };
+                friendListElement.appendChild(itemElement);
+            } catch (error) {
+                console.error('Errore durante l\'impostazione dell\'ID:', error);
+            }
+        }
+    } catch (error) {
+        console.error('Errore durante l\'aggiornamento della lista amici:', error);
+    }
+}
+
+
 
 function handlePrivateMessage(data, currentUsername) {
     const endOfUsernameIndex = data.message.indexOf(' ');
@@ -377,6 +459,7 @@ form.addEventListener('submit', (e)=> {
 
 function showContextMenu(event, id, isblocked = false) {
     // Ottieni il menu contestuale
+	console.log("isblocked",isblocked);
     const contextMenu = document.getElementById("contextMenu");
     const addfriendcontext = document.getElementById("addfriendcontext");
     const viewpfoilecontext = document.getElementById("viewprofilecontext");
@@ -408,7 +491,18 @@ function showFriendContextMenu(event, id, username) {
     const invitetournamentcontext = document.getElementById("invitetournamentcontext");
     const removefriendcontext = document.getElementById("removefriendcontext");
     // Posiziona il menu contestuale in base alla posizione del clic
-
+	let pathname = window.location.pathname;
+	console.log("nel context",pathname);
+	if (pathname.includes('lobby') === false) 
+	{
+		invitegamecontext.style.display = "none";
+		invitetournamentcontext.style.display = "none";
+	}
+	else
+	{
+		invitegamecontext.style.display = "block";
+		invitetournamentcontext.style.display = "block";
+	}
     invitegamecontext.dataset.id = id;
 	invitegamecontext.dataset.username = username;
     invitetournamentcontext.dataset.id = id;
@@ -430,6 +524,7 @@ function showFriendContextMenu(event, id, username) {
 
 function showRequestContextMenu(event, id, requesting_user) {
     // Ottieni il menu contestuale
+	console.log("requesting_user",requesting_user);
     const contextMenu = document.getElementById("requestContextMenu");
     const acceptrequestcontext = document.getElementById("acceptrequestcontext");
     const declinerequestcontext = document.getElementById("declinerequestcontext");
@@ -564,7 +659,7 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 	    console.error('Errore durante la fetch:', error);
 	    alert('Errore durante la fetch: ' + error.message);
 	}
-    });
+});
 
 
 document.getElementById("viewprofilecontext").addEventListener('click', async function(e) {
@@ -640,20 +735,21 @@ document.getElementById("blockusercontext").addEventListener('click', async func
     
 
 
-    document.getElementById("invitegamecontext").addEventListener('click', async function(e) {
+document.getElementById("invitegamecontext").addEventListener('click', async function(e) {
 	let accessToken = localStorage.getItem("accessToken");  // Usa let al posto di const
-	const id = e.target.dataset.id;  // ID dell'utente target
+	const id = e.target.dataset.id; 
 	const csrfToken = getCookie('csrftoken');
-    
+    let lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
 	const requestData = {
-	    requesting_user: localStorage.getItem('username'),  // Utente che manda l'invito
-	    request: 'pending'  // Stato della richiesta, che potrebbe essere 'pending', 'accepted', ecc.
+	    requesting_user: localStorage.getItem('username'),
+		target_user: id,
+	    request: 'pending',  
 	};
     
-	const requestType = 'game';  // Tipo di richiesta (in questo caso, "game")
-	
+	const requestType = 'game'; 
+	let url = `/api/request/${requestType}/${lobbyId}/`;
 	// Funzione per verificare la validità del token
-	async function checkTokenValidity(url) {
+	async function checkTokenValidity(url, requestType) {
 	    try {
 		const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
 		    method: "GET"
@@ -670,7 +766,8 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
 			localStorage.setItem("accessToken", newAccessToken);
 			// Richiesta effettiva con nuovo token
-			await performRequest(newAccessToken, url);
+			console
+			await performRequest(newAccessToken, url, requestType);
 		    } else {
 			loadPage("api/login/");
 		    }
@@ -683,7 +780,7 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 	}
     
 	// Funzione per eseguire la richiesta effettiva
-	const performRequest = async (token, url) => {
+	const performRequest = async (token, url, requestType) => {
 	    try {
 		const response = await fetch(url, {
 		    method: 'POST',  // Usa POST se richiesto
@@ -702,12 +799,16 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 		} else {
 		    alert('Invito a giocare inviato con successo');
 			console.log("request type: ", requestType);
-    
+			if (requestType === undefined) {
+				requestType = 'game';
+			}
 		    // Invia il messaggio tramite WebSocket per aggiornare in tempo reale
+			lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
 		    chatSocket.send(JSON.stringify({
 			'pending_request': 'send',
 			'target_user': id,
 			'requesting_user': localStorage.getItem('userId'),
+			'target_lobby': lobbyId,
 			'type': requestType
 		    }));
 		}
@@ -716,9 +817,11 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 		alert('Errore durante la fetch: ' + error.message);
 	    }
 	};
-    
-	await checkTokenValidity(`/api/request/${requestType}/${id}/`);
-    });
+    console.log("request type: ", requestType);
+	if (requestType === 'game') {
+		await checkTokenValidity(`/api/request/${requestType}/${id}/`, requestType);
+	}
+});
     
     
 
@@ -851,27 +954,29 @@ document.getElementById("acceptrequestcontext").addEventListener('click', async 
 		let friendListElement = document.getElementById("dashboard-friendlist");
 
 		if (friendListElement) {
+			console.log("friendListElement",friendListElement, response);
 			let itemElement = document.createElement('li');
-			itemElement.id = `friend_${data.target_user}`;
-			recoverUser(data.target_user).then(item => {
+			console.log("nel accept",e.target.dataset);
+			itemElement.id = `friend_${e.target.dataset.id}`;
+			recoverUser(e.target.dataset.id).then(item => {
 				itemElement.textContent = item.username;
 				try {
-				itemElement.dataset.id = data.target_user;
+				itemElement.dataset.id = e.target.dataset.id;
 				itemElement.oncontextmenu = function(event) {
 					event.preventDefault();
-					showFriendContextMenu(event, data.target_user);
+					showFriendContextMenu(event, e.target.dataset.id);
 				};
 				friendListElement.appendChild(itemElement);
 				} catch (error) {
 				console.error('Errore durante l\'impostazione dell\'ID:', error);
 				}
 			});
-			alert(`${data.target_user} ha accettato la tua richiesta`);
+			alert(`${e.target.dataset.id} ha accettato la tua richiesta`);
 		}
 		
 	}
 
-    });
+});
 
 
 document.getElementById("declinerequestcontext").addEventListener('click', async function(e) {

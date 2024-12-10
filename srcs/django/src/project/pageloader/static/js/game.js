@@ -1524,9 +1524,11 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         else if (data.action === 'player_leave')
         {
             gamePaused = true;
+            gameIsStarting = true;
             BALLS.forEach(ball => { ball.destroy(); });
             ballToRemove.clear();
             ballToRemoveHost.clear();
+            maxBalls = gameSettings.gameBalls;
             ballCounter = 0;
             ball_is_ready = false;
             collision_is_ready = false;
@@ -1538,19 +1540,26 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         }
         else if (data.action === 'player_rejoin')
         {
-            gamePaused = false;
+            /* gamePaused = false;
             gameIsStarting = true;
-            firstTimer = true;
+            firstTimer = true; */
             //document.getElementById("wait-modal").style.display = "none";
         }
         else if (data.action === 'join')
         {
-            gamePaused = false;
-            if (isHost === false && data.username !== username_game)
+            if (isHost === true && data.username !== username_game)
             {
-                GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
+                if (gamePaused === true) {
+                    gamePaused = false;
+                    firstTimer = true;
+                }
             }
 
+            if (isHost === false && data.username !== username_game)
+            {
+                launchReadyInterval();
+                GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
+            }
         }
         else if (data.action === 'start_game')
         {
@@ -1580,12 +1589,12 @@ function startCountdown() {
     let countdown = -10;
     let countdownElement = document.getElementById('countdown');
     window.timer = document.getElementById('countdown').textContent;
-    let interval = setInterval(() => {
+    let intervalCountdown = setInterval(() => {
         countdownElement.innerText = countdown;
         countdown++;
         GameSocket.send(JSON.stringify({ action: "time_update", time: countdown }));
         if (countdown == 0) {
-            clearInterval(interval);
+            clearInterval(intervalCountdown);
             GameSocket.send(JSON.stringify({ action: "start_game" }));
             if (gameSettings.gameRules == "time") {
                 gameIsStarting = false;
@@ -1612,13 +1621,16 @@ let firstTimerBanner = true;
 
 
 function animateonline(){
+
     if (firstTimerBanner === true) {
         document.getElementById("wait-modal").style.display = "block";
         firstTimerBanner = false;
     }
+    
     if (gameEnded === true) {
         return 0;
     }
+
     if (gamePaused === true) {
         console.log("game paused", gamePaused);
         if (isHost === false && firstTimer === true) {

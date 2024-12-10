@@ -919,6 +919,8 @@ class CreateAPIView(APIView):
             else:
                 if request.data.get('rules', '') == 'time':
                     timelimit = int(request.data.get('limit', 0)) * 60
+                else:
+                    timelimit = 0
                 game = Game.objects.create(
                     name=request.data.get('name', ''),
                     mode=request.data.get('mode', ''),
@@ -1248,11 +1250,12 @@ class UserRequestAPIView(APIView):
             if request_data.get('request') == "remove":
                 username = User.objects.get(username=request_data.get('target_user'))
             elif request_data.get('request') in ["accept", "decline"]:
-                if request_data.get('true') == "yes":
-                    logger.debug(f"Requesting user: {request_data.get('requesting_user')}")
+                logger.debug(f"qui ci entra dio merda user: {request_data.get('requesting_user')}")
+                if request_data.get('request') == "accept":
+                    logger.debug(f"Requesting user asdasd: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(username=request_data.get('requesting_user'))
-                elif request_data.get('true') == "no":
-                    logger.debug(f"Requesting user no: {request_data.get('requesting_user')}")
+                elif request_data.get('request') == "decline":
+                    logger.debug(f"Requesting user noxxxx: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(pk=request_data.get('requesting_user'))
             else:
                 requesting_user = User.objects.get(username=request_data.get('requesting_user'))
