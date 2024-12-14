@@ -1068,16 +1068,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     }))
                     return
                 
-                # if tournament.status != 'ready':
-                #     # Torneo non pronto per iniziare
-                #     await self.send(text_data=json.dumps({
-                #         'type': 'tournament_status',
-                #         'status': 'not_ready',
-                #         'message': 'The tournament is not ready to start yet.'
-                #     }))
-                #     return
+                current_round = await self.get_current_round()
+                ready_status = current_round.ready_status
+                if not all(ready_status.values()):
+                    # Non tutti i giocatori sono pronti
+                    return
                 
                 await self.start_tournament_flow()
+                
 
             elif action == 'countdown_complete':
                 await self.notify_players_to_join()
@@ -1435,13 +1433,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         try:
             tournament = await database_sync_to_async(Tournament.objects.get)(id=self.tournament_id)
             user = self.user
+            current_round = await self.get_current_round()
 
             # Controlla lo stato del torneo
             if tournament.status == 'not_started':
                 # Verifica se l'utente occupava uno slot
-                if self.current_round:
+                if current_round:
                     slot_to_release = None
-                    for slot, slot_data in self.current_round.slots.items():
+                    for slot, slot_data in current_round.slots.items():
                         if slot_data['username'] == user.username:
                             slot_to_release = slot
                             break
@@ -1465,9 +1464,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             
             else:
                 # Torneo già iniziato: rimuovi solo lo stato ready e aggiorna la lobby
-                if self.current_round:
+                if current_round:
                     slot_to_release = None
-                    for slot, slot_data in self.current_round.slots.items():
+                    for slot, slot_data in current_round.slots.items():
                         if slot_data['username'] == user.username:
                             slot_to_release = slot
                             break
@@ -1602,7 +1601,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         first_slot_user = None  # Variabile per salvare l'utente del primo slot
         for slot_key, slot_data in slots.items():
             logger.debug(f"Processing slot {slot_key}: {slot_data}")
-            if slot_data['player_id'] is not None:
+            if slot_data.get('player_id'):
                 slot_data['locked'] = True
                 players_to_block.append(slot_data['player_id'])
                 if not first_slot_user:
@@ -1860,7 +1859,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # Notifica i client con gli slot aggiornati
         if next_round and updated_slots:
             logger.info(f"Notifying clients with updated slots: {updated_slots}.")
-            await self.notify_clients_of_slot_updates(next_round_number, updated_slots)
+            await self.send_slot_status_update_to_group()
 
         # Marca il round come completato se tutti i game sono finiti
         if all_finished:
@@ -1883,22 +1882,22 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
 
-    async def notify_clients_of_slot_updates(self, next_round_number, updated_slots):
-        """
-        Notifica i client con tutti gli slot aggiornati del prossimo round.
-        """
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'send_message_to_clients',
-                'message': {
-                    'type': 'update_next_round_slots',
-                    'round_number': next_round_number,
-                    'slots': updated_slots
-                }
-            }
-        )
-        logger.info(f"Notified clients of updated slots for round {next_round_number}: {updated_slots}.")
+    # async def notify_clients_of_slot_updates(self, next_round_number, updated_slots):
+    #     """
+    #     Notifica i client con tutti gli slot aggiornati del prossimo round.
+    #     """
+    #     await self.channel_layer.group_send(
+    #         self.room_group_name,
+    #         {
+    #             'type': 'send_message_to_clients',
+    #             'message': {
+    #                 'type': 'update_next_round_slots',
+    #                 'round_number': next_round_number,
+    #                 'slots': updated_slots
+    #             }
+    #         }
+    #     )
+    #     logger.info(f"Notified clients of updated slots for round {next_round_number}: {updated_slots}.")
 
 
 

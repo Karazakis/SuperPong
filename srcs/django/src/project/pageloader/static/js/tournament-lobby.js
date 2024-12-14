@@ -95,7 +95,7 @@ function onPageLoad() {
     generateBracket(tournament);
     setupSlotSelection(tournament, currentUser);
     // necessaria per il ready se si esce e si rientra nella lobby
-    checkUserSlotAndReadyState();
+    //checkUserSlotAndReadyState();
 }
 
 function checkUserSlotAndReadyState(roundsSlots) {
@@ -830,6 +830,22 @@ function updateReadyStatusInUserList(slots, readyStatus) {
 }
 
 
+function disableAllButtonsButLeave() {
+    // Disabilita tutti i pulsanti ready, leave e start tournament
+    document.querySelectorAll('.player-slot').forEach(slot => {
+        slot.classList.add('blocked'); // Blocca visivamente lo slot
+        const readyButton = slot.querySelector('.lobby-ready');
+        const leaveButton = slot.querySelector('.lobby-leave');
+        if (readyButton) readyButton.disabled = true; // Disabilita il pulsante Ready
+        if (leaveButton) leaveButton.disabled = false; // Abilita il pulsante Leave
+    });
+
+    // Disabilita anche il pulsante "Start Tournament" se presente
+    const startTournamentButton = document.querySelector('.start-tournament');
+    if (startTournamentButton) {
+        startTournamentButton.disabled = true;
+    }
+}
 
 
 function disableButtonsAndSlots(playersToBlock) {
