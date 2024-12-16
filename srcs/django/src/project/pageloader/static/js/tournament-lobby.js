@@ -73,11 +73,7 @@ LobbySocket.onerror = function(e) {
 LobbySocket.onclose = function(e) {
     console.log('WebSocket connection closed:', e);
 
-    leaveLobby().then(() => {
-        console.log('leaveLobby completed');
-    }).catch((error) => {
-        console.error('Error during leaveLobby:', error);
-    });
+    // loadPage('/api/tournaments/');
 };
 
 // Funzione di inizializzazione della pagina della lobby
