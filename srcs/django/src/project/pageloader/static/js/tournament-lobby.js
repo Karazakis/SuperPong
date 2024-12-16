@@ -70,9 +70,14 @@ LobbySocket.onerror = function(e) {
     console.error('WebSocket error:', e);
 };
 
-// Gestione della chiusura del WebSocket
 LobbySocket.onclose = function(e) {
     console.log('WebSocket connection closed:', e);
+
+    leaveLobby().then(() => {
+        console.log('leaveLobby completed');
+    }).catch((error) => {
+        console.error('Error during leaveLobby:', error);
+    });
 };
 
 // Funzione di inizializzazione della pagina della lobby
@@ -675,91 +680,96 @@ if (deleteButton) {
     });
 }
 
+
 var leaveButton = document.getElementById('leave');
 if (leaveButton) {
     leaveButton.addEventListener('click', async (e) => {
         e.preventDefault();
-
-        let accessToken = localStorage.getItem("accessToken");
-
-        // Funzione per verificare la validità del token
-        async function checkTokenValidity() {
-            try {
-                const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
-                    method: "GET"
-                });
-                const data = await response.json();
-
-                if (data.message === 'Token valido') {
-                    return accessToken; // Token ancora valido
-                } else if (data.message === 'Token non valido') {
-                    // Prova a rinfrescare il token
-                    const newAccessToken = await refreshAccessToken();
-                    if (newAccessToken) {
-                        localStorage.setItem("accessToken", newAccessToken);
-                        return newAccessToken; // Restituisci il nuovo token
-                    } else {
-                        throw new Error("Token non valido e impossibile da rinfrescare");
-                    }
-                } else {
-                    throw new Error("Errore durante la verifica del token");
-                }
-            } catch (error) {
-                console.error('Errore durante la verifica del token:', error);
-                loadPage("/api/login/"); // Reindirizza alla pagina di login
-            }
-        }
-
-        // Funzione per rinfrescare il token
-        async function refreshAccessToken() {
-            try {
-                const response = await fetch(`${window.location.origin}/api/token/refresh/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ token: accessToken })
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    return data.access; // Restituisci il nuovo token
-                } else {
-                    throw new Error("Impossibile rinfrescare il token");
-                }
-            } catch (error) {
-                console.error("Errore durante il refresh del token:", error);
-                return null; // Fallimento del refresh
-            }
-        }
-
-        try {
-            // Verifica e ottieni un token valido
-            accessToken = await checkTokenValidity();
-
-            // Effettua la richiesta solo se il token è valido
-            const response = await fetch(`/api/tournament_lobby/${round_id_lobby}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${accessToken}`,
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ action: 'leave' })
-            });
-
-            if (response.ok) {
-                LobbySocket.send(JSON.stringify({ action: 'leave', username: username_lobby }));
-                LobbySocket.close();
-                loadPage('/api/tournaments/');
-            } else {
-                const errorData = await response.json();
-                throw new Error(errorData.error);
-            }
-        } catch (error) {
-            console.error('Errore durante la richiesta di uscita:', error);
-        }
+        await leaveLobby();
     });
 }
+
+
+async function leaveLobby() {
+    let accessToken = localStorage.getItem("accessToken");
+
+    // Funzione per verificare la validità del token
+    async function checkTokenValidity() {
+        try {
+            const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
+                method: "GET"
+            });
+            const data = await response.json();
+
+            if (data.message === 'Token valido') {
+                return accessToken;
+            } else if (data.message === 'Token non valido') {
+                const newAccessToken = await refreshAccessToken();
+                if (newAccessToken) {
+                    localStorage.setItem("accessToken", newAccessToken);
+                    return newAccessToken;
+                } else {
+                    throw new Error("Token non valido e impossibile da rinfrescare");
+                }
+            } else {
+                throw new Error("Errore durante la verifica del token");
+            }
+        } catch (error) {
+            console.error('Errore durante la verifica del token:', error);
+            loadPage("/api/login/"); // Reindirizza alla pagina di login
+        }
+    }
+
+    // Funzione per rinfrescare il token
+    async function refreshAccessToken() {
+        try {
+            const response = await fetch(`${window.location.origin}/api/token/refresh/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: accessToken })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return data.access;
+            } else {
+                throw new Error("Impossibile rinfrescare il token");
+            }
+        } catch (error) {
+            console.error("Errore durante il refresh del token:", error);
+            return null;
+        }
+    }
+
+    try {
+        // Verifica e ottieni un token valido
+        accessToken = await checkTokenValidity();
+
+        // Effettua la richiesta solo se il token è valido
+        const response = await fetch(`/api/tournament_lobby/${round_id_lobby}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${accessToken}`,
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ action: 'leave' })
+        });
+
+        if (response.ok) {
+            LobbySocket.send(JSON.stringify({ action: 'leave', username: username_lobby }));
+            LobbySocket.close();
+            loadPage('/api/tournaments/');
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.error);
+        }
+    } catch (error) {
+        console.error('Errore durante la richiesta di uscita:', error);
+    }
+}
+
 
 function updateReadyStatusInUserList(slots, readyStatus) {
     if (!slots || Object.keys(slots).length === 0) {

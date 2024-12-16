@@ -988,18 +988,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         logger.info(f"Disconnecting from tournament room: {self.room_group_name} with close code: {close_code}")
 
-        # Rimuovi il giocatore dalla lista
-        if self.user.username in self.users_in_lobby:
-            self.users_in_lobby.remove(self.user.username)
-
         # Verifica se l'utente ha già eseguito il leave
-        if not getattr(self, 'user_left', False):
-            await self.remove_user_from_lobby()
-            # Invia aggiornamenti solo se l'utente non ha già lasciato
-            
+        if getattr(self, 'user_left', True):
 
-        # Rimuovi il client dal gruppo del torneo
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+            # Rimuovi il client dal gruppo del torneo
+            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
 
     async def receive(self, text_data):
