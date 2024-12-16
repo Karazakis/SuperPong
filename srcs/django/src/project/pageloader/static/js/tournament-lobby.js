@@ -855,18 +855,23 @@ function disableAllButtonsButLeave() {
 
 
 function disableButtonsAndSlots(playersToBlock) {
-    // Disabilita i pulsanti ready e leave solo per i giocatori specificati
-    document.querySelectorAll('.player-slot').forEach(slot => {
-        const playerId = slot.getAttribute('data-player-id'); // Supponiamo che ogni slot abbia un attributo data-player-id
-        if (playersToBlock.includes(Number(playerId))) { // Controlla se il playerId è nella lista
-            slot.classList.add('blocked'); // Blocca lo slot
-            const readyButton = slot.querySelector('.lobby-ready');
-            const leaveButton = slot.querySelector('.lobby-leave');
-            if (readyButton) readyButton.disabled = true;
-            if (leaveButton) leaveButton.disabled = true;
-        }
-    });
+    // Recupera userId dal localStorage
+    const userId = Number(localStorage.getItem('userId')); // Assumi che l'ID sia memorizzato come stringa numerica
+    console.log(userId);
+
+    if (!playersToBlock.includes(userId)) {
+        // Se l'userId non è tra quelli da bloccare, esci dalla funzione
+        console.log(`Utente con ${userId} non e' da bloccare: playerstoblock = ${playersToBlock}`)
+        return;
+    }
+
+    const readyButton = document.querySelector('.lobby-ready');
+    const leaveButton = document.querySelector('.lobby-leave');
+    if (readyButton) readyButton.disabled = true;
+    if (leaveButton) leaveButton.disabled = true;
+    
 }
+
 
 
 // Listener per il pulsante "Start Round"
