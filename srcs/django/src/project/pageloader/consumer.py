@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 import asyncio
 import logging
 import urllib
+from asgiref.sync import sync_to_async
 logger = logging.getLogger(__name__)
 
 user_channel_mapping = {}
@@ -633,8 +634,6 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         }))
 
 
-    
-
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.game_id = self.scope['url_route']['kwargs']['game_id']
@@ -979,10 +978,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 return
             
         if self.tournament.status == 'finished':
-            tournament_winner = self.tournament.winner
+            tournament_winner = await sync_to_async(lambda: self.tournament.winner, thread_sensitive=False)()
             await self.notify_tournament_end(self.tournament.name, tournament_winner)
             logger.info(f"Notified client of tournament conclusion during connect for tournament: {self.tournament.name}.")
-            return
 
 
     async def disconnect(self, close_code):

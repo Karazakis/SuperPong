@@ -24,7 +24,7 @@ document.getElementById('leavegame').addEventListener('click', function() {
     // Emissione dell'evento custom
     gameEnded = true;
     new Promise(resolve => {
-        setTimeout(resolve, 10);
+        setTimeout(resolve, 20);
     });
 
     

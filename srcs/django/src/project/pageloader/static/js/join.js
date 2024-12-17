@@ -116,7 +116,10 @@ function deleteTournament(tournamentId) {
     .then(data => {
         if (data.success) {
             alert('Tournament deleted successfully.');
-            location.reload();
+            let currentUrl = window.location.pathname; // Ottiene l'URL corrente
+            loadPage("api"+currentUrl);
+            //refreshTournamentList();
+            //location.reload();
         } else {
             console.error('Failed to delete tournament:', data.error);
             alert('Failed to delete tournament: ' + data.error);

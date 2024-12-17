@@ -330,6 +330,12 @@ function loadPage(url) {
 
     if(!url.includes("game")){
         if (window.starSky == null) {
+            let canva = document.getElementsByTagName('canvas');
+            if (canva) {
+                for (let i = 0; i < canva.length; i++) {
+                    canva[i].remove();
+                }
+            }
             window.initStarSky();
             window.animateStarSky();
         }

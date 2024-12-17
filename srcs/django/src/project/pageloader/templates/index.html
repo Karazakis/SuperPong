@@ -94,6 +94,9 @@
 
         // Funzione di animazione
         window.animateStarSky = function ( ) {
+            if (window.starScene == null || window.camera == null || window.particles == null || window.renderer == null) {
+                return;
+            }
             requestAnimationFrame(animateStarSky);
             window.particles.rotation.x = 0.75;
             window.particles.rotation.y += 0.001; // Aggiunge una rotazione lenta alle stelle
@@ -108,6 +111,7 @@
         window.animateStarSky( window.renderer, window.starScene, window.camera, window.particles);
 
         window.clearScene = function (scene) {
+
             if(scene != null) {
                 while (scene.children.length > 0) {
                     const object = scene.children[0];
@@ -119,6 +123,7 @@
         }
 
         window.clearAllScene = function () {
+            console.log("Clear all scene");
             window.clearScene(window.starScene);
             window.clearScene(window.gameScene);
             window.starScene = null;

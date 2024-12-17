@@ -1,31 +1,25 @@
 <div class="row justify-content-center">
-    <!-- Profile Information Section -->
-    <div class="col-md-8">
+    <!-- Profile Information and Friends Section -->
+    <div class="col-md-3">
         
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <div class="card border rounded shadow my-4">
+        <div class="card border rounded shadow my-3" style="min-width: 20vh !important;">
             <div class="card-body text-center">
-                <h2 class="card-title">Profile Information</h2>
+                <h2 class="card-title">Profile<br> Information</h2>
                 <!-- User Image -->
                 <div class="text-center mb-3">
                     <img src="/static/media/{{ userprofile.img_profile }}" class="rounded-circle profile-img" style="width: 150px; height: 150px;" alt="User Image">
                 </div>
                 <!-- User Nickname and Last Online -->
                 <h3 class="card-title text-nowrap">{{ userprofile.nickname }}</h3>
-                <p class="text-muted text-nowrap">Last Online: {{ userprofile.user.last_login }}</p>
             </div>
         </div>
-        <div class="card border rounded shadow m-3">
+        <div class="card border rounded shadow my-3" style="min-width: 20vh !important;">
             <div class="card-body">
                 <h4 class="card-title text-center">Friends</h4>
                 <ul class="list-group list-group-flush">
                     {% if friends %}
                         {% for friend in friends %}
-                            <li class="list-group-item friend-item" data-id="{{ friend.user.id}}">
+                            <li class="list-group-item friend-item" data-id="{{ friend.user.id }}">
                                 {{ friend.nickname }}
                             </li>
                         {% endfor %}
@@ -36,34 +30,36 @@
             </div>
         </div>
     </div>
+
+    <!-- User Stats Section -->
     <div class="col-md-8">
-        <div class="card border rounded shadow m-3">
-            <div class="card-body">
+        <div class="card border rounded shadow my-3 " style="height: 40vh;">
+            <div class="card-body" style="max-height: 8vh;">
                 <h4 class="card-title text-center">User Stats</h4>
             </div>
-            <div class="card-footer">
+            <div class="card-footer" style="height: 35vh;">
                 <div class="row">
-                    <!-- Colonna del grafico -->
-                    <div class="col-md-9">
+                    <!-- Chart Column -->
+                    <div class="col-md-8">
                         <canvas id="user-stats-chart"></canvas>
                     </div>
-                    <!-- Colonna delle statistiche -->
-                    <div class="col-md-3 d-flex flex-column justify-content-center">
+                    <!-- Stats List Column -->
+                    <div class="col-md-4 d-flex flex-column justify-content-center ">
                         <ul class="list-group" id="stat-values">
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Precision</span><span id="precision">{{ relative_game_statistics.precision }}</span><strong id="stat-precision"></strong>
+                                <span>Precision</span><span id="precision">{{ relative_game_statistics.precision }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Reactivity</span><span id="reactivity" >{{ relative_game_statistics.reactivity }}</span><strong id="stat-reactivity"></strong>
+                                <span>Reactivity</span><span id="reactivity">{{ relative_game_statistics.reactivity }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Luck</span><span id="luck">{{ relative_game_statistics.luck }}</span> <strong id="stat-luck"></strong>
+                                <span>Luck</span><span id="luck">{{ relative_game_statistics.luck }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Madness</span><span id="madness">{{ relative_game_statistics.madness }}</span> <strong id="stat-madness"></strong>
+                                <span>Madness</span><span id="madness">{{ relative_game_statistics.madness }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Leadership</span><span id="leadership">{{ relative_game_statistics.leadership }}</span> <strong id="stat-leadership"></strong>
+                                <span>Leadership</span><span id="leadership">{{ relative_game_statistics.leadership }}</span>
                             </li>
                         </ul>
                     </div>
@@ -71,18 +67,19 @@
             </div>
         </div>
     </div>
-    
-    
+</div>
+
+<!-- Game History and Tournament History Section -->
+<div class="row justify-content-center">
     <!-- Game History Section -->
-    <div class="col-md-6">
-        <div class="card border rounded shadow m-3">
-            <div class="card-body" style="max-height: 30vh;overflow: scroll;">
+    <div class="col-md-5">
+        <div class="card border rounded shadow my-3">
+            <div class="card-body" style="max-height: 30vh; overflow: scroll;">
                 <h4 class="card-title text-center">Game History</h4>
-                <!-- Game Statistics -->
                 <div class="row text-center" id="game-stats">
                     <div class="col-3">
                         <strong>Wins</strong>
-                        <p id="game-wins">{{ game_wins }}</p>
+                        <p id="game-wins"> {{ game_wins }}</p>
                     </div>
                     <div class="col-3">
                         <strong>Losses</strong>
@@ -97,7 +94,6 @@
                         <p id="game-abandons">{{ game_abandons }}</p>
                     </div>
                 </div>
-                <!-- Game List -->
                 <table class="table table-striped mt-3" id="game-history-table">
                     <thead>
                         <tr>
@@ -124,6 +120,7 @@
                         {% else %}
                             <tr>
                                 <td colspan="3" class="text-center">No game history available</td>
+                            </tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -133,10 +130,9 @@
 
     <!-- Tournament History Section -->
     <div class="col-md-6">
-        <div class="card border rounded shadow m-3">
+        <div class="card border rounded shadow my-3">
             <div class="card-body" style="max-height: 30vh; min-height: 30vh; overflow: scroll;">
                 <h4 class="card-title text-center">Tournament History</h4>
-                <!-- Tournament Statistics -->
                 <div class="row text-center" id="tournament-stats">
                     <div class="col-3">
                         <strong>Wins</strong>
@@ -155,7 +151,6 @@
                         <p id="tournament-abandons">{{ tournament_abandons }}</p>
                     </div>
                 </div>
-                <!-- Tournament List -->
                 <table class="table table-striped mt-3" id="tournament-history-table">
                     <thead>
                         <tr>

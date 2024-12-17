@@ -173,6 +173,8 @@ function initializeWebSocket() {
 			    handleGameInvite(data);
 			} else if (data.request_type === 'friend') {
 				handleFriendRequest(data, accessToken, csrfToken);
+			} else if (data.type === 'tournament') {
+				handleTournamentInvite(data);
 			}
 		}
 	    };
@@ -206,6 +208,44 @@ function handleGameInvite(data, accessToken, csrfToken) {
     let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
     if (invite) {
 		joinGame(data.target_lobby);
+    } else {
+		chatSocket.send(JSON.stringify({
+			'type': 'remove',
+			'pending_request': 'remove',
+			'target_user': data.requesting_user,
+			'requesting_user': data.target_user,
+			'lobby_id': data.target_lobby
+		}));
+    }
+}
+
+
+function handleTournamentInvite(data, accessToken, csrfToken) {
+	function joinTournament(tournamentId) {
+		console.log('Joining tournament:', tournamentId);
+		let accessToken = localStorage.getItem('accessToken');
+		fetch(`/api/join_tournament/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				"Authorization": `Bearer ${accessToken}`
+			},
+			body: JSON.stringify({ user_id: localStorage.getItem('userId'), tournament_id: tournamentId }),
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				loadPage(`/api/tournament_lobby/${tournamentId}/`);
+			} else {
+				alert(data.message);
+			}
+		})
+		.catch(error => console.error('Error joining tournament:', error));
+	}
+	
+    let invite = confirm(`${data.requesting_user} ti ha invitato ad un torneo`);
+    if (invite) {
+		joinTournament(data.target_lobby);
     } else {
 		chatSocket.send(JSON.stringify({
 			'type': 'remove',
@@ -312,6 +352,7 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
     }).catch(error => {
         console.error('Error processing friend request:', error);
     }); */
+	updateFriendListFromServer();
 }
 
 function updateFriendshipStatus(data) {
@@ -621,6 +662,10 @@ async function recoverUser(id) {
 document.getElementById("addfriendcontext").addEventListener('click', async function(e) {
 	const accessToken = localStorage.getItem("accessToken");
 	const id = e.target.dataset.id;
+	if (id === localStorage.getItem('userId')) {
+		alert('Non puoi aggiungere te stesso come amico');
+		return;
+	}
 	const csrfToken = getCookie('csrftoken');
 	
 	const requestData = {
@@ -826,57 +871,94 @@ document.getElementById("invitegamecontext").addEventListener('click', async fun
     
 
 document.getElementById("invitetournamentcontext").addEventListener('click', async function(e) {
-    const id = e.target.dataset.id;
-    loadPage(`api/invite_tournament/${id}/`);
+	let accessToken = localStorage.getItem("accessToken");  // Usa let al posto di const
+	const id = e.target.dataset.id; 
+	const csrfToken = getCookie('csrftoken');
+    let lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
+	const requestData = {
+	    requesting_user: localStorage.getItem('username'),
+		target_user: id,
+	    request: 'pending',  
+	};
+    
+	const requestType = 'tournament'; 
+	let url = `/api/request/${requestType}/${lobbyId}/`;
+	// Funzione per verificare la validità del token
+	async function checkTokenValidity(url, requestType) {
+	    try {
+		const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
+		    method: "GET"
+		});
+		const data = await response.json();
+    
+		if (data.message === 'Token valido') {
+		    // Token valido, procedi con la richiesta effettiva
+		    await performRequest(accessToken);
+		} else if (data.message === 'Token non valido') {
+		    // Token non valido, prova a rinfrescare
+		    const newAccessToken = await refreshAccessToken();
+		    if (newAccessToken) {
+			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+			localStorage.setItem("accessToken", newAccessToken);
+			// Richiesta effettiva con nuovo token
+			console
+			await performRequest(newAccessToken, url, requestType);
+		    } else {
+			loadPage("api/login/");
+		    }
+		} else {
+		    throw new Error('Network response was not ok');
+		}
+	    } catch (error) {
+		console.error('Errore durante la verifica del token:', error);
+	    }
+	}
+    
+	// Funzione per eseguire la richiesta effettiva
+	const performRequest = async (token, url, requestType) => {
+	    try {
+		const response = await fetch(url, {
+		    method: 'POST',  // Usa POST se richiesto
+		    headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${token}`,
+			'X-CSRFToken': csrfToken
+		    },
+		    body: JSON.stringify(requestData)
+		});
+    
+		if (!response.ok) {
+		    const errorMessage = await response.json();
+		    console.error('Errore durante l\'invio dell\'invito a torneo:', errorMessage);
+		    alert(`Errore durante l'invio dell'invito: ${errorMessage.error}`);
+		} else {
+		    alert('Invito a torneo inviato con successo');
+			console.log("request type: ", requestType);
+			if (requestType === undefined) {
+				requestType = 'tournament';
+			}
+		    // Invia il messaggio tramite WebSocket per aggiornare in tempo reale
+			lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
+		    chatSocket.send(JSON.stringify({
+			'pending_request': 'send',
+			'target_user': id,
+			'requesting_user': localStorage.getItem('userId'),
+			'target_lobby': lobbyId,
+			'type': requestType
+		    }));
+		}
+	    } catch (error) {
+		console.error('Errore durante la fetch:', error);
+		alert('Errore durante la fetch: ' + error.message);
+	    }
+	};
+    console.log("request type: ", requestType);
+	if (requestType === 'tournament') {
+		await checkTokenValidity(`/api/request/${requestType}/${id}/`, requestType);
+	}
+});
 
-	async function checkTokenValidity(url) {
-		try {
-			const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
-			method: "GET"
-			});
-			const data = await response.json();
-	
-			if (data.message === 'Token valido') {
-			// Token valido, procedi con la richiesta effettiva
-			await performRequest(accessToken, url);
-			} else if (data.message === 'Token non valido') {
-			// Token non valido, prova a rinfrescare
-			const newAccessToken = await refreshAccessToken();
-			if (newAccessToken) {
-				accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
-				localStorage.setItem("accessToken", newAccessToken);
-				// Richiesta effettiva con nuovo token
-				await performRequest(newAccessToken, url);
-			} else {
-				loadPage("api/login/");
-			}
-			} else {
-			throw new Error('Network response was not ok');
-			}
-		} catch (error) {
-			console.error('Errore durante la verifica del token:', error);
-		}
-		}
-		const performRequest = async (token, url) => {
-		try {
-			const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				"Authorization": `Bearer ${token}`
-			}
-			});
-	
-			if (!response.ok) {
-				throw new Error('Errore durante il blocco dell\'utente');
-			}
-		} catch (error) {
-			console.error('Errore durante la richiesta:', error);
-			}
-		}
-		checkTokenValidity(`/api/invite_tournament/${id}/`);
-}
-);
+
 
 document.getElementById("removefriendcontext").addEventListener('click', async function(e) {
     let accessToken = localStorage.getItem("accessToken");

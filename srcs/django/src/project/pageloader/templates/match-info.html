@@ -1,13 +1,58 @@
-<div>
-    <h1>Game Info: {{ game.name }}</h1>
-    <p>Mode: {{ game.mode }}</p>
-    <p>Status: {{ game.status }}</p>
-    <p>Team 1 Score: {{ game.team1_score }}</p>
-    <p>Team 2 Score: {{ game.team2_score }}</p>
-    <p>Players: {{ game.players|join:", " }}</p>
-    <!-- Go back button -->
-    <div class="row justify-content-center my-3">
-        <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="h3">Game Information: {{ game.name }}</h1>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Player 1 Details -->
+                <div class="col-md-6 text-center">
+                    <img src="/static/media/{{ game.player1_image }}" alt="{{ game.player1 }}" class="img-thumbnail rounded-circle mb-3" style="width: 120px; height: 120px;">
+                    <h4>{{ game.player1 }}</h4>
+                    <p><strong>Score:</strong> {{ game.player1_score }}</p>
+                    <p><strong>Hits:</strong> {{ game.player1_hit }}  |  <strong>Keys pressed:</strong> {{ game.player1_keyPressCount }}</p>
+                </div>
+                <!-- Player 2 Details -->
+                <div class="col-md-6 text-center">
+                    <img src="/static/media/{{ game.player2_image }}" alt="{{ game.player2 }}" class="img-thumbnail rounded-circle mb-3" style="width: 120px; height: 120px;">
+                    <h4>{{ game.player2 }}</h4>
+                    <p><strong>Score:</strong> {{ game.player2_score }}</p>
+                    <p><strong>Hits:</strong> {{ game.player2_hit }}  |  <strong>Keys pressed:</strong> {{ game.player2_keyPressCount }}</p>
+                </div>
+                <div class="col-12 text-center mb-3">
+                    <strong>Total Balls: {{ game.ballCount }}</strong>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Mode:</strong> {{ game.mode }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge {{ game.status|lower }}-status">
+                            {{ game.status }}
+                        </span>
+                    </p>
+                    <p><strong>Boost:</strong> {{ game.boost }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Ball Limit:</strong> {{ game.balls }}</p>
+                    <p><strong>Rules:</strong> {{ game.rules }}</p>
+                    <p><strong>Winner:</strong> 
+                        {% if game.winner %}
+                            <span class="text-success">{{ game.winner }}</span>
+                        {% else %}
+                            <span class="text-danger">No winner yet</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center bg-light">
+            <p><strong>Game ID:</strong> {{ game.id }}</p>
+        </div>
     </div>
-
+    <div class="row justify-content-center my-3">
+        <button type="button" id="go-back-prf" class="btn btn-warning">Back</button>
+    </div>
 </div>
+

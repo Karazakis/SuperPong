@@ -49,8 +49,10 @@ LobbySocket.onmessage = function(e) {
             showJoinGamePopup(data.game_link);
             break;
         case 'tournament_finished':
-            console.log("Tournament finished!");
-            showWinnerPopup(data.winner);
+            console.log("Tournament finished! Displaying winner popup after delay.");
+            setTimeout(() => {
+                showWinnerPopup(data.winner);
+            }, 500);
             break;
         case 'start_countdown':
             if (data.authorized_client === username_lobby) {
@@ -72,8 +74,6 @@ LobbySocket.onerror = function(e) {
 
 LobbySocket.onclose = function(e) {
     console.log('WebSocket connection closed:', e);
-
-    // loadPage('/api/tournaments/');
 };
 
 // Funzione di inizializzazione della pagina della lobby
@@ -766,7 +766,6 @@ async function leaveLobby() {
     }
 }
 
-
 function updateReadyStatusInUserList(slots, readyStatus) {
     if (!slots || Object.keys(slots).length === 0) {
         console.error("No slots data available");
@@ -780,20 +779,15 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     console.log("Slots received:", slots);
     console.log("Ready status received:", readyStatus);
 
-    // Itera sugli utenti nella lista e aggiorna lo stato "ready"
+    // Aggiorna la lista utenti con lo stato "ready"
     Array.from(userItems).forEach(item => {
         const username = item.id.replace('user_', '');
         const slotKey = Object.keys(slots).find(key => slots[key].username === username);
 
         if (slotKey && readyStatus[slotKey] !== undefined) {
-            // Aggiorna lo stato di "ready" nella lista utenti
-            if (readyStatus[slotKey]) {
-                item.innerHTML = `${username} ✔️`; // Segna come pronto
-            } else {
-                item.innerHTML = username; // Non pronto
-            }
+            item.innerHTML = `${username} ${readyStatus[slotKey] ? '✔️' : ''}`;
         } else {
-            item.innerHTML = username; // Nessuno slot assegnato
+            item.innerHTML = username; // Nessuno slot assegnato o dati mancanti
         }
     });
 
@@ -801,23 +795,21 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     const readyButton = document.getElementById('ready');
     if (readyButton) {
         const currentUserSlot = Object.keys(slots).find(slotKey => slots[slotKey].username === currentUser);
-        if (currentUserSlot) {
-            readyButton.disabled = readyStatus[currentUserSlot] || false; // Disabilita se pronto
-        } else {
-            readyButton.disabled = true; // Disabilita se nessuno slot assegnato
-        }
+        readyButton.disabled = currentUserSlot ? readyStatus[currentUserSlot] || false : true;
     }
 
-    // Controlla se tutti gli slot occupati sono pronti
-    const allReady = Object.keys(slots).every(slotKey => 
-        slots[slotKey].username !== "empty" && readyStatus[slotKey]
-    );
+    // Controlla se tutti gli slot hanno player_id valido
+    const allSlotsHavePlayer = Object.keys(slots).every(slotKey => slots[slotKey].player_id);
 
-    const allOccupied = Object.keys(slots).every(slotKey => 
-        slots[slotKey].username !== "empty"
-    );
+    // Controlla se tutti i ready status sono true
+    const allReady = Object.keys(readyStatus).every(slotKey => readyStatus[slotKey]);
 
-    // Controlla se l'owner è attivo
+    if (!allSlotsHavePlayer || !allReady) {
+        console.warn("Conditions not met: Not all slots have player_id or not all ready statuses are true.");
+        return; // Termina se le condizioni non sono soddisfatte
+    }
+
+    // Verifica se l'owner è attivo e avvia il torneo se necessario
     const tournamentOwner = document.getElementById('tournament-data').dataset.owner;
     const startButton = document.getElementById('start');
     const activeUsernames = Object.values(slots)
@@ -827,24 +819,24 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     if (startButton) {
         const ownerInGame = activeUsernames.includes(tournamentOwner);
         if (ownerInGame) {
-            startButton.disabled = !(allOccupied && allReady);
+            startButton.disabled = false; // Attiva il pulsante "Start"
         } else {
-            console.log("Owner not in game. Automatically triggering start logic.");
+            console.warn("Owner not in game. Automatically triggering start logic.");
             startTournamentLogic(); // Avvia direttamente la logica
         }
     }
 }
 
 
+
 function disableAllButtonsButLeave() {
     // Disabilita tutti i pulsanti ready, leave e start tournament
-    document.querySelectorAll('.player-slot').forEach(slot => {
-        slot.classList.add('blocked'); // Blocca visivamente lo slot
-        const readyButton = slot.querySelector('.lobby-ready');
-        const leaveButton = slot.querySelector('.lobby-leave');
-        if (readyButton) readyButton.disabled = true; // Disabilita il pulsante Ready
-        if (leaveButton) leaveButton.disabled = false; // Abilita il pulsante Leave
-    });
+    // Blocca visivamente lo slot
+    const readyButton = slot.querySelector('.lobby-ready');
+    const leaveButton = slot.querySelector('.lobby-leave');
+    if (readyButton) readyButton.disabled = true; // Disabilita il pulsante Ready
+    if (leaveButton) leaveButton.disabled = false; // Abilita il pulsante Leave
+    
 
     // Disabilita anche il pulsante "Start Tournament" se presente
     const startTournamentButton = document.querySelector('.start-tournament');
@@ -859,20 +851,20 @@ function disableButtonsAndSlots(playersToBlock) {
     const userId = Number(localStorage.getItem('userId')); // Assumi che l'ID sia memorizzato come stringa numerica
     console.log(userId);
 
+    const readyButton = document.querySelector('.lobby-ready');
+    const leaveButton = document.querySelector('.lobby-leave');
+
     if (!playersToBlock.includes(userId)) {
         // Se l'userId non è tra quelli da bloccare, esci dalla funzione
         console.log(`Utente con ${userId} non e' da bloccare: playerstoblock = ${playersToBlock}`)
+        if (leaveButton) leaveButton.disabled = false;
         return;
     }
 
-    const readyButton = document.querySelector('.lobby-ready');
-    const leaveButton = document.querySelector('.lobby-leave');
     if (readyButton) readyButton.disabled = true;
     if (leaveButton) leaveButton.disabled = true;
     
 }
-
-
 
 // Listener per il pulsante "Start Round"
 var startTournament = document.getElementById("start");
