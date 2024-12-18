@@ -1970,48 +1970,87 @@ class GameAPIView(APIView):
     
     def post(self, request, pk):
         if request.user.is_authenticated:
-            data = request.data
-
-            try:
-                
-                # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
-                game = Game.objects.get(id=pk)
-                player1 = UserProfile.objects.get(user=game.player1)
-                player2 = UserProfile.objects.get(user=game.player2)
-
             
-                # Aggiorna i campi solo se i dati sono presenti
-                game.player1_score = data.get('scorePlayer1', game.player1_score)
-                game.player2_score = data.get('scorePlayer2', game.player2_score)
-                game.player1_hit = data.get('player1_hit', game.player1_hit)
-                game.player2_hit = data.get('player2_hit', game.player2_hit)
-                game.player1_keyPressCount = data.get('player1_keyPressCount', game.player1_keyPressCount)
-                game.player2_keyPressCount = data.get('player2_keyPressCount', game.player2_keyPressCount)
-                game.ballCount = data.get('ballCount', game.ballCount)
-
-                if game.player1_score > game.player2_score:
-                    player1.game_win += 1
-                    player2.game_lose += 1
-                    game.winner = game.player1
-                elif game.player2_score > game.player1_score:
-                    player2.game_win += 1
-                    player1.game_lose += 1
-                    game.winner = game.player2
-                else:
-                    player1.game_draw += 1
-                    player2.game_draw += 1
-                    game.winner = None
-                game.status = data.get('gameStatus')
-                logger.debug(f"NEL GAME status fa: {game.status}")
-                logger.debug(f"NEL GAME madonna fa: {game}")
-                # Salva le modifiche
-                game.save()
+            if 'local' in request.path:
+                data = request.data
+                user = get_object_or_404(User, pk=request.user.id)
+                game = Game.objects.create(
+                    name=data.get('name'),
+                    mode=data.get('mode'),
+                    rules=data.get('rules'),
+                    limit=data.get('limit'),
+                    balls=data.get('balls'),
+                    boost=data.get('boost'),
+                    player1=user,
+                    player2=user,
+                    player1_score= data.get('player1_score', 0),
+                    player2_score= data.get('player2_score', 0),
+                    player1_hit= data.get('player1_hit', 0),
+                    player2_hit= data.get('player2_hit', 0),
+                    player1_keyPressCount= data.get('player1_keyPressCount', 0),
+                    player2_keyPressCount= data.get('player2_keyPressCount', 0),
+                    ballCount= data.get('ballCount', 0),
+                    status='finished',
+                )
                 
+                game.save()
+
                 return Response({'success': game.id}, status=status.HTTP_200_OK)
-            except Game.DoesNotExist:
-                return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                data = request.data
+
+                try:
+                    
+                    # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
+                    game = Game.objects.get(id=pk)
+                    player1 = UserProfile.objects.get(user=game.player1)
+                    player2 = UserProfile.objects.get(user=game.player2)
+
+                    abandon = data.get('abandon', 0)
+                    winner = data.get('winner', None)
+                    # Aggiorna i campi solo se i dati sono presenti
+                    game.player1_score = data.get('scorePlayer1', game.player1_score)
+                    game.player2_score = data.get('scorePlayer2', game.player2_score)
+                    game.player1_hit = data.get('player1_hit', game.player1_hit)
+                    game.player2_hit = data.get('player2_hit', game.player2_hit)
+                    game.player1_keyPressCount = data.get('player1_keyPressCount', game.player1_keyPressCount)
+                    game.player2_keyPressCount = data.get('player2_keyPressCount', game.player2_keyPressCount)
+                    game.ballCount = data.get('ballCount', game.ballCount)
+                    
+                    if abandon != 0:
+                        if abandon == 1:
+                            player1.game_abandon += 1
+                            player2.game_win += 1
+                            game.winner = game.player2
+                        elif abandon == 2:
+                            player1.game_win += 1
+                            player2.game_abandon += 1
+                            game.winner = game.player1
+                    elif game.player1_score > game.player2_score:
+                        player1.game_win += 1
+                        player2.game_lose += 1
+                        game.winner = game.player1
+                    elif game.player2_score > game.player1_score:
+                        player2.game_win += 1
+                        player1.game_lose += 1
+                        game.winner = game.player2
+                    else:
+                        player1.game_draw += 1
+                        player2.game_draw += 1
+                        game.winner = None
+                    game.status = data.get('gameStatus')
+                    logger.debug(f"NEL GAME status fa: {game.status}")
+                    logger.debug(f"NEL GAME madonna fa: {game}")
+                    # Salva le modifiche
+                    player1.save()
+                    player2.save()
+                    game.save()
+                    
+                    return Response({'success': game.id}, status=status.HTTP_200_OK)
+                except Game.DoesNotExist:
+                    return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+                except Exception as e:
+                    return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 

@@ -959,6 +959,12 @@ function showJoinGamePopup(gameLink) {
 function showWinnerPopup(winner) {
     console.log("Showing winner popup for:", winner); // Log per controllare che la funzione venga chiamata correttamente
 
+    // Controlla se il popup esiste già
+    if (document.querySelector('.popup')) {
+        console.log("Popup already exists. Not creating a new one.");
+        return; // Evita di crearne un altro
+    }
+
     // Creazione del popup
     const popup = document.createElement('div');
     popup.classList.add('popup');

@@ -919,6 +919,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     
 
 
+
 class TournamentConsumer(AsyncWebsocketConsumer):
     users_in_lobby = {}  # Traccia gli utenti connessi per ogni torneo
     processed_tournaments = set()  # Traccia i tornei già processati
@@ -1084,46 +1085,25 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             logger.error(f"Error processing receive message: {e}")
 
-    async def manage_ready_status(self, data):
-            slot = data.get('slot')
-            username = data.get('username')
-            ready_status = data.get('status', False)
+    async def manage_slot_status(self, data):
+        action = data['action']
+        slot = data.get('slot')
+        username = data.get('username')
 
-            logger.info(f"Ready status received: Slot {slot}, Username: {username}, Ready Status: {ready_status}")
+        logger.info(f"Action received: {action}, Slot: {slot}, Username: {username}")
 
-            # Recupera il round corrente
-            current_round = await self.get_current_round()
-            if not current_round:
-                logger.error("Current round not found.")
-                return
+        # Controllo se l'utente ha già uno slot assegnato
+        user_slot = next((s for s, info in self.current_round.slots.items() if info['username'] == username), None)
+        if user_slot:
+            logger.warning(f"User {username} already has an assigned slot: {user_slot}. Slot change denied.")
+            return  # Se l'utente ha già uno slot, non permettiamo il cambio
 
-            logger.debug(f"Current round slots: {current_round.slots}")
+        await self.update_slot_status_in_round(slot, username if action == 'assign_slot' else None)
 
-            # Verifica che l'utente possa modificare il proprio stato ready
-            current_slot_user = current_round.slots.get(str(slot), {}).get('username')
+        logger.info(f"Slot status updated successfully for action: {action} on slot: {slot}")
 
-            if current_slot_user == username:
-                # Controllo se l'utente è già "ready"
-                if current_round.ready_status.get(str(slot)):
-                    logger.warning(f"User {username} is already marked as ready. Status change denied.")
-                    return  # Se l'utente è già "ready", non permettiamo il cambio
-
-                # Aggiorna direttamente lo stato ready nel round corrente
-                current_round.ready_status[str(slot)] = (ready_status == 'ready')
-                logger.info(f"Ready status updated locally: {current_round.ready_status}")
-
-                # Salva direttamente il round corrente nel database
-                await database_sync_to_async(current_round.save)()
-                logger.info(f"Ready status saved in the database for slot {slot}")
-
-                # Chiamata alla funzione esistente per eventuali controlli doppi
-                await self.update_ready_status_in_round(slot, ready_status == 'ready')
-
-                # Invia l'aggiornamento dello stato ready a tutti i client connessi
-                await self.send_ready_status_update_to_group()
-            else:
-                logger.warning(f"User {username} is not authorized to change the ready status for slot {slot}")
-
+        # Invia l'aggiornamento a tutti i client connessi
+        await self.send_slot_status_update_to_group()
 
 
 

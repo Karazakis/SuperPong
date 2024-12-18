@@ -30,7 +30,8 @@ document.getElementById('leavegame').addEventListener('click', function() {
     
     if (document.getElementById('game-details').dataset.gameStatus !== 'finished' && document.getElementById('gametype').textContent !== 'local-game') {
         if (this.dataset.posit === "p1") {
-            endgameOnline();
+
+            endgameOnline(true, true);
         }
         window.GameSocket.send(JSON.stringify({ action: "leave" }));
     }

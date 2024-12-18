@@ -103,25 +103,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% if game_history %}
-                            {% for game in game_history %}
-                                <tr>
-                                    <td>{{ game.name }}</td>
-                                    <td>{{ game.mode }}</td>
-                                    <td>
-                                        {% if game.winner == userprofile.user %}
-                                            Win
-                                        {% else %}
-                                            Loss
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="3" class="text-center">No game history available</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td colspan="3" class="text-center">No game history available</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -161,26 +145,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% if tournament_history %}
-                            {% for tournament in tournament_history %}
-                                <tr>
-                                    <td>{{ tournament.name }}</td>
-                                    <td>{{ tournament.mode }}</td>
-                                    <td>{{ tournament.status }}</td>
-                                    <td>
-                                        {% if tournament.winner == userprofile.user %}
-                                            Winner
-                                        {% else %}
-                                            Loss
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center">No tournament history available</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td colspan="4" class="text-center">No tournament history available</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
