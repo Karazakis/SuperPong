@@ -176,7 +176,7 @@ font-weight: 700;
     display: block;
     margin: 0 auto;
     width: 50%;
-    max-width: 500px; /* Limita la larghezza massima */
+    max-width: 600px; /* Limita la larghezza massima */
     height: auto;
 }
 .card-footer {

@@ -129,7 +129,7 @@ function updateProfileStats(data) {
     document.getElementById("game-losses").textContent = data.game_history.filter(game => game.status === "loss").length;
     document.getElementById("game-draws").textContent = data.game_history.filter(game => game.status === "draw").length;
     document.getElementById("game-abandons").textContent = data.game_history.filter(game => game.status === "abandon").length;
-
+    console.log("Game history:", data.game_history);
     // Popola la tabella della cronologia delle partite
     const matchTableBody = document.getElementById("game-history-table").querySelector("tbody");
     matchTableBody.innerHTML = "";
@@ -192,10 +192,23 @@ function updateProfileStats(data) {
     }
 }
 
+// Funzione per estrarre l'ID del profilo dall'URL e memorizzarlo nel sessionStorage
+function saveProfileIdFromUrl() {
+    const path = window.location.pathname; // Ottiene il percorso dell'URL
+    const regex = /\/profile\/(\d+)\//; // RegEx per estrarre l'ID dal percorso (es. /profile/9/)
+    const match = path.match(regex);
+
+    if (match && match[1]) {
+        const profileId = match[1];
+        sessionStorage.setItem('profile_id', profileId);
+    } else {
+        console.error('ID del profilo non trovato nell\'URL');
+    }
+}
 
 
+saveProfileIdFromUrl();
 
-// Esegui la funzione per ottenere le statistiche
 fetchUserStatistics(userId);
 
 function initializeChart() {

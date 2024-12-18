@@ -408,7 +408,7 @@ class ProfileAPIView(APIView):
             tournament_losses = user_profile.tournament_lose
             tournament_draws = user_profile.tournament_draw
             tournament_abandons = user_profile.tournament_abandon
-
+            
             # Calcola statistiche globali, individuali e normalizzate
             global_game_statistics = calculate_global_game_statistics()
             individual_game_statistics = calculate_individual_game_statistics(user_profile)
@@ -432,6 +432,7 @@ class ProfileAPIView(APIView):
                 'tournament_abandons': tournament_abandons,
                 'relative_game_statistics': normalized_game_statistics,  # Normalizzate
             }
+            
             html = render_to_string('profile.html', context)
             dash_base = render_to_string('dashboard-base.html', context)
             data = {
@@ -536,8 +537,6 @@ class SettingsAPIView(APIView):
             if nickname:
                 user_profile.nickname = nickname
             user.save()
-
-
             
             p1Right = request.POST.get('right1')
             p1Left = request.POST.get('left1')
@@ -547,14 +546,6 @@ class SettingsAPIView(APIView):
             p2Left = request.POST.get('left2')
             p2Shoot = request.POST.get('shoot2')
             p2Boost = request.POST.get('boost2')
-            p3Right = request.POST.get('right3')
-            p3Left = request.POST.get('left3')
-            p3Shoot = request.POST.get('shoot3')
-            p3Boost = request.POST.get('boost3')
-            p4Right = request.POST.get('right4')
-            p4Left = request.POST.get('left4')
-            p4Shoot = request.POST.get('shoot4')
-            p4Boost = request.POST.get('boost4')
 
             if p1Right:
                 user_profile.p1Right = p1Right
@@ -572,23 +563,6 @@ class SettingsAPIView(APIView):
                 user_profile.p2Shoot = p2Shoot
             if p2Boost:
                 user_profile.p2Boost = p2Boost
-            if p3Right:
-                user_profile.p3Right = p3Right
-            if p3Left:
-                user_profile.p3Left = p3Left
-            if p3Shoot:
-                user_profile.p3Shoot = p3Shoot
-            if p3Boost:
-                user_profile.p3Boost = p3Boost
-            if p4Right:
-                user_profile.p4Right = p4Right
-            if p4Left:
-                user_profile.p4Left = p4Left
-            if p4Shoot:
-                user_profile.p4Shoot = p4Shoot
-            if p4Boost:
-                user_profile.p4Boost = p4Boost
-
 
             user_profile.save()
             return Response({'success': 'Profilo aggiornato con successo.'}, status=status.HTTP_200_OK)
@@ -714,40 +688,6 @@ class JoinAPIView(APIView):
             }
             return Response(data)
 
-    # def post(self, request):
-    #     if request.user.is_authenticated:
-    #         user = get_object_or_404(User, pk=request.user.id)
-    #         user_profile = get_object_or_404(UserProfile, user=user)
-    #         data = request.data
-    #         current_url = request.path
-
-    #         if 'join_lobby' in current_url:
-    #             game_id = data.get('game_id')
-    #             if game_id:
-    #                 game = get_object_or_404(Game, pk=game_id, status='not_started', tournament__isnull=True)
-    #                 if game.player_inlobby < game.player_limit:
-    #                     game.player_inlobby += 1 
-    #                     game.save()
-    #                     user_profile.in_game_lobby = game
-    #                     user_profile.save()
-    #                     return Response({'success': True}, status=status.HTTP_200_OK)
-    #                 else:
-    #                     return Response({'success': False, 'message': 'Game is full'}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         elif 'join_tournament' in current_url:
-    #             tournament_id = data.get('tournament_id')
-    #             if tournament_id:
-    #                 tournament = get_object_or_404(Tournament, pk=tournament_id, status='not_started')
-    #                 tournament.players_in_lobby += 1
-    #                 tournament.save()
-    #                 user_profile.in_tournament_lobby = tournament
-    #                 user_profile.save()
-    #                 return Response({'success': True}, status=status.HTTP_200_OK)
-
-    #         return Response({'success': False, 'message': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
-    #     else:
-    #         return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-
     def post(self, request):
         """
         Aggiunge il giocatore a un gioco o torneo.
@@ -786,17 +726,16 @@ class JoinAPIView(APIView):
                         if tournament.players_in_lobby > tournament.nb_players:
                             return Response({'success': False, 'message': 'Tournament is full'}, status=status.HTTP_400_BAD_REQUEST)
                         if user not in tournament.players.all():
-                            tournament.players.add(user)  # Aggiungi il giocatore al torneo
-                            tournament.players_in_lobby += 1  # Incrementa il numero di giocatori
+                            tournament.players.add(user)
+                            tournament.players_in_lobby += 1  
                             tournament.save()
 
-                            # Aggiorna il profilo dell'utente
                             user_profile.in_tournament_lobby = tournament
                             user_profile.save()
 
                         return Response({'success': True}, status=status.HTTP_200_OK)
 
-                    elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round']:
+                    elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','finished']:
                         # Tornei in corso: logica di re-join
                         if user in tournament.players.all():
                             # L'utente è già nel torneo, esegui il re-join
@@ -919,6 +858,8 @@ class CreateAPIView(APIView):
             else:
                 if request.data.get('rules', '') == 'time':
                     timelimit = int(request.data.get('limit', 0)) * 60
+                else:
+                    timelimit = 0
                 game = Game.objects.create(
                     name=request.data.get('name', ''),
                     mode=request.data.get('mode', ''),
@@ -1112,6 +1053,7 @@ class UserStatusAPIView(APIView):
 
 logger = logging.getLogger(__name__)
 class UserInfoAPIView(APIView):
+    #logica da rivedere, alcuni campi non esistono nei modelli e vanno recuperati in modo diverso
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
@@ -1133,6 +1075,7 @@ class UserInfoAPIView(APIView):
                 }
                 for game in user_profile.game_played.all()
             ]
+            # 
             tournament_history = [
                 {
                     'id': tournament.id,
@@ -1143,7 +1086,9 @@ class UserInfoAPIView(APIView):
                     'balls': tournament.balls,
                     'boost': tournament.boost,
                     'status': tournament.status,
-                    'creation_date': tournament.creation_date.isoformat(),
+                    'rounds': tournament.rounds,
+                    'players': tournament.players, # giocatori che hanno partecipato al torneo
+                    # 'creation_date': tournament.creation_date.isoformat(), non esiste come campo
                 }
                 for tournament in user_profile.tournament_played.all()
             ]
@@ -1194,20 +1139,20 @@ class UserInfoAPIView(APIView):
                 'p2Left': user_profile.p2Left,
                 'p2Shoot': user_profile.p2Shoot,
                 'p2Boost': user_profile.p2Boost,
-                'p3Right': user_profile.p3Right,
-                'p3Left': user_profile.p3Left,
-                'p3Shoot': user_profile.p3Shoot,
-                'p3Boost': user_profile.p3Boost,
-                'p4Right': user_profile.p4Right,
-                'p4Left': user_profile.p4Left,
-                'p4Shoot': user_profile.p4Shoot,
-                'p4Boost': user_profile.p4Boost,
                 'pending_requests': pending_requests,
                 'user_friend_list': user_friend_list,
                 'blocked_userslist': blocked_userslist,
                 'in_game_lobby': user_profile.in_game_lobby.id if user_profile.in_game_lobby else None,
                 'game_history': game_history,
                 'tournament_history': tournament_history,
+                # 'tournament_played': user_profile.tournament_played,
+                'tournament_win': user_profile.tournament_win, 
+                'tournament_lose': user_profile.tournament_lose,
+                # 'game_played': user_profile.game_played,
+                'game_win': user_profile.game_win,
+                'game_lose': user_profile.game_lose,
+                'game_draw': user_profile.game_draw,
+                'game_abandon': user_profile.game_abandon,
             }
             return Response(data)
         
@@ -1248,11 +1193,12 @@ class UserRequestAPIView(APIView):
             if request_data.get('request') == "remove":
                 username = User.objects.get(username=request_data.get('target_user'))
             elif request_data.get('request') in ["accept", "decline"]:
-                if request_data.get('true') == "yes":
-                    logger.debug(f"Requesting user: {request_data.get('requesting_user')}")
+                logger.debug(f"qui ci entra dio merda user: {request_data.get('requesting_user')}")
+                if request_data.get('request') == "accept":
+                    logger.debug(f"Requesting user asdasd: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(username=request_data.get('requesting_user'))
-                elif request_data.get('true') == "no":
-                    logger.debug(f"Requesting user no: {request_data.get('requesting_user')}")
+                elif request_data.get('request') == "decline":
+                    logger.debug(f"Requesting user noxxxx: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(pk=request_data.get('requesting_user'))
             else:
                 requesting_user = User.objects.get(username=request_data.get('requesting_user'))
@@ -1319,7 +1265,36 @@ class UserRequestAPIView(APIView):
                 target_user_profile.pending_requests.add(new_request)
 
                 return Response({'success': 'Invito a giocare inviato con successo.'}, status=status.HTTP_200_OK)
+            
+            elif request_type == 'tournament':
+                user_profile = UserProfile.objects.get(user=user)
 
+                if request_data.get('request') == 'accept':
+                    return self.accept_torunement_request(request, id, requesting_user)
+                elif request_data.get('request') == 'decline':
+                    return self.decline_tournement_request(request, id, requesting_user)
+
+                # Controlla se esiste già una richiesta pendente di tipo 'game'
+                if PendingRequest.objects.filter(
+                    target_user=user,
+                    requesting_user=requesting_user,
+                    request_type=request_type,
+                ).exists():
+                    return Response({'error': 'La richiesta è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Creazione di una nuova richiesta di invito a giocare
+                new_request = PendingRequest.objects.create(
+                    request_type=request_type,
+                    target_user=user,
+                    requesting_user=requesting_user,
+                    request=request_data.get('request'),
+                )
+
+                # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
+                target_user_profile = UserProfile.objects.get(user=user)
+                target_user_profile.pending_requests.add(new_request)
+
+                return Response({'success': 'Invito a torneo inviato con successo.'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             logger.error(f"L'utente con username {request_data.get('requesting_user')} non esiste.")
             return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
@@ -1329,6 +1304,45 @@ class UserRequestAPIView(APIView):
         except Exception as e:
             logger.error(f"Errore durante la creazione della richiesta pendente: {e}", exc_info=True)
             return Response({'error': 'Errore durante la creazione della richiesta.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def accept_torunement_request(self, request, id, requesting_user):
+        try:
+            # Verifica se l'utente è autenticato
+            if not request.user.is_authenticated:
+                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Recupera l'utente target
+            target_user_base = User.objects.get(pk=id)
+            target_user = UserProfile.objects.get(user=target_user_base)
+
+            # Trova tutte le richieste pendenti
+            pending_requests = PendingRequest.objects.filter(
+                target_user=target_user.user,
+                requesting_user=requesting_user,
+                request_type='tournament'
+            )
+
+            if not pending_requests.exists():
+                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Elimina tutte le richieste pendenti trovate
+            pending_requests.delete()
+            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
+
+            logger.info(f"Invito accettato tra {requesting_user_profile.user.username} e {target_user.user.username}")
+            return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            logger.error(f"L'utente con ID {id} non esiste.")
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except AttributeError as e:
+            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
 
     def accept_game_request(self, request, id, requesting_user):
         try:
@@ -1356,6 +1370,45 @@ class UserRequestAPIView(APIView):
 
             logger.info(f"Invito accettato tra {requesting_user_profile.user.username} e {target_user.user.username}")
             return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            logger.error(f"L'utente con ID {id} non esiste.")
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except AttributeError as e:
+            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def decline_tournement_request(self, request, id, requesting_user):
+        try:
+            # Verifica se l'utente è autenticato
+            if not request.user.is_authenticated:
+                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Recupera l'utente target
+            target_user_base = User.objects.get(pk=id)
+            target_user = UserProfile.objects.get(user=target_user_base)
+
+            # Trova tutte le richieste pendenti
+            pending_requests = PendingRequest.objects.filter(
+                target_user=target_user.user,
+                requesting_user=requesting_user,
+                request_type='tournament'
+            )
+
+            if not pending_requests.exists():
+                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Elimina tutte le richieste pendenti trovate
+            pending_requests.delete()
+            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
+
+            logger.info(f"Richiesta di invito rifiutata {requesting_user_profile.user.username} e {target_user.user.username}")
+            return Response({'success': 'Richiesta rifiutata con successo.'}, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
             logger.error(f"L'utente con ID {id} non esiste.")
@@ -1921,48 +1974,87 @@ class GameAPIView(APIView):
     
     def post(self, request, pk):
         if request.user.is_authenticated:
-            data = request.data
-
-            try:
-                
-                # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
-                game = Game.objects.get(id=pk)
-                player1 = UserProfile.objects.get(user=game.player1)
-                player2 = UserProfile.objects.get(user=game.player2)
-
             
-                # Aggiorna i campi solo se i dati sono presenti
-                game.player1_score = data.get('scorePlayer1', game.player1_score)
-                game.player2_score = data.get('scorePlayer2', game.player2_score)
-                game.player1_hit = data.get('hitPlayer1', game.player1_hit)
-                game.player2_hit = data.get('hitPlayer2', game.player2_hit)
-                game.player1_keyPressCount = data.get('keyCountPlayer1', game.player1_keyPressCount)
-                game.player2_keyPressCount = data.get('keyCountPlayer2', game.player2_keyPressCount)
-                game.ballCount = data.get('ballCount', game.ballCount)
-
-                if game.player1_score > game.player2_score:
-                    player1.game_win += 1
-                    player2.game_lose += 1
-                    game.winner = game.player1
-                elif game.player2_score > game.player1_score:
-                    player2.game_win += 1
-                    player1.game_lose += 1
-                    game.winner = game.player2
-                else:
-                    player1.game_draw += 1
-                    player2.game_draw += 1
-                    game.winner = None
-                game.status = data.get('gameStatus')
-                logger.debug(f"NEL GAME status fa: {game.status}")
-                logger.debug(f"NEL GAME madonna fa: {game}")
-                # Salva le modifiche
-                game.save()
+            if 'local' in request.path:
+                data = request.data
+                user = get_object_or_404(User, pk=request.user.id)
+                game = Game.objects.create(
+                    name=data.get('name'),
+                    mode=data.get('mode'),
+                    rules=data.get('rules'),
+                    limit=data.get('limit'),
+                    balls=data.get('balls'),
+                    boost=data.get('boost'),
+                    player1=user,
+                    player2=user,
+                    player1_score= data.get('player1_score', 0),
+                    player2_score= data.get('player2_score', 0),
+                    player1_hit= data.get('player1_hit', 0),
+                    player2_hit= data.get('player2_hit', 0),
+                    player1_keyPressCount= data.get('player1_keyPressCount', 0),
+                    player2_keyPressCount= data.get('player2_keyPressCount', 0),
+                    ballCount= data.get('ballCount', 0),
+                    status='finished',
+                )
                 
+                game.save()
+
                 return Response({'success': game.id}, status=status.HTTP_200_OK)
-            except Game.DoesNotExist:
-                return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                data = request.data
+
+                try:
+                    
+                    # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
+                    game = Game.objects.get(id=pk)
+                    player1 = UserProfile.objects.get(user=game.player1)
+                    player2 = UserProfile.objects.get(user=game.player2)
+
+                    abandon = data.get('abandon', 0)
+                    winner = data.get('winner', None)
+                    # Aggiorna i campi solo se i dati sono presenti
+                    game.player1_score = data.get('scorePlayer1', game.player1_score)
+                    game.player2_score = data.get('scorePlayer2', game.player2_score)
+                    game.player1_hit = data.get('player1_hit', game.player1_hit)
+                    game.player2_hit = data.get('player2_hit', game.player2_hit)
+                    game.player1_keyPressCount = data.get('player1_keyPressCount', game.player1_keyPressCount)
+                    game.player2_keyPressCount = data.get('player2_keyPressCount', game.player2_keyPressCount)
+                    game.ballCount = data.get('ballCount', game.ballCount)
+                    
+                    if abandon != 0:
+                        if abandon == 1:
+                            player1.game_abandon += 1
+                            player2.game_win += 1
+                            game.winner = game.player2
+                        elif abandon == 2:
+                            player1.game_win += 1
+                            player2.game_abandon += 1
+                            game.winner = game.player1
+                    elif game.player1_score > game.player2_score:
+                        player1.game_win += 1
+                        player2.game_lose += 1
+                        game.winner = game.player1
+                    elif game.player2_score > game.player1_score:
+                        player2.game_win += 1
+                        player1.game_lose += 1
+                        game.winner = game.player2
+                    else:
+                        player1.game_draw += 1
+                        player2.game_draw += 1
+                        game.winner = None
+                    game.status = data.get('gameStatus')
+                    logger.debug(f"NEL GAME status fa: {game.status}")
+                    logger.debug(f"NEL GAME madonna fa: {game}")
+                    # Salva le modifiche
+                    player1.save()
+                    player2.save()
+                    game.save()
+                    
+                    return Response({'success': game.id}, status=status.HTTP_200_OK)
+                except Game.DoesNotExist:
+                    return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+                except Exception as e:
+                    return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -2024,10 +2116,18 @@ class StatsAPIView(APIView):
                     'balls': game.balls,
                     'boost': game.boost,
                     'status': game.status,
-                    'team1_score': game.team1_score,
-                    'team2_score': game.team2_score,
                     'winner': game.winner.username if game.winner else None,
-                    'players': [player.username for player in game.players.all()],
+                    'player1': game.player1.username,
+                    'player2': game.player2.username,
+                    'player1_score': game.player1_score,
+                    'player2_score': game.player2_score,
+                    'player1_hit': game.player1_hit,
+                    'player2_hit': game.player2_hit,
+                    'player1_keyPressCount': game.player1_keyPressCount,
+                    'player2_keyPressCount': game.player2_keyPressCount,
+                    'ballCount': game.ballCount,
+                    'player1_image': user_profile.img_profile,
+                    'player2_image': user_profile.img_profile,
                 },
             }
             html = render_to_string('match-info.html', context)
