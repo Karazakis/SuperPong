@@ -731,6 +731,7 @@ class JoinAPIView(APIView):
                             tournament.save()
 
                             user_profile.in_tournament_lobby = tournament
+                            user_profile.tournament_played.add(tournament) # ULTIMO
                             user_profile.save()
 
                         return Response({'success': True}, status=status.HTTP_200_OK)
@@ -767,9 +768,14 @@ class JoinAPIView(APIView):
                 try:
                     tournament = Tournament.objects.get(id=tournament_id)
                     user = get_object_or_404(User, pk=request.user.id)
+                    user_profile = get_object_or_404(UserProfile, user=user)
                     if tournament.players.filter(id=user.id).exists():
                         tournament.players.remove(user)
                         tournament.save()
+                    # Se il torneo non è iniziato, rimuovilo anche da tournament_played
+                    if tournament.status == 'not_started':
+                        user_profile.tournament_played.remove(tournament)
+                        user_profile.save()
                     return Response({'success': True})
                 except Tournament.DoesNotExist:
                     return Response({'success': False, 'error': 'Tournament not found'}, status=404)
@@ -851,6 +857,7 @@ class CreateAPIView(APIView):
                 tournament.save()
 
                 user_profile.in_tournament_lobby = tournament
+                user_profile.tournament_played.add(tournament) 
                 user_profile.save()
                 logging.debug(f'Torneo creato: {tournament.id}')
                 tournament.generate_initial_rounds()

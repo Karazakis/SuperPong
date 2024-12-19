@@ -14,7 +14,7 @@ if (goBackPrf) {
         
         if (profileId) {
             // Reindirizza alla pagina del profilo del giocatore
-            window.location.href = `/profile/${profileId}/`;
+            loadPage(`api/profile/${profileId}/`);
         } else {
             console.error("ID del profilo non trovato nel sessionStorage.");
         }

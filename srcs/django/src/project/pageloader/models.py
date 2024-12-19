@@ -119,8 +119,8 @@ class Tournament(models.Model):
             return max(4, self.nb_players // (4 ** current_round_number))  # Mantiene almeno 4 giocatori
         return 1
 
-    def __str__(self):
-        return f"Tournament: {self.name}"
+    # def __str__(self):
+    #     return f"Tournament: {self.name}"
 
 class Round(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='tournament_rounds')
@@ -173,8 +173,8 @@ class Round(models.Model):
         self.save()
 
 
-    def __str__(self):
-        return f"Round {self.round_number} - {self.tournament.name}"
+    # def __str__(self):
+    #     return f"Round {self.round_number} - {self.tournament.name}"
 
 class Game(models.Model):
     id = models.AutoField(primary_key=True)

@@ -79,7 +79,7 @@
                 <div class="row text-center" id="game-stats">
                     <div class="col-3">
                         <strong>Wins</strong>
-                        <p id="game-wins"> {{ game_wins }}</p>
+                        <p id="game-wins">{{ game_wins }}</p>
                     </div>
                     <div class="col-3">
                         <strong>Losses</strong>
@@ -103,9 +103,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="3" class="text-center">No game history available</td>
-                        </tr>
+                        {% if match_history %}
+                            {% for game in match_history %}
+                                <tr>
+                                    <td><a href="#" class="game-link" data-id="{{ game.id }}">{{ game.name }}</a></td>
+                                    <td>{{ game.mode }}</td>
+                                    <td>{{ game.result }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center">No game history available</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -145,15 +155,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="4" class="text-center">No tournament history available</td>
-                        </tr>
+                        {% if tournament_history %}
+                            {% for tournament in tournament_history %}
+                                <tr>
+                                    <td><a href="#" class="tournament-link" data-id="{{ tournament.id }}">{{ tournament.name }}</a></td>
+                                    <td>{{ tournament.mode }}</td>
+                                    <td>{{ tournament.status }}</td>
+                                    <!-- <td>{{ tournament.result }}</td> -->
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No tournament history available</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Go back button -->
 <div class="row justify-content-center my-3">
