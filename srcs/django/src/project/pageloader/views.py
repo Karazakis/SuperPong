@@ -1053,6 +1053,7 @@ class UserStatusAPIView(APIView):
 
 logger = logging.getLogger(__name__)
 class UserInfoAPIView(APIView):
+    #logica da rivedere, alcuni campi non esistono nei modelli e vanno recuperati in modo diverso
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
@@ -1074,6 +1075,7 @@ class UserInfoAPIView(APIView):
                 }
                 for game in user_profile.game_played.all()
             ]
+            # 
             tournament_history = [
                 {
                     'id': tournament.id,
@@ -1084,7 +1086,9 @@ class UserInfoAPIView(APIView):
                     'balls': tournament.balls,
                     'boost': tournament.boost,
                     'status': tournament.status,
-                    'creation_date': tournament.creation_date.isoformat(),
+                    'rounds': tournament.rounds,
+                    'players': tournament.players, # giocatori che hanno partecipato al torneo
+                    # 'creation_date': tournament.creation_date.isoformat(), non esiste come campo
                 }
                 for tournament in user_profile.tournament_played.all()
             ]
@@ -1135,20 +1139,20 @@ class UserInfoAPIView(APIView):
                 'p2Left': user_profile.p2Left,
                 'p2Shoot': user_profile.p2Shoot,
                 'p2Boost': user_profile.p2Boost,
-                'p3Right': user_profile.p3Right,
-                'p3Left': user_profile.p3Left,
-                'p3Shoot': user_profile.p3Shoot,
-                'p3Boost': user_profile.p3Boost,
-                'p4Right': user_profile.p4Right,
-                'p4Left': user_profile.p4Left,
-                'p4Shoot': user_profile.p4Shoot,
-                'p4Boost': user_profile.p4Boost,
                 'pending_requests': pending_requests,
                 'user_friend_list': user_friend_list,
                 'blocked_userslist': blocked_userslist,
                 'in_game_lobby': user_profile.in_game_lobby.id if user_profile.in_game_lobby else None,
                 'game_history': game_history,
                 'tournament_history': tournament_history,
+                # 'tournament_played': user_profile.tournament_played,
+                'tournament_win': user_profile.tournament_win, 
+                'tournament_lose': user_profile.tournament_lose,
+                # 'game_played': user_profile.game_played,
+                'game_win': user_profile.game_win,
+                'game_lose': user_profile.game_lose,
+                'game_draw': user_profile.game_draw,
+                'game_abandon': user_profile.game_abandon,
             }
             return Response(data)
         

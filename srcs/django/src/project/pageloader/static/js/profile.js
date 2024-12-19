@@ -124,11 +124,6 @@ async function fetchUserStatistics(userId) {
 }
 
 function updateProfileStats(data) {
-    // Aggiorna le statistiche dei giochi
-    document.getElementById("game-wins").textContent = data.game_history.filter(game => game.status === "win").length;
-    document.getElementById("game-losses").textContent = data.game_history.filter(game => game.status === "loss").length;
-    document.getElementById("game-draws").textContent = data.game_history.filter(game => game.status === "draw").length;
-    document.getElementById("game-abandons").textContent = data.game_history.filter(game => game.status === "abandon").length;
     console.log("Game history:", data.game_history);
     // Popola la tabella della cronologia delle partite
     const matchTableBody = document.getElementById("game-history-table").querySelector("tbody");
@@ -157,11 +152,6 @@ function updateProfileStats(data) {
         matchTableBody.innerHTML = `<tr><td colspan="3" class="text-center">No game history available</td></tr>`;
     }
 
-    // Aggiorna le statistiche dei tornei
-    document.getElementById("tournament-wins").textContent = data.tournament_history.filter(tournament => tournament.status === "win").length;
-    document.getElementById("tournament-losses").textContent = data.tournament_history.filter(tournament => tournament.status === "loss").length;
-    document.getElementById("tournament-draws").textContent = data.tournament_history.filter(tournament => tournament.status === "draw").length;
-    document.getElementById("tournament-abandons").textContent = data.tournament_history.filter(tournament => tournament.status === "abandon").length;
 
     // Popola la tabella della cronologia dei tornei
     const tournamentTableBody = document.getElementById("tournament-history-table").querySelector("tbody");
