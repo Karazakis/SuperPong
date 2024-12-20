@@ -1075,10 +1075,38 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 
 
             elif action == 'countdown_complete':
+                await self.reset_ready_statuses()
                 await self.notify_players_to_join()
 
         except Exception as e:
             logger.error(f"Error processing receive message: {e}")
+
+    async def reset_ready_statuses(self):
+        """
+        Resetta tutti i ready status su 'false' nel round corrente
+        e invia l'aggiornamento ai client connessi.
+        """
+        try:
+            # Assicurati di lavorare con il round corrente aggiornato
+            current_round = await self.get_current_round()
+            if not current_round:
+                logger.error("Current round not found. Cannot reset ready statuses.")
+                return
+
+            # Resetta tutti i ready status su 'false'
+            ready_statuses = {slot: False for slot in current_round.ready_status}
+            current_round.ready_status = ready_statuses
+
+            # Salva nel database
+            await database_sync_to_async(current_round.save)()
+            logger.info("All ready statuses have been reset to 'false'.")
+
+            # Invia l'aggiornamento ai client connessi
+            await self.send_ready_status_update_to_group()
+            logger.info("Ready status reset update sent to group.")
+        except Exception as e:
+            logger.error(f"Error resetting ready statuses: {e}")
+
 
     async def manage_slot_status(self, data):
         action = data['action']
@@ -1121,17 +1149,20 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         current_slot_user = current_round.slots.get(str(slot), {}).get('username')
 
         if current_slot_user == username:
-            # Controllo se l'utente è già "ready"
-            if self.current_round.ready_status.get(str(slot)):
-                logger.warning(f"User {username} is already marked as ready. Status change denied.")
-                return  # Se l'utente è già "ready", non permettiamo il cambio
+            # Controlla se lo stato desiderato è diverso da quello attuale
+            current_status = self.current_round.ready_status.get(str(slot), False)
+            if current_status == (ready_status == 'ready'):
+                logger.warning(f"User {username} is already marked as ready: {current_status}. Status change denied.")
+                return  # Lo stato non cambia, quindi blocchiamo l'azione
 
             # Aggiorna solo lo stato ready per lo slot specificato
             await self.update_ready_status_in_round(slot, ready_status == 'ready')
+
             # Invia l'aggiornamento dello stato ready a tutti i client connessi
             await self.send_ready_status_update_to_group()
         else:
             logger.warning(f"User {username} is not authorized to change the ready status for slot {slot}")
+
 
 
     async def update_slot_status_in_round(self, slot, username, player_id=None):
@@ -1385,23 +1416,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             logger.error(f"Error sending chat message: {e}")
 
-    async def manage_team(self, action, team, username):
-        """
-        Gestisce le azioni di join e leave dei team.
-        """
-        try:
-            message = {
-                'type': 'update_team',
-                'team': team,
-                'username': username,
-                'action': action
-            }
-            await self.channel_layer.group_send(self.room_group_name, {
-                'type': 'send_message_to_clients',
-                'message': message
-            })
-        except Exception as e:
-            logger.error(f"Error managing team: {e}")
 
     async def add_user_to_lobby(self):
         """
