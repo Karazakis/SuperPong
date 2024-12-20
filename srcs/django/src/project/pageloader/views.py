@@ -1703,7 +1703,7 @@ class GameAPIView(APIView):
                         {
                             'name': 'Player 2', 
                             'score': 0, 
-                            'img_profile': user_profile.img_profile,
+                            'img_profile': 'media/profiles/default.png',
                             'controls': {
                                 'right': user_profile.p2Right,
                                 'left': user_profile.p2Left,
@@ -1741,6 +1741,8 @@ class GameAPIView(APIView):
                 })
             else:
                 game = get_object_or_404(Game, pk=pk)
+                player1 = UserProfile.objects.get(user=game.player1)
+                player2 = UserProfile.objects.get(user=game.player2)
                 if game.tournament:
                     if game.mode == '1v1':
                         if game.player1 == user:
@@ -1768,7 +1770,7 @@ class GameAPIView(APIView):
                             {
                                 'name': game.player1, 
                                 'score': game.player1_score, 
-                                'img_profile': user_profile.img_profile,
+                                'img_profile': player1.img_profile,
                                 'controls': {
                                     'right': posp1right,
                                     'keyright': user_profile.p1Right,
@@ -1784,7 +1786,7 @@ class GameAPIView(APIView):
                             {
                                 'name': game.player2, 
                                 'score': game.player2_score, 
-                                'img_profile': user_profile.img_profile,
+                                'img_profile': player2.img_profile,
                                 'controls': {
                                     'right': posp2right,
                                     'left': posp2left,
@@ -1889,7 +1891,7 @@ class GameAPIView(APIView):
                         {
                             'name': game.player1, 
                             'score': game.player1_score, 
-                            'img_profile': user_profile.img_profile,
+                            'img_profile': player1.img_profile,
                             'controls': {
                                 'right': posp1right,
                                 'keyright': user_profile.p1Right,
@@ -1905,7 +1907,7 @@ class GameAPIView(APIView):
                         {
                             'name': game.player2, 
                             'score': game.player2_score, 
-                            'img_profile': user_profile.img_profile,
+                            'img_profile': player2.img_profile,
                             'controls': {
                                 'right': posp2right,
                                 'left': posp2left,

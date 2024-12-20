@@ -117,8 +117,10 @@
                                         </div>
                                         {% if player.name == 'Bot 1' or player.name == 'Bot 2' or player.name == 'Bot 3' %}
                                             <img src="{% static 'media/profiles/bot.png' %}" alt="player-pic" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 2px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                                        {% elif player.name == 'Player 2' %}
+                                            <img src="{% static 'media/profiles/default.png' %}" alt="player-pic" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 2px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
                                         {% else %}
-                                            <img src="/static/media/{{ userprofile.img_profile }}" alt="player-pic" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 2px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
+                                            <img src="/static/media/{{ player.img_profile }}" alt="player-pic" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 2px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1);">
                                         {% endif %}
                                         <div class="dash_username"><h5>{{ player.name }}</h5></div>
                                     </div>
