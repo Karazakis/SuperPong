@@ -1,11 +1,82 @@
-<div>
-    <h1>Tournament Info: {{ tournament.name }}</h1>
-    <p>Mode: {{ tournament.mode }}</p>
-    <p>Status: {{ tournament.status }}</p>
-    <p>Players in Lobby: {{ tournament.players_in_lobby }}</p>
-    <p>Players: {{ tournament.players|join:", " }}</p>
-    <div class="row justify-content-center my-3">
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h1 class="h3">Tournament Information: {{ tournament.name }}</h1>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Mode:</strong> {{ tournament.mode }}</p>
+                    <p><strong>Rules:</strong> {{ tournament.rules }}</p>
+                    <p><strong>Player Limit:</strong> {{ tournament.limit }}</p>
+                    <p><strong>Ball Limit:</strong> {{ tournament.balls }}</p>
+                    <p><strong>Boost:</strong> {{ tournament.boost }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Status:</strong> 
+                        <span class="badge {{ tournament.status|lower }}-status">
+                            {{ tournament.status }}
+                        </span>
+                    </p>
+                    <p><strong>Number of Players:</strong> {{ tournament.nb_players }}</p>
+                    <p><strong>Owner:</strong> {{ tournament.owner }}</p>
+                    <p><strong>Winner:</strong> 
+                        {% if tournament.winner %}
+                            <span class="text-success">{{ tournament.winner }}</span>
+                        {% else %}
+                            <span class="text-danger">No winner yet</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Players:</strong> {{ tournament.players|join:", " }}</p>
+                </div>
+            </div>
+            <hr>
+            <h3 class="h5 text-center">Games in Tournament</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Game Name</th>
+                            <th>Player 1</th>
+                            <th>Player 2</th>
+                            <th>Winner</th>
+                            <th>Player 1 Score</th>
+                            <th>Player 2 Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for game in tournament.games %}
+                        <tr>
+                            <td>{{ game.name }}</td>
+                            <td>
+                                <img src="/static/media/{{ game.player1_image }}" alt="{{ game.player1 }}" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px;">
+                                <br>{{ game.player1 }}
+                            </td>
+                            <td>
+                                <img src="/static/media/{{ game.player2_image }}" alt="{{ game.player2 }}" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px;">
+                                <br>{{ game.player2 }}
+                            </td>
+                            <td>
+                                {% if game.winner %}
+                                    <span class="text-success">{{ game.winner }}</span>
+                                {% else %}
+                                    <span class="text-danger">No winner yet</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ game.player1_score }}</td>
+                            <td>{{ game.player2_score }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-center bg-light">
+            <p><strong>Tournament ID:</strong> {{ tournament.id }}</p>
+        </div>
+    </div>
+   <div class="row justify-content-center my-3">
         <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
     </div>
-
 </div>

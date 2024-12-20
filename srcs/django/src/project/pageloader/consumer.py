@@ -929,11 +929,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.room_group_name = f'tournament_{self.tournament_id}'
         logger.info(f"Connecting to tournament room: {self.room_group_name} with tournament_id: {self.tournament_id}")
 
-        # Inizializza la lobby per il torneo se non esiste
         if self.tournament_id not in TournamentConsumer.users_in_lobby:
             TournamentConsumer.users_in_lobby[self.tournament_id] = set()
 
-        # Recupera l'utente
         self.user = await self.get_user()
         if not self.user:
             logger.warning("User not found. Closing connection.")
@@ -941,12 +939,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             return
 
         logger.info(f"User {self.user.username} connected successfully.")
-        # Controlla lo stato del torneo
         self.tournament = await self.get_tournament()
-        # Recupera il round corrente
         self.current_round = await self.get_current_round()
 
-        # Aggiungi l'utente alla lobby del torneo specifico
         TournamentConsumer.users_in_lobby[self.tournament_id].add(self.user.username)
 
         # Aggiungi il client al gruppo del torneo
@@ -1703,17 +1698,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                             try:
                                 # Recupera il giocatore tramite il player_id
                                 player = await database_sync_to_async(User.objects.get)(id=player_id)
-
-                                # Assegna il giocatore al campo corretto del game
+                                playerprofile = await database_sync_to_async(UserProfile.objects.get)(user=player)
                                 if player_idx == 0:
-                                    game.player1 = player
+                                    await database_sync_to_async(setattr)(game, 'player1', player)
                                 elif player_idx == 1:
-                                    game.player2 = player
+                                    await database_sync_to_async(setattr)(game, 'player2', player)
                                 elif player_idx == 2 and game.mode != '1v1':
-                                    game.player3 = player
+                                    await database_sync_to_async(setattr)(game, 'player3', player)
                                 elif player_idx == 3 and game.mode != '1v1':
-                                    game.player4 = player
-
+                                    await database_sync_to_async(setattr)(game, 'player4', player)
+                                await database_sync_to_async(setattr)(game, 'status', 'in_progress')
+                                await database_sync_to_async(playerprofile.game_played.add)(game)
+                                await database_sync_to_async(playerprofile.save)()
+                                await database_sync_to_async(game.save)()
                                 logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
                             except User.DoesNotExist:
                                 logger.error(f"Player with ID {player_id} not found for slot {slot}.")

@@ -397,8 +397,8 @@ class ProfileAPIView(APIView):
             match_history = user_profile.game_played.all()
 
             # Tournament history
-            tournament_history = user_profile.tournament_played.all()
-
+            tournamnt_history = user_profile.tournament_played.all()
+            logger.debug(f"DIOCANE L?USER {user_profile.tournament_played.all()}")
             # Additional statistics
             game_wins = user_profile.game_win
             game_losses = user_profile.game_lose
@@ -415,13 +415,13 @@ class ProfileAPIView(APIView):
             normalized_game_statistics = normalize_statistics(
                 individual_game_statistics, global_game_statistics
             )
-
+            logger.debug(f"tournament_history: {tournamnt_history}")
             context = {
                 'user': user,
                 'userprofile': user_profile,
                 'friends': friends,
                 'match_history': match_history,
-                'tournament_history': tournament_history,
+                'tournamnt_history': tournamnt_history,
                 'game_wins': game_wins,
                 'game_losses': game_losses,
                 'game_draws': game_draws,
@@ -731,7 +731,7 @@ class JoinAPIView(APIView):
                             tournament.save()
 
                             user_profile.in_tournament_lobby = tournament
-                            user_profile.tournament_played.add(tournament) # ULTIMO
+                            user_profile.tournament_played.add(tournament)
                             user_profile.save()
 
                         return Response({'success': True}, status=status.HTTP_200_OK)
@@ -1082,7 +1082,6 @@ class UserInfoAPIView(APIView):
                 }
                 for game in user_profile.game_played.all()
             ]
-            # 
             tournament_history = [
                 {
                     'id': tournament.id,
@@ -1093,9 +1092,6 @@ class UserInfoAPIView(APIView):
                     'balls': tournament.balls,
                     'boost': tournament.boost,
                     'status': tournament.status,
-                    'rounds': tournament.rounds,
-                    'players': tournament.players, # giocatori che hanno partecipato al torneo
-                    # 'creation_date': tournament.creation_date.isoformat(), non esiste come campo
                 }
                 for tournament in user_profile.tournament_played.all()
             ]
@@ -1131,7 +1127,7 @@ class UserInfoAPIView(APIView):
                 }
                 for blocked_user in user_profile.blocked_users.all()
             ]
-
+            logger.debug(f"User profile DIODOIDOIDOIDOIDOIDOIDOaasdasd")
             data = {
                 'id': user.id,
                 'username': user.username,
@@ -1146,20 +1142,20 @@ class UserInfoAPIView(APIView):
                 'p2Left': user_profile.p2Left,
                 'p2Shoot': user_profile.p2Shoot,
                 'p2Boost': user_profile.p2Boost,
+                'p3Right': user_profile.p3Right,
+                'p3Left': user_profile.p3Left,
+                'p3Shoot': user_profile.p3Shoot,
+                'p3Boost': user_profile.p3Boost,
+                'p4Right': user_profile.p4Right,
+                'p4Left': user_profile.p4Left,
+                'p4Shoot': user_profile.p4Shoot,
+                'p4Boost': user_profile.p4Boost,
                 'pending_requests': pending_requests,
                 'user_friend_list': user_friend_list,
                 'blocked_userslist': blocked_userslist,
                 'in_game_lobby': user_profile.in_game_lobby.id if user_profile.in_game_lobby else None,
                 'game_history': game_history,
                 'tournament_history': tournament_history,
-                # 'tournament_played': user_profile.tournament_played,
-                'tournament_win': user_profile.tournament_win, 
-                'tournament_lose': user_profile.tournament_lose,
-                # 'game_played': user_profile.game_played,
-                'game_win': user_profile.game_win,
-                'game_lose': user_profile.game_lose,
-                'game_draw': user_profile.game_draw,
-                'game_abandon': user_profile.game_abandon,
             }
             return Response(data)
         
@@ -2151,6 +2147,25 @@ class StatsAPIView(APIView):
         if tournament_id:
             # Recupera i dettagli del torneo
             tournament = get_object_or_404(Tournament, pk=tournament_id)
+
+            games = Game.objects.filter(tournament=tournament)
+            games_data = []
+
+            for game in games:
+                player1 = UserProfile.objects.get(user=game.player1)
+                player2 = UserProfile.objects.get(user=game.player2)
+                games_data.append({
+                    'id': game.id,
+                    'name': game.name,
+                    'player1': game.player1.username,
+                    'player2': game.player2.username,
+                    'winner': game.winner.username if game.winner else None,
+                    'player1_score': game.player1_score,
+                    'player2_score': game.player2_score,
+                    'player1_image': player1.img_profile,
+                    'player2_image': player2.img_profile,
+                })
+
             context = {
                 'user': user,
                 'userprofile': user_profile,
@@ -2164,10 +2179,10 @@ class StatsAPIView(APIView):
                     'boost': tournament.boost,
                     'status': tournament.status,
                     'nb_players': tournament.nb_players,
-                    'players_in_lobby': tournament.players_in_lobby,
                     'owner': tournament.owner.username if tournament.owner else None,
                     'winner': tournament.winner.username if tournament.winner else None,
                     'players': [player.username for player in tournament.players.all()],
+                    'games': games_data,
                 },
             }
             html = render_to_string('tournament-info.html', context)

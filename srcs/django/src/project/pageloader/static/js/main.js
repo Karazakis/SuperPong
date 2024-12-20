@@ -308,11 +308,6 @@ function refreshAccessToken() {
     });
 }
 
-// function isAuthenticated() {
-//     const accessToken = localStorage.getItem("accessToken");
-//     return accessToken !== null;
-// }
-
 function loadPage(url) {
     let accessToken = localStorage.getItem("accessToken");
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
@@ -494,8 +489,10 @@ async function checkUserPermission(page) {
             let data = await recoverUser(localStorage.getItem("userId"));
             if (data) {
                 let game = data.game_history;
+                console.log("la game histori ++++", data.game_history);
                 for (let element of game) {
                     if (element.id == gameId) {
+                        console.log("element TROVATO GAME giusto", element);
                         if (element.status != "finished" && element.status != "not_started") {
                             return true;
                         } else {

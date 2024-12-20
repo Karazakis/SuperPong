@@ -558,10 +558,13 @@ function startTimer() {
     }
 }
 
+let goldenGoal = false;
+
 function startTimerOnline() {
     let timerElement = document.getElementById('game-timer');
     let countdownElement = document.getElementById('countdown');
     let timerValue = parseInt(timerElement.getAttribute('data-timer'), 10);
+ 
 
     if (typeof GameSocket === 'undefined' || GameSocket === null) {
         console.error("GameSocket non è definito.");
@@ -575,7 +578,6 @@ function startTimerOnline() {
         GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
         const countdownInterval = setInterval(function() {
             if (GameSocket === null) {
-                console.warn("GameSocket è diventato null. Interruzione del timer.");
                 clearInterval(countdownInterval);
                 return;
             }
@@ -586,8 +588,13 @@ function startTimerOnline() {
             }
 
             if (timeRemaining <= 0) {
+                if (gameSettings.gameType === "tournament" && score[0] === score[1]) {
+                    console.log("Tempo scaduto! Punteggio uguale, avvio il countdown per il golden goal.");
+                    goldenGoal = true;
+                }
+
                 clearInterval(countdownInterval);
-                if (isHost) {
+                if (isHost && goldenGoal === false) {
                     GameSocket.send(JSON.stringify({ action: 'game_over' , p1: score[0], p2: score[1] }));
                 }
             }
@@ -1213,7 +1220,7 @@ function checkScoreHost(ball){
             scoreTeam[0]--;
         }
 
-        if(score[1] == 0 && gameSettings.gameRules == "score")
+        if(score[1] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);     
     }
@@ -1228,7 +1235,7 @@ function checkScoreHost(ball){
             scoreTeam[0]--;
         }
    
-        if(score[0] == 0 && gameSettings.gameRules == "score")
+        if(score[0] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);
     }
@@ -1241,7 +1248,7 @@ function checkScoreHost(ball){
             score[2]--;
             scoreTeam[1]--;
         }
-        if(score[2] == 0 && gameSettings.gameRules == "score")
+        if(score[2] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);
     }
@@ -1254,7 +1261,7 @@ function checkScoreHost(ball){
             score[3]--;
             scoreTeam[1]--;
         }
-        if(score[3] == 0 && gameSettings.gameRules == "score")
+        if(score[3] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         return(1);
     }
