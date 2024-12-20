@@ -2107,6 +2107,8 @@ class StatsAPIView(APIView):
         if game_id:
             # Recupera i dettagli del gioco
             game = get_object_or_404(Game, pk=game_id)
+            player1 = UserProfile.objects.get(user=game.player1)
+            player2 = UserProfile.objects.get(user=game.player2)
             context = {
                 'user': user,
                 'userprofile': user_profile,
@@ -2129,8 +2131,8 @@ class StatsAPIView(APIView):
                     'player1_keyPressCount': game.player1_keyPressCount,
                     'player2_keyPressCount': game.player2_keyPressCount,
                     'ballCount': game.ballCount,
-                    'player1_image': user_profile.img_profile,
-                    'player2_image': user_profile.img_profile,
+                    'player1_image': player1.img_profile,
+                    'player2_image': player2.img_profile,
                 },
             }
             html = render_to_string('match-info.html', context)

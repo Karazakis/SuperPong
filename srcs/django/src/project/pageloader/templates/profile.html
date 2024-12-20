@@ -99,7 +99,7 @@
                         <tr>
                             <th>Game Name</th>
                             <th>Mode</th>
-                            <th>Result</th>
+                            <th>Winner</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,7 +108,7 @@
                                 <tr>
                                     <td><a href="#" class="game-link" data-id="{{ game.id }}">{{ game.name }}</a></td>
                                     <td>{{ game.mode }}</td>
-                                    <td>{{ game.result }}</td>
+                                    <td>{{ game.winner }}</td>
                                 </tr>
                             {% endfor %}
                         {% else %}
@@ -151,26 +151,33 @@
                             <th>Tournament Name</th>
                             <th>Mode</th>
                             <th>Status</th>
-                            <th>Result</th>
+                            <th>Winner</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tbody>
-                        {% if tournamnt_history %}
-                            {% for tournament in tournamnt_history %}
+                            {% if tournamnt_history %}
+                                {% for tournament in tournamnt_history %}
+                                    <tr>
+                                        <td>
+                                            {% if tournament.status == 'finished' %}
+                                                <a href="#" class="tournament-link" data-id="{{ tournament.id }}">{{ tournament.name }}</a>
+                                            {% else %}
+                                                <span class="text-muted">{{ tournament.name }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ tournament.mode }}</td>
+                                        <td>{{ tournament.status }}</td>
+                                        <td>{{ tournament.winner|default:"No winner yet" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
                                 <tr>
-                                    <td><a href="#" class="tournament-link" data-id="{{ tournament.id }}">{{ tournament.name }}</a></td>
-                                    <td>{{ tournament.mode }}</td>
-                                    <td>{{ tournament.status }}</td>
-                                    <td>{{ tournament.result }}</td>
+                                    <td colspan="4" class="text-center">No tournament history available</td>
                                 </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center">No txxournament history available</td>
-                            </tr>
-                        {% endif %}
-                        </tbody>
+                            {% endif %}
+                            </tbody>
+                            
                     </tbody>
                 </table>
             </div>
