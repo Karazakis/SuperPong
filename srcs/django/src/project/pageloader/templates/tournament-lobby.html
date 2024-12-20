@@ -12,6 +12,7 @@
         {{ rounds|safe }}
     </div>
     <div id="current-user" data-username="{{ user.username }}" style="display: none;"></div>
+    <div id="current-user-nickname" data-nickname="{{ userprofile.nickname }}" style="display: none;"></div>
     <div id="tournament_bracket" class="mt-4 text-center"></div>
 
     <div class="row mt-4">
@@ -27,6 +28,9 @@
             <h3>Users in Lobby</h3>
             <ul id="users_in_lobby" class="list-unstyled">
                 {% for player in tournament.players.all %}
+                <li id="user_{{ player.username }}" data-nickname="{{ player.profile.nickname }}">
+                    {{ player.profile.nickname }}
+                </li>
                 <li id="user_{{ player.username }}">{{ player.username }}</li>
                 {% endfor %}
             </ul>

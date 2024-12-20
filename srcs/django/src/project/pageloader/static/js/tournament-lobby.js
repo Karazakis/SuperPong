@@ -33,10 +33,6 @@ LobbySocket.onmessage = function(e) {
         case 'update_ready_status':
             updateReadyStatusInUserList(data.slots, data.ready_status);
             break;
-        case 'update_team':
-            updateTeamSlots(data);
-            updateUserList(data.users);
-            break;
         case 'update_lobby':
             updateUserList(data.user_list,data.slots, data.ready_status);
             break;
@@ -82,6 +78,7 @@ function onPageLoad() {
     const tournamentDataElement = document.getElementById('tournament-data');
     const roundsDataElement = document.getElementById('rounds-data');
     const currentUserElement = document.getElementById('current-user');
+    const currentUserNickElement = document.getElementById('current-user-nickname');
     
     const tournament = {
         mode: tournamentDataElement.dataset.mode,
@@ -89,14 +86,15 @@ function onPageLoad() {
         rounds: JSON.parse(roundsDataElement.textContent.trim())
     };
     const currentUser = currentUserElement.dataset.username;
+    const currentUserNick = currentUserNickElement.dataset.nickname;
 
     console.log('Tournament data:', tournament);
     console.log('Current user:', currentUser);
+    console.log('Current user Nickname:', currentUserNick);
 
     generateBracket(tournament);
     setupSlotSelection(tournament, currentUser);
-    // necessaria per il ready se si esce e si rientra nella lobby
-    //checkUserSlotAndReadyState();
+
 }
 
 function checkUserSlotAndReadyState(roundsSlots) {
@@ -171,8 +169,6 @@ function checkUserSlotAndReadyState(roundsSlots) {
         readyButton.disabled = true;
     }
 }
-
-
 
 
 
@@ -363,10 +359,13 @@ function updateAllSlots(roundsSlots) {
 function updateSlot(roundNumber, slotKey, slotData) {
     const slotElement = document.querySelector(`.round[data-round="${roundNumber}"] .player-slot[data-slot="${slotKey}"]`);
     if (slotElement) {
-        if (slotData && slotData.username !== 'empty' && !slotData.username.toLowerCase().includes('winner') ) {
+        // Verifica se slotData e username sono validi
+        const username = (slotData && typeof slotData.username === 'string') ? slotData.username : null;
+
+        if (username && username !== 'empty' && !username.toLowerCase().includes('winner')) {
             // Se c'è un utente nello slot, aggiorna l'username e blocca lo slot
             slotElement.classList.add('occupied', 'locked');
-            slotElement.textContent = slotData.username;
+            slotElement.textContent = username;
             slotElement.style.pointerEvents = 'none'; // Disabilita ulteriori clic
         } else {
             // Se lo slot è vuoto, ripristina lo stato predefinito
@@ -379,8 +378,6 @@ function updateSlot(roundNumber, slotKey, slotData) {
         console.error(`Slot element not found for round ${roundNumber}, slot ${slotKey}. Verify HTML structure.`);
     }
 }
-
-
 
 
 
@@ -428,8 +425,6 @@ function lockAllSlots(slots) {
 }
 
 
-
-
 // Funzione per aggiornare lo stato dello slot sul server
 function updateSlotOnServer(action, slot, username) {
     const player_id = localStorage.getItem('userId');
@@ -448,11 +443,13 @@ function updateSlotOnServer(action, slot, username) {
 function updateUserList(users, slots, readyStatus) {
     const userList = document.getElementById('users_in_lobby');
     userList.innerHTML = '';
-
+    console.log("AAAAAAAAAAAAAAAAA")
     users.forEach(user => {
         // Trova lo slot associato all'utente
         let userSlot = null;
         for (let slot in slots) {
+            console.log("slots:  "+slots[slot].username)
+            console.log(user)
             if (slots[slot].username === user.username) {
                 userSlot = slot;
                 break;
@@ -472,121 +469,6 @@ function updateUserList(users, slots, readyStatus) {
     });
 }
 
-
-// Funzione per gestire la selezione dei team
-var buttons = document.querySelectorAll('.lobby-join-team');
-buttons.forEach(button => {
-    button.addEventListener('click', function() {
-        const teamSelected = this.getAttribute('data-team');
-        const isJoin = this.textContent === 'Join Team';
-
-        console.log('Button clicked:', teamSelected, username_lobby, isJoin); 
-
-        let message;
-
-        if (isJoin) {
-            message = {
-                action: 'join_team',
-                team: teamSelected,
-                username: username_lobby
-            };
-            LobbySocket.send(JSON.stringify(message));
-            this.textContent = 'Leave Team'; 
-            disableOtherTeamButton(teamSelected); 
-        } else {
-            message = {
-                action: 'leave_team',
-                team: teamSelected,
-                username: username_lobby
-            };
-            LobbySocket.send(JSON.stringify(message));
-            this.textContent = 'Join Team'; 
-            enableOtherTeamButton(); 
-        }
-
-        console.log('Message sent:', message); 
-    });
-});
-
-// Funzione per disabilitare i pulsanti di altri team
-function disableOtherTeamButton(currentTeam) {
-    buttons.forEach(button => {
-        if (button.getAttribute('data-team') !== currentTeam) {
-            button.disabled = true;
-        }
-    });
-}
-
-// Funzione per abilitare i pulsanti dei team
-function enableOtherTeamButton() {
-    buttons.forEach(button => {
-        button.disabled = false;
-    });
-}
-
-// Funzione per aggiornare i team nella lobby
-function updateTeamSlots(data) {
-    const team = data.team;
-    const player = data.player;
-    console.log('updateTeamSlots:', team, player); 
-    if (data.action === 'join_team') {
-        if (team === 'team1') {
-            if (document.getElementById('t1p1_lobby_label').textContent === 'Empty' && document.getElementById('t1p2_lobby_label').textContent !== player) {
-                document.getElementById('t1p1_lobby_label').textContent = player;
-            } else if (document.getElementById('t1p2_lobby_label').textContent === 'Empty' && document.getElementById('t1p1_lobby_label').textContent !== player) {
-                document.getElementById('t1p2_lobby_label').textContent = player;
-            }
-        } else if (team === 'team2') {
-            if (document.getElementById('t2p1_lobby_label').textContent === 'Empty' && document.getElementById('t2p2_lobby_label').textContent !== player){
-                document.getElementById('t2p1_lobby_label').textContent = player;
-            } else if (document.getElementById('t2p2_lobby_label').textContent === 'Empty' && document.getElementById('t2p1_lobby_label').textContent !== player){
-                document.getElementById('t2p2_lobby_label').textContent = player;
-            }
-        }
-    } else if (data.action === 'leave_team') {
-        if (team === 'team1') {
-            if (document.getElementById('t1p1_lobby_label').textContent === player) {
-                document.getElementById('t1p1_lobby_label').textContent = 'Empty';
-            } else if (document.getElementById('t1p2_lobby_label').textContent === player) {
-                document.getElementById('t1p2_lobby_label').textContent = 'Empty';
-            }
-        } else if (team === 'team2') {
-            if (document.getElementById('t2p1_lobby_label').textContent === player) {
-                document.getElementById('t2p1_lobby_label').textContent = 'Empty';
-            } else if (document.getElementById('t2p2_lobby_label').textContent === player) {
-                document.getElementById('t2p2_lobby_label').textContent = 'Empty';
-            }
-        }
-    }
-    checkTeamsFull();
-}
-
-// Funzione per verificare se i team sono pieni
-function checkTeamsFull() {
-    const team1Full = document.getElementById('t1p1_lobby_label').textContent !== 'Empty' && document.getElementById('t1p2_lobby_label').textContent !== 'Empty';
-    const team2Full = document.getElementById('t2p1_lobby_label').textContent !== 'Empty' && document.getElementById('t2p2_lobby_label').textContent !== 'Empty';
-
-    if (document.getElementById('t1_button').textContent !== 'Leave Team') {
-        if (!team1Full && document.getElementById('t2_button').textContent !== 'Leave Team') {
-            document.getElementById('t1_button').disabled = team1Full;
-        }
-
-        if (team1Full) {
-            document.getElementById('t1_button').textContent = 'Team Full';
-            document.getElementById('t1_button').disabled = true;
-        }
-    }
-    if (document.getElementById('t2_button').textContent !== 'Leave Team') {
-        if (!team2Full && document.getElementById('t1_button').textContent !== 'Leave Team') {
-            document.getElementById('t2_button').disabled = team2Full;
-        }
-
-        if (team2Full) {
-            document.getElementById('t2_button').textContent = 'Team Full';
-            document.getElementById('t2_button').disabled = true;
-        }
-    }
-}
 
 // Gestione dell'invio dei messaggi in chat
 var form_lobby = document.getElementById('lobby_form');
@@ -650,31 +532,6 @@ if (readyButton !== null) {
     });
 }
  
-
-
-// Gestione del pulsante di eliminazione della lobby
-var deleteButton = document.getElementById('delete');
-if (deleteButton) {
-    deleteButton.addEventListener('click', (e) => {
-        let accessToken = localStorage.getItem("accessToken");
-        fetch(`/api/lobby/${round_id_lobby}/`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${accessToken}`,
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                loadPage('/api/remote/');
-            } else {
-                return response.json().then(data => { throw new Error(data.error); });
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-}
 
 
 var leaveButton = document.getElementById('leave');
@@ -828,7 +685,6 @@ function updateReadyStatusInUserList(slots, readyStatus) {
 }
 
 
-
 function disableAllButtonsButLeave() {
     // Disabilita tutti i pulsanti ready, leave e start tournament
     // Blocca visivamente lo slot
@@ -871,7 +727,7 @@ var startTournament = document.getElementById("start");
 if (startTournament) {
     startTournament.addEventListener('click', (e) => {
         e.preventDefault();
-        startTournamentLogic(); // Richiama la funzione incapsulata
+        startTournamentLogic();
     });
 }
 

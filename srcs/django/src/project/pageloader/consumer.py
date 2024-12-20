@@ -1875,8 +1875,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
 
-
-
     async def update_next_round_slot(self, next_round, slot_key, winner):
         """
         Aggiorna lo slot del round successivo con i dati del vincitore.
@@ -1884,25 +1882,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         next_round.slots[slot_key] = {'player_id': winner.id, 'username': winner.username}
         await database_sync_to_async(next_round.save)()
         logger.info(f"Updated slot {slot_key} in round {next_round.round_number} with winner {winner.username}.")
-
-
-
-    # async def notify_clients_of_slot_updates(self, next_round_number, updated_slots):
-    #     """
-    #     Notifica i client con tutti gli slot aggiornati del prossimo round.
-    #     """
-    #     await self.channel_layer.group_send(
-    #         self.room_group_name,
-    #         {
-    #             'type': 'send_message_to_clients',
-    #             'message': {
-    #                 'type': 'update_next_round_slots',
-    #                 'round_number': next_round_number,
-    #                 'slots': updated_slots
-    #             }
-    #         }
-    #     )
-    #     logger.info(f"Notified clients of updated slots for round {next_round_number}: {updated_slots}.")
 
 
 
