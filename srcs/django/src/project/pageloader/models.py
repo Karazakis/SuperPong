@@ -126,12 +126,17 @@ class Round(models.Model):
 
     def generate_games(self, num_games, mode, rules, limit, balls, boost):
         """Genera i game per il round in base al numero di game e le regole del torneo."""
+        if rules == 'time':
+            time_left = limit * 60
+        else:
+            time_left = 0
         for i in range(1, num_games + 1):
             game = Game.objects.create(
                 name=f"{self.tournament.name} - Round {self.round_number} - Game {i}",
                 mode=mode,
                 rules=rules,
                 limit=limit,
+                time_left=time_left,
                 balls=balls,
                 boost=boost,
                 tournament=self.tournament,

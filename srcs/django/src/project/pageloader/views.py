@@ -924,8 +924,6 @@ class TournamentsAPIView(APIView):
             }
             return Response(data)
 
-
-
 class LobbyAPIView(APIView):
     def get(self, request, pk):
         if request.user.is_authenticated:
@@ -1184,8 +1182,6 @@ class UserRequestAPIView(APIView):
 
             if request_type not in ['friend', 'game', 'tournament']:
                 return Response({'error': 'Tipo di richiesta non valido.'}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Controlla se l'utente di destinazione esiste
             try:
                 user = User.objects.get(pk=id)
             except User.DoesNotExist:
@@ -1768,7 +1764,7 @@ class GameAPIView(APIView):
                         
                         players = [
                             {
-                                'name': game.player1, 
+                                'name': player1.nickname, 
                                 'score': game.player1_score, 
                                 'img_profile': player1.img_profile,
                                 'controls': {
@@ -1784,7 +1780,7 @@ class GameAPIView(APIView):
                                 'player_posit': player_posit,
                             },
                             {
-                                'name': game.player2, 
+                                'name': player2.nickname, 
                                 'score': game.player2_score, 
                                 'img_profile': player2.img_profile,
                                 'controls': {
@@ -1811,8 +1807,7 @@ class GameAPIView(APIView):
                         context.update({
                             'players': players,
                             'game_info': game_info,
-                        })
-                        
+                        })    
                 else:
                     if game.player1 == user:
                         player_posit = "p1"
@@ -1889,7 +1884,7 @@ class GameAPIView(APIView):
                     
                     players = [
                         {
-                            'name': game.player1, 
+                            'name': player1.nickname, 
                             'score': game.player1_score, 
                             'img_profile': player1.img_profile,
                             'controls': {
@@ -1905,7 +1900,7 @@ class GameAPIView(APIView):
                             'player_posit': player_posit,
                         },
                         {
-                            'name': game.player2, 
+                            'name': player2.nickname, 
                             'score': game.player2_score, 
                             'img_profile': player2.img_profile,
                             'controls': {

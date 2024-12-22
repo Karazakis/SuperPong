@@ -39,6 +39,12 @@ LobbySocket.onmessage = function(e) {
     } else if (data.action === 'start_game') {
         let time = 10;
         let messages = document.getElementById('lobby_messages');
+        let butToDisable = document.querySelectorAll('button');
+        butToDisable.forEach(element => {
+            element.disabled = true;
+        });
+
+
         setInterval(() => {
             time--;
             messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start"><strong>Server:</strong><p>THE GAME WILL START IN ${time}!!!</p></div>`);

@@ -27,10 +27,11 @@ document.getElementById('leavegame').addEventListener('click', function() {
         setTimeout(resolve, 20);
     });
 
-    
+    console.log('Game ended by leave ', document.getElementById('game-details').dataset.gameStatus, document.getElementById('gametype').textContent);
+    console.log("DUICAADADADDADDUUD +++++++ ", this.dataset.posit);
     if (document.getElementById('game-details').dataset.gameStatus !== 'finished' && document.getElementById('gametype').textContent !== 'local-game') {
         if (this.dataset.posit === "p1") {
-
+            console.log('Player 1 left the game properly');
             endgameOnline(true, true);
         }
         window.GameSocket.send(JSON.stringify({ action: "leave" }));

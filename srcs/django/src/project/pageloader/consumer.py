@@ -216,7 +216,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def pending_request(self, event):
         message = event['message']
         logger.info(f'Pending request:asdasdasdzxccx<<<< {message}')
-        if message['target_lobby']:
+        if message['request_type'] != 'friend':
             await self.send(text_data=json.dumps({
                 'type': 'pending_request',
                 'request': message['request'],
@@ -1107,7 +1107,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             logger.error(f"Error resetting ready statuses: {e}")
 
-
     async def manage_slot_status(self, data):
         action = data['action']
         slot = data.get('slot')
@@ -1127,7 +1126,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         # Invia l'aggiornamento a tutti i client connessi
         await self.send_slot_status_update_to_group()
-
 
 
     async def manage_ready_status(self, data):
@@ -1896,7 +1894,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         next_round.slots[slot_key] = {'player_id': winner.id, 'username': winner.username}
         await database_sync_to_async(next_round.save)()
         logger.info(f"Updated slot {slot_key} in round {next_round.round_number} with winner {winner.username}.")
-
 
 
     async def mark_round_as_finished(self):

@@ -164,6 +164,7 @@ function initializeWebSocket() {
 		} else if (data.type === 'invite_game') {
 			handleGameInvite(data, accessToken, csrfToken);		    
 		} else if (data.type === 'friend_request') {
+			handleFriendRequest(data, accessToken, csrfToken);
 		} else if (data.type === 'accept') {
 			updateFriendshipStatus(data);
 		} else if (data.type === 'remove') {
@@ -173,7 +174,7 @@ function initializeWebSocket() {
 			    handleGameInvite(data);
 			} else if (data.request_type === 'friend') {
 				handleFriendRequest(data, accessToken, csrfToken);
-			} else if (data.type === 'tournament') {
+			} else if (data.request_type === 'tournament') {
 				handleTournamentInvite(data);
 			}
 		}
@@ -183,6 +184,7 @@ function initializeWebSocket() {
 initializeWebSocket();
 
 function handleGameInvite(data, accessToken, csrfToken) {
+
 	function joinGame(gameId) {
 		console.log('Joining game:', gameId);
 		let accessToken = localStorage.getItem('accessToken');
@@ -207,6 +209,11 @@ function handleGameInvite(data, accessToken, csrfToken) {
 	
     let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
     if (invite) {
+		let pathname = window.location.pathname;
+		if (pathname.includes('lobby') === true) {
+			alert("Sei già in una lobby");
+			return;
+		}
 		joinGame(data.target_lobby);
     } else {
 		chatSocket.send(JSON.stringify({
@@ -221,6 +228,7 @@ function handleGameInvite(data, accessToken, csrfToken) {
 
 
 function handleTournamentInvite(data, accessToken, csrfToken) {
+
 	function joinTournament(tournamentId) {
 		console.log('Joining tournament:', tournamentId);
 		let accessToken = localStorage.getItem('accessToken');
@@ -245,6 +253,11 @@ function handleTournamentInvite(data, accessToken, csrfToken) {
 	
     let invite = confirm(`${data.requesting_user} ti ha invitato ad un torneo`);
     if (invite) {
+		let pathname = window.location.pathname;
+		if (pathname.includes('lobby') === true) {
+			alert("Sei già in una lobby");
+			return;
+		}
 		joinTournament(data.target_lobby);
     } else {
 		chatSocket.send(JSON.stringify({
@@ -294,7 +307,7 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 	
 	
 	try {
-	    const response = await fetch(`/api/request/friend/${data.target_user}/`, {
+	    const response = await fetch(`/api/request/friend/${data.requesting_user}/`, {
 		method: 'POST',
 		headers: {
 		    'Content-Type': 'application/json',
@@ -305,18 +318,18 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 	    });
 	
 	    if (!response.ok) {
-		const errorMessage = await response.json();
-		console.error('Errore durante l\'invio della risposta:', errorMessage);
-		alert(`Errore durante l'invio della risposta: ${errorMessage.error}`);
+			const errorMessage = await response.json();
+			console.error('Errore durante l\'invio della risposta:', errorMessage);
+			alert(`Errore durante l'invio della risposta: ${errorMessage.error}`);
 	    } else {
-		alert('risposta inviata con successo');
-	
-		chatSocket.send(JSON.stringify({
-			'type': action,
-			'pending_request': action,
-			'target_user': data.requesting_user,
-			'requesting_user': data.target_user,
-		}));
+			alert('risposta inviata con successo');
+		
+			chatSocket.send(JSON.stringify({
+				'type': action,
+				'pending_request': action,
+				'target_user': data.requesting_user,
+				'requesting_user': data.target_user,
+			}));
 	    }
 	} catch (error) {
 	    console.error('Errore durante la fetch:', error);
@@ -534,14 +547,19 @@ function showFriendContextMenu(event, id, username) {
     // Posiziona il menu contestuale in base alla posizione del clic
 	let pathname = window.location.pathname;
 	console.log("nel context",pathname);
-	if (pathname.includes('lobby') === false) 
+	if (pathname.includes('lobby') === false && pathname.includes('tournament') === false)
 	{
 		invitegamecontext.style.display = "none";
 		invitetournamentcontext.style.display = "none";
 	}
-	else
+	else if (pathname.includes('lobby') === true && pathname.includes('tournament') === false)
 	{
 		invitegamecontext.style.display = "block";
+		invitetournamentcontext.style.display = "none";
+	}
+	else if (pathname.includes('lobby') === true && pathname.includes('tournament') === true)
+	{
+		invitegamecontext.style.display = "none";
 		invitetournamentcontext.style.display = "block";
 	}
     invitegamecontext.dataset.id = id;
@@ -652,7 +670,8 @@ async function recoverUser(id) {
         return data; // Modifica questo percorso in base alla struttura della tua risposta
 
     } catch (error) {
-		recoverUser(id);
+		console.log("DA ERRORE MA L'ID è: ",id);
+		//recoverUser(id);
         //console.error('Errore durante il recupero dei dati dell\'utente:', error);
         //throw error;
     }
@@ -716,7 +735,11 @@ document.getElementById("viewprofilecontext").addEventListener('click', async fu
 document.getElementById("blockusercontext").addEventListener('click', async function(e) {
 	let accessToken = localStorage.getItem("accessToken");
 	const id = e.target.dataset.id;
-    
+	if (id === localStorage.getItem('userId')) {
+		alert('Non puoi bloccare te stesso');
+		return;
+	}
+
 	// Funzione per verificare la validità del token
 	async function checkTokenValidity(url) {
 	    try {
