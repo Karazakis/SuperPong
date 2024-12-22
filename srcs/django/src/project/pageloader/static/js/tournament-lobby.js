@@ -40,6 +40,10 @@ LobbySocket.onmessage = function(e) {
             console.log("Blocking slots and disabling buttons");
             disableButtonsAndSlots(data.players_to_block);
             break;
+        case 'reset_ready_statuses':
+            const readyButton = document.querySelector('.lobby-ready');     
+            if (readyButton) readyButton.disabled = true;
+            break
         case 'join_game_notification':
             console.log("Join game notification received");
             showJoinGamePopup(data.game_link);

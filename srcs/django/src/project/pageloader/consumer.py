@@ -1102,7 +1102,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             logger.info("All ready statuses have been reset to 'false'.")
 
             # Invia l'aggiornamento ai client connessi
-            await self.send_ready_status_update_to_group()
+            await self.send_ready_status_update_to_group(custom_message_type='reset_ready_statuses')
             logger.info("Ready status reset update sent to group.")
         except Exception as e:
             logger.error(f"Error resetting ready statuses: {e}")
@@ -1298,7 +1298,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
 
-    async def send_ready_status_update_to_group(self):
+    async def send_ready_status_update_to_group(self, custom_message_type='update_ready_status'):
         """
         Invia l'aggiornamento dello stato 'ready' del round corrente a tutti i client connessi.
         """
@@ -1315,7 +1315,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             logger.info(f"Sending ready status update. Slots: {slots_status}, Ready status: {ready_statuses}")
 
             message = {
-                'type': 'update_ready_status',
+                'type': custom_message_type,
                 'ready_status': ready_statuses,
                 'slots': slots_status
             }
