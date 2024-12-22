@@ -934,6 +934,12 @@ class LobbyAPIView(APIView):
             if 'tournament_lobby' in current_url:
                 tournament = Tournament.objects.get(pk=pk)
 
+                # Recupera tutti i giocatori del torneo e serializza i dati in modo esplicito
+                user_nicknames = [
+                    {'username': player.username, 'nickname': player.userprofile.nickname}
+                    for player in User.objects.all()
+                ]
+                user_nicknames_json = json.dumps(user_nicknames)
 
                 rounds = Round.objects.filter(tournament=tournament)
                 rounds_list = list(rounds.values()) 
@@ -941,7 +947,8 @@ class LobbyAPIView(APIView):
                     'user': user,
                     'userprofile': user_profile,
                     'tournament': tournament,
-                    'rounds': json.dumps(rounds_list, cls=DjangoJSONEncoder)
+                    'rounds': json.dumps(rounds_list, cls=DjangoJSONEncoder),
+                    'user_nicknames': user_nicknames_json,
                 }
                 html = render_to_string('tournament-lobby.html', context)
                 url = f'tournament_lobby/{pk}'

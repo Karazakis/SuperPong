@@ -8,6 +8,29 @@ var slotSelectionLocked = false;
 var lobby = `wss://${window.location.host}/wss/tournament/${round_id_lobby}/?id=${userId_lobby}`;
 var LobbySocket = new WebSocket(lobby);
 
+var usernameToNicknameMap = {};
+
+// Aggiungi il nickname del client corrente durante l'inizializzazione
+function initializeNicknameMapFromTemplate() {
+    const nicknameElement = document.getElementById('user-nicknames');
+    if (nicknameElement) {
+        try {
+            const nicknamesArray = JSON.parse(nicknameElement.dataset.nicknames);
+
+            // Itera sull'array per costruire una mappa username -> nickname
+            nicknamesArray.forEach(entry => {
+                usernameToNicknameMap[entry.username] = entry.nickname;
+            });
+
+            console.log("Initialized usernameToNicknameMap:", usernameToNicknameMap);
+        } catch (error) {
+            console.error("Error parsing nickname data:", error);
+        }
+    }
+}
+
+
+
 
 onPageLoad();
 
@@ -79,6 +102,7 @@ LobbySocket.onclose = function(e) {
 
 // Funzione di inizializzazione della pagina della lobby
 function onPageLoad() {
+    initializeNicknameMapFromTemplate()
     console.log("Pagina lobby torneo caricata");
     const tournamentDataElement = document.getElementById('tournament-data');
     const roundsDataElement = document.getElementById('rounds-data');
@@ -369,10 +393,12 @@ function updateSlot(roundNumber, slotKey, slotData) {
         // Verifica se slotData e username sono validi
         const username = (slotData && typeof slotData.username === 'string') ? slotData.username : null;
 
+        const nickname = usernameToNicknameMap[username] || username;
+
         if (username && username !== 'empty' && !username.toLowerCase().includes('winner')) {
             // Se c'è un utente nello slot, aggiorna l'username e blocca lo slot
             slotElement.classList.add('occupied', 'locked');
-            slotElement.textContent = username;
+            slotElement.textContent = nickname;
             slotElement.style.pointerEvents = 'none'; // Disabilita ulteriori clic
         } else {
             // Se lo slot è vuoto, ripristina lo stato predefinito
@@ -463,6 +489,9 @@ function updateUserList(users, slots, readyStatus) {
             }
         }
 
+        // Ottieni il nickname dalla mappa
+        const nickname = usernameToNicknameMap[user.username] || user.username;
+
         // Controlla se l'utente è ready
         let isReady = false;
         if (userSlot && readyStatus[userSlot]) {
@@ -472,7 +501,7 @@ function updateUserList(users, slots, readyStatus) {
         const readyIcon = isReady ? '✔️' : '';  // Aggiungi l'icona se l'utente è pronto
 
         // Aggiungi l'utente alla lista con l'icona ready se applicabile
-        userList.insertAdjacentHTML('beforeend', `<li id="user_${user.username}">${user.username} ${readyIcon}</li>`);
+        userList.insertAdjacentHTML('beforeend', `<li id="user_${user.username}">${nickname} ${readyIcon}</li>`);
     });
 }
 
@@ -498,6 +527,8 @@ if (readyButton !== null) {
         let userSlot = null;
         let maxRoundNumber = -1;
 
+        // Recupera il nickname associato all'utente
+        const userNickname = usernameToNicknameMap[username_lobby];
         // Trova tutti i round nel DOM
         const rounds = document.querySelectorAll('.round[data-round]');
         if (!rounds.length) {
@@ -510,7 +541,7 @@ if (readyButton !== null) {
             const playerSlots = round.querySelectorAll('.player-slot');
 
             playerSlots.forEach(slot => {
-                if (slot.classList.contains('occupied') && slot.textContent === username_lobby && roundNumber > maxRoundNumber) {
+                if (slot.classList.contains('occupied') && slot.textContent === userNickname && roundNumber > maxRoundNumber) {
                     userSlot = slot.dataset.slot;
                     maxRoundNumber = roundNumber; // Aggiorna il round maggiore trovato
                 }
@@ -645,12 +676,13 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     // Aggiorna la lista utenti con lo stato "ready"
     Array.from(userItems).forEach(item => {
         const username = item.id.replace('user_', '');
+        const nickname = usernameToNicknameMap[username] || username;
         const slotKey = Object.keys(slots).find(key => slots[key].username === username);
 
         if (slotKey && readyStatus[slotKey] !== undefined) {
-            item.innerHTML = `${username} ${readyStatus[slotKey] ? '✔️' : ''}`;
+            item.innerHTML = `${nickname} ${readyStatus[slotKey] ? '✔️' : ''}`;
         } else {
-            item.innerHTML = username; // Nessuno slot assegnato o dati mancanti
+            item.innerHTML = nickname; // Nessuno slot assegnato o dati mancanti
         }
     });
 
@@ -828,6 +860,8 @@ function showWinnerPopup(winner) {
         return; // Evita di crearne un altro
     }
 
+    const winnerNickname = usernameToNicknameMap[winner.username] || winner.username;
+
     // Creazione del popup
     const popup = document.createElement('div');
     popup.classList.add('popup');
@@ -835,7 +869,7 @@ function showWinnerPopup(winner) {
         <div class="popup-content">
             <h2>Congratulations!</h2>
             <p>The tournament has concluded.</p>
-            <h3>Winner: ${winner.username}</h3>
+            <h3>Winner: ${winnerNickname}</h3>
             <button id="close-popup-btn" class="btn btn-primary">Close</button>
         </div>
     `;

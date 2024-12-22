@@ -6,6 +6,10 @@
     </div>
 
     <!-- Elementi nascosti per passare i dati -->
+
+    <div id="user-nicknames" data-nicknames="{{ user_nicknames }}"></div>
+
+
     <div id="tournament-data" data-mode="{{ tournament.mode }}" data-nb-players="{{ tournament.nb_players }}"
         data-owner="{{ tournament.owner.username }}"></div>
     <div id="rounds-data" style="display: none;">
@@ -27,12 +31,7 @@
         <div class="col-md-4 text-center">
             <h3>Users in Lobby</h3>
             <ul id="users_in_lobby" class="list-unstyled">
-                {% for player in tournament.players.all %}
-                <li id="user_{{ player.username }}" data-nickname="{{ player.profile.nickname }}">
-                    {{ player.profile.nickname }}
-                </li>
-                <li id="user_{{ player.username }}">{{ player.username }}</li>
-                {% endfor %}
+                
             </ul>
         </div>
     </div>
