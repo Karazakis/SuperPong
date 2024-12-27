@@ -72,7 +72,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Ottieni la lista degli username
         user_list = list(user_channel_mapping.keys())
 
-        # Invia la lista degli utenti connessi a tutti gli utenti nel gruppo
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -182,6 +181,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 print('User not found')
         elif data['pending_request'] == 'accept':
             recipient = data['target_user']
+            logger.info(f'Accepting request from {data}')
             recipient_channel = user_channel_mapping.get(recipient)
             if recipient_channel:
                 await self.channel_layer.send(recipient_channel, {
@@ -359,9 +359,11 @@ class LobbyConsumer(AsyncWebsocketConsumer):
     async def user_connected(self, event):
         username = event['username']
         logger.info(f'User {username} connected')
+        userprofile = await self.get_user_profile(username)
         await self.send(text_data=json.dumps({
             'action': 'connected',
-            'username': username
+            'username': username,
+            'nickname': userprofile.nickname
         }))
 
 
@@ -393,6 +395,11 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             return user
         except User.DoesNotExist:
             return None
+
+    @database_sync_to_async
+    def get_user_profile(self, username):
+        user = User.objects.get(username=username)
+        return UserProfile.objects.get(user=user)
 
     @database_sync_to_async
     def assign_player_slot(self):
@@ -435,14 +442,18 @@ class LobbyConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_user_list(self):
         game = Game.objects.get(id=self.game_id)
+        player1 = UserProfile.objects.get(user=game.player1) if game.player1 else None
+        player2 = UserProfile.objects.get(user=game.player2) if game.player2 else None
         return [
             {
                 'slot': 'player1',
+                'nickname': player1.nickname if player1 else 'Empty',
                 'player': game.player1.username if game.player1 else 'Empty',
                 'team': 'team1' if game.player1 in game.team1.all() else ('team2' if game.player1 in game.team2.all() else 'none')
             },
             {
                 'slot': 'player2',
+                'nickname': player2.nickname if player2 else 'Empty',
                 'player': game.player2.username if game.player2 else 'Empty',
                 'team': 'team1' if game.player2 in game.team1.all() else ('team2' if game.player2 in game.team2.all() else 'none')
             },

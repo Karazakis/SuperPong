@@ -14,10 +14,7 @@
     <script src="/static/js/lib/jquery.min.js"></script>
     <script src="/static/js/lib/popper.min.js"></script>
     <script src="/static/js/lib/bootstrap.min.js"></script>
-    <script src="/static/js/lib/jquery.min.js"></script>
-    <script src="/static/js/lib/popper.min.js"></script>
-    <script src="/static/js/lib/bootstrap.min.js"></script>
-    
+   
     <!-- Includi Three.js -->
     <script src="/static/js/game/module/three.min.js"></script>    
 
@@ -50,7 +47,7 @@
 <body id="body">
     <div id="app">
     </div>
-    <script>
+    <script defer>
         
         window.initStarSky = function () {
             window.starScene = new THREE.Scene();
@@ -123,7 +120,6 @@
         }
 
         window.clearAllScene = function () {
-            console.log("Clear all scene");
             window.clearScene(window.starScene);
             window.clearScene(window.gameScene);
             window.starScene = null;
@@ -137,7 +133,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
-        {% load static %}
-    <script src="{% static '/js/main.js' %}"></script>    
+    <script src="{% static '/js/main.js' %}" defer></script>    
 </body>
 </html>

@@ -98,11 +98,33 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     formData.append('username', username);
     formData.append('nickname', nickname);
     formData.append('email', email);
+
     const imgProfileInput = document.getElementById('img_profile');
     if (imgProfileInput.files.length > 0) {
-        const imgProfile = imgProfileInput.files[0]; // Prende il primo file selezionato
-        formData.append('img_profile', imgProfile); // Aggiunge l'immagine al FormData
+        const imgProfile = imgProfileInput.files[0];
+
+        // Controllo del tipo di file
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(imgProfile.type)) {
+            displayError('img-profile-error', "Il file deve essere un'immagine (JPEG, PNG, GIF).");
+            hasError = true;
+        }
+
+        // Controllo della dimensione in byte
+        const maxImageSize = 2 * 1024 * 1024; // 2 MB
+        if (imgProfile.size > maxImageSize) {
+            displayError('img-profile-error', `L'immagine non può superare i 2 MB. Dimensione attuale: ${(imgProfile.size / 1024 / 1024).toFixed(2)} MB`);
+            hasError = true;
+        }
+
+        // Controllo asincrono della dimensione in pixel
+        if (!hasError) {
+            formData.append('img_profile', imgProfile);
+            }
+    } else {
+        // tutto ok con l immagine
     }
+
     formData.append('password', password);
 
     fetch('/api/settings/', {
@@ -118,7 +140,6 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     .then(data => {
         if (data.success) {
             updateUserProfile();
-            
             loadPage("api/settings/");
         } else {
             handleServerErrors(data.errors);
@@ -126,6 +147,7 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     })
     .catch(error => handleServerErrors(JSON.parse(error.message)));
 });
+
 
 function validateUsername(username) {
     username = username.replace(/[<>]/g, '');
@@ -144,7 +166,9 @@ function validatePassword(password) {
 }
 
 function displayError(elementId, message) {
+    console.log(elementId, message);
     document.getElementById(elementId).innerText = message;
+    
 }
 
 function clearErrors() {

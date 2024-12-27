@@ -29,9 +29,6 @@ function initializeNicknameMapFromTemplate() {
     }
 }
 
-
-
-
 onPageLoad();
 
 // Gestione dell'apertura del WebSocket
@@ -102,7 +99,7 @@ LobbySocket.onclose = function(e) {
 
 // Funzione di inizializzazione della pagina della lobby
 function onPageLoad() {
-    initializeNicknameMapFromTemplate()
+    initializeNicknameMapFromTemplate();
     console.log("Pagina lobby torneo caricata");
     const tournamentDataElement = document.getElementById('tournament-data');
     const roundsDataElement = document.getElementById('rounds-data');
@@ -392,7 +389,6 @@ function updateSlot(roundNumber, slotKey, slotData) {
     if (slotElement) {
         // Verifica se slotData e username sono validi
         const username = (slotData && typeof slotData.username === 'string') ? slotData.username : null;
-
         const nickname = usernameToNicknameMap[username] || username;
 
         if (username && username !== 'empty' && !username.toLowerCase().includes('winner')) {
@@ -489,7 +485,6 @@ function updateUserList(users, slots, readyStatus) {
             }
         }
 
-        // Ottieni il nickname dalla mappa
         const nickname = usernameToNicknameMap[user.username] || user.username;
 
         // Controlla se l'utente è ready
@@ -527,7 +522,6 @@ if (readyButton !== null) {
         let userSlot = null;
         let maxRoundNumber = -1;
 
-        // Recupera il nickname associato all'utente
         const userNickname = usernameToNicknameMap[username_lobby];
         // Trova tutti i round nel DOM
         const rounds = document.querySelectorAll('.round[data-round]');
@@ -714,7 +708,8 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     if (startButton) {
         const ownerInGame = activeUsernames.includes(tournamentOwner);
         if (ownerInGame) {
-            startButton.disabled = false;
+            // startButton.disabled = false;
+            startTournamentLogic();
         } else {
             console.warn("Owner not in game. Automatically triggering start logic.");
             startTournamentLogic();

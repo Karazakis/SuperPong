@@ -207,6 +207,7 @@ class Game(models.Model):
     time_left = models.IntegerField(default=0, null=True, blank=True)
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_winner', default=None, null=True, blank=True)
     status = models.CharField(max_length=100, default='not_started')
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
 def user_directory_path(instance, filename):
     # Il file verrà caricato in MEDIA_ROOT / profiles / user_<id> / <filename>

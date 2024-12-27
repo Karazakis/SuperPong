@@ -21,6 +21,7 @@
                 <div class="form-group">
                     <label for="img_profile">Profile Image:</label>
                     <input type="file" class="form-control-file" id="img_profile" name="img_profile">
+                    <div id="img-profile-error" class="error-message"></div>
                 </div>
                 <div class="form-group">
                     <label for="username">Username:</label>
@@ -60,7 +61,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-6" style="display: none;">
                                 <label for="keyInput13">Shoot:</label>
                                 <input type="text" class="key-capture form-control" id="keyInput13" name="shoot1" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p1Shoot }}">
                             </div>
@@ -70,7 +71,7 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div >
                         <h6 class="text-center mt-3"><strong>Player 2</strong></h6>
                         <div class="row">
                             <div class="col-6">
@@ -83,7 +84,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-6" style="display: none;">
                                 <label for="keyInput23">Shoot:</label>
                                 <input type="text" class="key-capture form-control" id="keyInput23" name="shoot2" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p2Shoot }}">
                             </div>
@@ -93,7 +94,7 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div style="display: none;">
                         <h6 class="text-center mt-3"><strong>Player 3</strong></h6>
                         <div class="row">
                             <div class="col-6">
@@ -106,7 +107,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-6" style="display: none;">
                                 <label for="keyInput33">Shoot:</label>
                                 <input type="text" class="key-capture form-control" id="keyInput33" name="shoot3" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p3Shoot }}">
                             </div>
@@ -116,7 +117,7 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div style="display: none;">
                         <h6 class="text-center mt-3"><strong>Player 4</strong></h6>
                         <div class="row">
                             <div class="col-6">
@@ -129,7 +130,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-6" style="display: none;">
                                 <label for="keyInput43">Shoot:</label>
                                 <input type="text" class="key-capture form-control" id="keyInput43" name="shoot4" readonly="readonly" placeholder="Press a key..." value="{{ user.userprofile.p4Shoot }}">
                             </div>

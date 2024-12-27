@@ -97,8 +97,9 @@
                 <table class="table table-striped mt-3" id="game-history-table">
                     <thead>
                         <tr>
+                            <th>Created</th>
                             <th>Game Name</th>
-                            <th>Mode</th>
+                            <th>Type</th>
                             <th>Winner</th>
                         </tr>
                     </thead>
@@ -106,9 +107,40 @@
                         {% if match_history %}
                             {% for game in match_history %}
                                 <tr>
+                                    <td>{{ game.created }}</td>
                                     <td><a href="#" class="game-link" data-id="{{ game.id }}">{{ game.name }}</a></td>
-                                    <td>{{ game.mode }}</td>
-                                    <td>{{ game.winner }}</td>
+                                    <td>
+                                        {% if game.player1 == game.player2 %}
+                                            Local Game
+                                        {% elif game.tournament %}
+                                            Tournament Game
+                                        {% else %}
+                                            Remote Game
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if game.player1 == game.player2 %}
+                                            {% if game.rules == 'time' %}
+                                                {% if game.player1_score < game.player2_score %}
+                                                    <span class="text-danger">{{ game.winner.nickname }}</span>
+                                                {% elif game.player1_score > game.player2_score %}
+                                                    <span class="text-danger">Local Player 2</span>
+                                                {% else %}
+                                                    <span class="text-success">Draw</span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if game.player1_score > game.player2_score %}
+                                                    <span class="text-success">{{ game.player1 }}</span>
+                                                {% elif game.player1_score < game.player2_score %}
+                                                    <span class="text-success">Local Player 2</span>
+                                                {% else %}
+                                                    <span class="text-danger">Draw</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ game.winner }}
+                                        {% endif %}
+                                    </td>                                    
                                 </tr>
                             {% endfor %}
                         {% else %}
@@ -149,7 +181,6 @@
                     <thead>
                         <tr>
                             <th>Tournament Name</th>
-                            <th>Mode</th>
                             <th>Status</th>
                             <th>Winner</th>
                         </tr>
@@ -166,7 +197,6 @@
                                                 <span class="text-muted">{{ tournament.name }}</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ tournament.mode }}</td>
                                         <td>{{ tournament.status }}</td>
                                         <td>{{ tournament.winner|default:"No winner yet" }}</td>
                                     </tr>

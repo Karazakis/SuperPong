@@ -15,7 +15,13 @@
                 <!-- Player 2 Details -->
                 <div class="col-md-6 text-center">
                     <img src="/static/media/{{ game.player2_image }}" alt="{{ game.player2 }}" class="img-thumbnail rounded-circle mb-3" style="width: 120px; height: 120px;">
-                    <h4>{{ game.player2 }}</h4>
+                    <h4>
+                        {% if game.type == 'local-game' %}
+                            Local Player 2
+                        {% else %}
+                            {{ game.player2 }}
+                        {% endif %}
+                        </h4>
                     <p><strong>Score:</strong> {{ game.player2_score }}</p>
                     <p><strong>Hits:</strong> {{ game.player2_hit }}  |  <strong>Keys pressed:</strong> {{ game.player2_keyPressCount }}</p>
                 </div>
@@ -26,7 +32,7 @@
             <hr>
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Mode:</strong> {{ game.mode }}</p>
+                    <p><strong>Type:</strong> {{ game.type }}</p>
                     <p><strong>Status:</strong> 
                         <span class="badge {{ game.status|lower }}-status">
                             {{ game.status }}
@@ -38,8 +44,26 @@
                     <p><strong>Ball Limit:</strong> {{ game.balls }}</p>
                     <p><strong>Rules:</strong> {{ game.rules }}</p>
                     <p><strong>Winner:</strong> 
-                        {% if game.winner %}
+                        {% if game.winner and game.type != 'local-game' %}
                             <span class="text-success">{{ game.winner }}</span>
+                        {% elif game.type == 'local-game' %}
+                            {% if game.rules == 'time' %}
+                                {% if game.player1_score < game.player2_score %}
+                                    <span class="text-danger">{{ game.winner }}</span>
+                                {% elif game.player1_score > game.player2_score %}
+                                    <span class="text-danger">Local Player 2</span>
+                                {% else %}
+                                    <span class="text-success">Draw</span>
+                                {% endif %}
+                            {% else %}
+                                {% if game.player1_score > game.player2_score %}
+                                    <span class="text-success">{{ game.player1 }}</span>
+                                {% elif game.player1_score < game.player2_score %}
+                                    <span class="text-success">Local Player 2</span>
+                                {% else %}
+                                    <span class="text-danger">Draw</span>
+                                {% endif %}
+                            {% endif %}
                         {% else %}
                             <span class="text-danger">No winner yet</span>
                         {% endif %}

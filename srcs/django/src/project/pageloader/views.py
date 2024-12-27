@@ -129,7 +129,7 @@ class CreateUserAPIView(APIView):
                     'access': str(refresh.access_token),
                 }, status=status.HTTP_201_CREATED)
             except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': str(e)}, status=status.HTTP_200_OK)
         else:
             errors_with_field_type = {
                 field: {
@@ -138,7 +138,7 @@ class CreateUserAPIView(APIView):
                 } for field, messages in form.errors.items()
             }
             logger.warning(f"Errori di validazione: {errors_with_field_type}")
-            return Response({'errors': errors_with_field_type}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'errors': errors_with_field_type}, status=status.HTTP_200_OK)
 
 
 
@@ -178,22 +178,20 @@ class LoginUserAPIView(APIView):
         password = request.data.get('password')
         
         if not username or not password:
-            return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Username and password are required'}, status=status.HTTP_200_OK)
 
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            return Response({'error': 'Username does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Username does not exist'}, status=status.HTTP_200_OK)
 
         if not user.check_password(password):
-            return Response({'error': 'Incorrect password'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Incorrect password'}, status=status.HTTP_200_OK)
 
         refresh = RefreshToken.for_user(user)
 
-        # Genera il token CSRF
         csrf_token = get_token(request)
 
-        # Imposta il token CSRF nel cookie di risposta
         response = Response({
             'username': user.username,
             'userId': user.id,
@@ -215,19 +213,16 @@ class RefreshTokenAPIView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     def get(self, request):
-        # Ottiene il token di accesso dai parametri di query
         token = request.GET.get('token')
         if not token:
             return Response({'message': 'Token non fornito'}, status=status.HTTP_200_OK)
 
         try:
-            # Verifica il token di accesso
             access_token = AccessToken(token)
             access_token.verify()  # Metodo che verifica se il token è valido
 
             return Response({'message': 'Token valido'}, status=status.HTTP_200_OK)
         except TokenError as e:
-            # Gestione del caso in cui il token non è valido
             return Response({'message': 'Token non valido', 'error': str(e)}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
@@ -273,20 +268,26 @@ def clamp(value):
     return value
 
 def normalize_statistics(individual_stats, global_stats):
+
     normalized_stats = {}
+
     for key in individual_stats.keys():
-        if global_stats[key] > 0:  # Evitiamo divisioni per zero
-            normalized_value = (individual_stats[key] / global_stats[key]) * 5
-            normalized_stats[key] = round(clamp(normalized_value), 2)  # Applichiamo il clamp
+        global_value = global_stats.get(key, 0)
+        if global_value > 0:
+           
+            normalized_value = (individual_stats[key] / global_value) * 5
+            normalized_stats[key] = round(clamp(normalized_value), 2)
         else:
-            normalized_stats[key] = 1  # Se la statistica globale è 0, restituisci il minimo
+            normalized_stats[key] = 1
+
     return normalized_stats
 
 def calculate_global_game_statistics():
     total_games = Game.objects.count()
+
     if total_games == 0:
         return {
-            'precision': 1,  # Evitiamo divisione per zero
+            'precision': 1,  # Evitiamo divisioni per zero
             'reactivity': 1,
             'luck': 1,
             'madness': 1,
@@ -294,27 +295,40 @@ def calculate_global_game_statistics():
             'intensity': 1,
         }
 
-    precision = Game.objects.aggregate(
-        avg_precision=(Avg('player1_score') + Avg('player2_score')) / 2
-    )['avg_precision'] or 1
+    precision_scores = Game.objects.aggregate(
+        avg_player1_score=Avg('player1_score'),
+        avg_player2_score=Avg('player2_score')
+    )
+    precision = (
+        (precision_scores['avg_player1_score'] or 0) +
+        (precision_scores['avg_player2_score'] or 0)
+    ) / 2
 
-    reactivity = Game.objects.aggregate(
-        avg_reactivity=(Avg('player1_hit') + Avg('player2_hit')) / 2
-    )['avg_reactivity'] or 1
+    reactivity_hits = Game.objects.aggregate(
+        avg_player1_hit=Avg('player1_hit'),
+        avg_player2_hit=Avg('player2_hit')
+    )
+    reactivity = (
+        (reactivity_hits['avg_player1_hit'] or 0) +
+        (reactivity_hits['avg_player2_hit'] or 0)
+    ) / 2
 
     luck = Game.objects.filter(boost=True).count() / total_games * 5
 
     madness = Game.objects.aggregate(
-        avg_madness=Avg('balls')
-    )['avg_madness'] or 1
+        avg_balls=Avg('balls')
+    )['avg_balls'] or 0
 
-    leadership = (
-        Game.objects.filter(winner__isnull=False).count() / total_games * 5
+    leadership = Game.objects.filter(winner__isnull=False).count() / total_games * 5
+
+    intensity_keys = Game.objects.aggregate(
+        avg_player1_keyPress=Avg('player1_keyPressCount'),
+        avg_player2_keyPress=Avg('player2_keyPressCount')
     )
-
-    intensity = Game.objects.aggregate(
-        avg_intensity=(Avg('player1_keyPressCount') + Avg('player2_keyPressCount')) / 2
-    )['avg_intensity'] or 1
+    intensity = (
+        (intensity_keys['avg_player1_keyPress'] or 0) +
+        (intensity_keys['avg_player2_keyPress'] or 0)
+    ) / 2
 
     return {
         'precision': round(precision, 2),
@@ -328,6 +342,7 @@ def calculate_global_game_statistics():
 def calculate_individual_game_statistics(user_profile):
     match_history = user_profile.game_played.all()
     total_games = match_history.count()
+
     if total_games == 0:
         return {
             'precision': 0,
@@ -338,31 +353,44 @@ def calculate_individual_game_statistics(user_profile):
             'intensity': 0,
         }
 
-    precision = sum(
-        match.player1_score + match.player2_score
-        for match in match_history
-        if match.player1_score and match.player2_score
-    ) / total_games
+    total_scores = 0
+    total_hits = 0
+    boost_count = 0
+    total_balls = 0
+    win_count = 0
+    total_key_presses = 0
+    valid_scores_count = 0
+    valid_hits_count = 0
+    valid_key_presses_count = 0
 
-    reactivity = sum(
-        match.player1_hit + match.player2_hit
-        for match in match_history
-        if match.player1_hit and match.player2_hit
-    ) / total_games
+    for match in match_history:
+        if match.player1_score is not None and match.player2_score is not None:
+            total_scores += match.player1_score + match.player2_score
+            valid_scores_count += 1
 
-    luck = sum(1 for match in match_history if match.boost) / total_games * 5
+        if match.player1_hit is not None and match.player2_hit is not None:
+            total_hits += match.player1_hit + match.player2_hit
+            valid_hits_count += 1
 
-    madness = sum(match.balls for match in match_history if match.balls) / total_games
+        if match.boost:
+            boost_count += 1
 
-    leadership = sum(
-        1 for match in match_history if match.winner == user_profile.user
-    ) / total_games * 5
+        if match.balls is not None:
+            total_balls += match.balls
 
-    intensity = sum(
-        match.player1_keyPressCount + match.player2_keyPressCount
-        for match in match_history
-        if match.player1_keyPressCount and match.player2_keyPressCount
-    ) / total_games
+        if match.winner == user_profile.user:
+            win_count += 1
+
+        if match.player1_keyPressCount is not None and match.player2_keyPressCount is not None:
+            total_key_presses += match.player1_keyPressCount + match.player2_keyPressCount
+            valid_key_presses_count += 1
+
+    precision = total_scores / valid_scores_count if valid_scores_count > 0 else 0
+    reactivity = total_hits / valid_hits_count if valid_hits_count > 0 else 0
+    luck = (boost_count / total_games) * 5
+    madness = total_balls / total_games
+    leadership = (win_count / total_games) * 5
+    intensity = total_key_presses / valid_key_presses_count if valid_key_presses_count > 0 else 0
 
     return {
         'precision': round(precision, 2),
@@ -372,6 +400,7 @@ def calculate_individual_game_statistics(user_profile):
         'leadership': round(leadership, 2),
         'intensity': round(intensity, 2),
     }
+
 
 def calculate_relative_statistics(individual_stats, global_stats):
     relative_stats = {}
@@ -389,17 +418,45 @@ class ProfileAPIView(APIView):
         try:
             user = User.objects.get(pk=pk)
             user_profile = UserProfile.objects.get(user=user)
-
-            # Friends
             friends = user_profile.user_friend_list.all()
+            logger.debug(f"User profile: {user_profile.game_played}")
 
-            # Match history (games played)
-            match_history = user_profile.game_played.all()
+            match_history = [
+                {
+                    'created': game.created,
+                    'id': game.id,
+                    'name': game.name,
+                    'mode': game.mode,
+                    'rules': game.rules,
+                    'limit': game.limit,
+                    'balls': game.balls,
+                    'boost': game.boost,
+                    'status': game.status,
+                    'winner': UserProfile.objects.get(user=game.winner).nickname if game.winner else None,
+                    'player1': UserProfile.objects.get(user=game.player1).nickname,
+                    'player2': UserProfile.objects.get(user=game.player2).nickname,
+                    'tournament': game.tournament,
+                    'player1_score': game.player1_score,
+                    'player2_score': game.player2_score,
+                }
+                for game in user_profile.game_played.all()
+            ]
+            tournamnt_history = [
+                {
+                    'id': tournament.id,
+                    'name': tournament.name,
+                    'mode': tournament.mode,
+                    'rules': tournament.rules,
+                    'limit': tournament.limit,
+                    'balls': tournament.balls,
+                    'boost': tournament.boost,
+                    'status': tournament.status,
+                    'winner': UserProfile.objects.get(user=tournament.winner).nickname if tournament.winner else None,
+                }
+                for tournament in user_profile.tournament_played.all()
+            ]
 
-            # Tournament history
-            tournamnt_history = user_profile.tournament_played.all()
             logger.debug(f"DIOCANE L?USER {user_profile.tournament_played.all()}")
-            # Additional statistics
             game_wins = user_profile.game_win
             game_losses = user_profile.game_lose
             game_draws = user_profile.game_draw
@@ -409,7 +466,6 @@ class ProfileAPIView(APIView):
             tournament_draws = user_profile.tournament_draw
             tournament_abandons = user_profile.tournament_abandon
             
-            # Calcola statistiche globali, individuali e normalizzate
             global_game_statistics = calculate_global_game_statistics()
             individual_game_statistics = calculate_individual_game_statistics(user_profile)
             normalized_game_statistics = normalize_statistics(
@@ -485,16 +541,13 @@ class SettingsAPIView(APIView):
             user_profile = UserProfile.objects.get(user=user)
             img_profile = request.FILES.get('img_profile')
             if img_profile:                    
-                # Crea il percorso della cartella in base all'ID dell'utente
                 user_folder = os.path.join(settings.MEDIA_ROOT, f'profiles/{user.id}/')
                 if not os.path.exists(user_folder):
                     os.makedirs(user_folder)
-                # Salva l'immagine nel percorso specificato
                 fs = FileSystemStorage(location=user_folder)
                 filename = fs.save(img_profile.name, img_profile)
                 user_profile.img_profile = f'profiles/{user.id}/{filename}'
             else:
-                # Se non viene caricata una nuova immagine, utilizza l'immagine di default se necessario
                 if not user_profile.img_profile:
                     user_profile.img_profile = 'profiles/default.png'
             
@@ -723,7 +776,7 @@ class JoinAPIView(APIView):
 
                     if tournament.status == 'not_started':
                         # Tornei non iniziati: esegui il normale join
-                        if tournament.players_in_lobby > tournament.nb_players:
+                        if tournament.players_in_lobby >= tournament.nb_players:
                             return Response({'success': False, 'message': 'Tournament is full'}, status=status.HTTP_400_BAD_REQUEST)
                         if user not in tournament.players.all():
                             tournament.players.add(user)
@@ -778,7 +831,15 @@ class JoinAPIView(APIView):
                         user_profile.save()
                     return Response({'success': True})
                 except Tournament.DoesNotExist:
-                    return Response({'success': False, 'error': 'Tournament not found'}, status=404)
+                    # Se il torneo è stato cancellato, rimuovi comunque il giocatore bloccato
+                    user = get_object_or_404(User, pk=request.user.id)
+                    user_profile = get_object_or_404(UserProfile, user=user)
+
+                    # Rimuovi il riferimento al torneo (anche se non esiste più)
+                    user_profile.tournament_played.filter(id=tournament_id).delete()
+                    user_profile.save()
+
+                    return Response({'success': True, 'message': 'Tournament not found, but user was removed from lobby.'})
             return Response({'success': False, 'error': 'Tournament ID not provided'}, status=400)
         else:
             return Response({'success': False, 'message': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -934,7 +995,6 @@ class LobbyAPIView(APIView):
             if 'tournament_lobby' in current_url:
                 tournament = Tournament.objects.get(pk=pk)
 
-                # Recupera tutti i giocatori del torneo e serializza i dati in modo esplicito
                 user_nicknames = [
                     {'username': player.username, 'nickname': player.userprofile.nickname}
                     for player in User.objects.all()
@@ -1016,7 +1076,7 @@ class LobbyAPIView(APIView):
             user_profile = UserProfile.objects.get(user=user)
             try:
                 if 'tournament_lobby' in current_url:
-                    tournament = Tournament.objects.get(pk=pk)
+                    # tournament = Tournament.objects.get(pk=pk)
                     return Response({'success': True}, status=status.HTTP_200_OK)
                 else:
                     game = Game.objects.get(pk=pk)
@@ -1106,7 +1166,9 @@ class UserInfoAPIView(APIView):
                     'id': req.id,
                     'request_type': req.request_type,
                     'target_user': req.target_user.username,
+                    'target_user_id': req.target_user.id,
                     'requesting_user': req.requesting_user.username,
+                    'requesting_user_id': req.requesting_user.id,
                     'status': req.status,
                     'creation_date': req.creation_date.isoformat()
                 }
@@ -1202,7 +1264,8 @@ class UserRequestAPIView(APIView):
                 logger.debug(f"qui ci entra dio merda user: {request_data.get('requesting_user')}")
                 if request_data.get('request') == "accept":
                     logger.debug(f"Requesting user asdasd: {request_data.get('requesting_user')}")
-                    requesting_user = User.objects.get(username=request_data.get('requesting_user'))
+                    requesting_user = User.objects.get(pk=request_data.get('requesting_user'))
+                    target_user = User.objects.get(pk=request_data.get('target_user'))
                 elif request_data.get('request') == "decline":
                     logger.debug(f"Requesting user noxxxx: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(pk=request_data.get('requesting_user'))
@@ -1214,9 +1277,9 @@ class UserRequestAPIView(APIView):
                 user_profile = UserProfile.objects.get(user=user)
                 if user in user_profile.user_friend_list.all():
                     return Response({'error': 'L\'utente è già un amico.'}, status=status.HTTP_400_BAD_REQUEST)
-
+                logger.debug(f"Request  nel requesttipe : {request_data}")
                 if request_data.get('request') == 'accept':
-                    return self.accept_request(request, id, requesting_user)
+                    return self.accept_request(request, target_user, requesting_user)
                 elif request_data.get('request') == 'decline':
                     return self.decline_request(request, id, requesting_user)
                 elif request_data.get('request') == 'remove':
@@ -1467,19 +1530,14 @@ class UserRequestAPIView(APIView):
             logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
             return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def accept_request(self, request, id, requesting_user):
+    def accept_request(self, request, target_user, requesting_user):
         try:
-            # Verifica se l'utente è autenticato
             if not request.user.is_authenticated:
                 return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            # Recupera l'utente target
-            target_user_base = User.objects.get(pk=id)
-            target_user = UserProfile.objects.get(user=target_user_base)
-
-            # Trova tutte le richieste pendenti
+            
             pending_requests = PendingRequest.objects.filter(
-                target_user=target_user.user,
+                target_user=target_user,
                 requesting_user=requesting_user,
                 request_type='friend'
             )
@@ -1492,9 +1550,10 @@ class UserRequestAPIView(APIView):
             requesting_user_profile = UserProfile.objects.get(user=requesting_user)
 
             # Aggiungi il target_user alla lista amici di requesting_user_profile
-            requesting_user_profile.user_friend_list.add(target_user)
+            target_user_profile = UserProfile.objects.get(user=target_user)
+            requesting_user_profile.user_friend_list.add(target_user_profile)
 
-            logger.info(f"Amicizia accettata tra {requesting_user_profile.user.username} e {target_user.user.username}")
+            logger.info(f"Amicizia accettata tra {requesting_user_profile.user.username} e {target_user_profile.user.username}")
             return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
@@ -1979,23 +2038,34 @@ class GameAPIView(APIView):
             }
             return Response(data)
     
-    def post(self, request, pk):
+    def post(self, request, pk=None):
         if request.user.is_authenticated:
             
             if 'local' in request.path:
                 data = request.data
+                logger.debug(f"NEL GAME data fa: {data}")
+
                 user = get_object_or_404(User, pk=request.user.id)
+                user_profile = get_object_or_404(UserProfile, user=user)
+                boosts = data.get('boosts', 0)
+                logger.debug(f"NEL COSA CREA DIOCANE {data}")
+                player1_score = data.get('scorePlayer1', '0')
+                player2_score = data.get('scorePlayer2', '0')
+                if boosts == "true":
+                    boosts = True
+                else:
+                    boosts = False
                 game = Game.objects.create(
-                    name=data.get('name'),
+                    name=data.get('name', 'Game'),
                     mode=data.get('mode'),
                     rules=data.get('rules'),
                     limit=data.get('limit'),
                     balls=data.get('balls'),
-                    boost=data.get('boost'),
+                    boost=boosts,
                     player1=user,
                     player2=user,
-                    player1_score= data.get('player1_score', 0),
-                    player2_score= data.get('player2_score', 0),
+                    player1_score= int(player1_score),
+                    player2_score= int(player2_score),
                     player1_hit= data.get('player1_hit', 0),
                     player2_hit= data.get('player2_hit', 0),
                     player1_keyPressCount= data.get('player1_keyPressCount', 0),
@@ -2003,7 +2073,8 @@ class GameAPIView(APIView):
                     ballCount= data.get('ballCount', 0),
                     status='finished',
                 )
-                
+                user_profile.game_played.add(game)
+                user_profile.save()
                 game.save()
 
                 return Response({'success': game.id}, status=status.HTTP_200_OK)
@@ -2037,11 +2108,19 @@ class GameAPIView(APIView):
                             player1.game_win += 1
                             player2.game_abandon += 1
                             game.winner = game.player1
-                    elif game.player1_score > game.player2_score:
+                    elif game.player1_score < game.player2_score and game.rules == 'time':
                         player1.game_win += 1
                         player2.game_lose += 1
                         game.winner = game.player1
-                    elif game.player2_score > game.player1_score:
+                    elif game.player2_score < game.player1_score and game.rules == 'time':
+                        player2.game_win += 1
+                        player1.game_lose += 1
+                        game.winner = game.player2
+                    elif game.player1_score > game.player2_score and game.rules == 'score':
+                        player1.game_win += 1
+                        player2.game_lose += 1
+                        game.winner = game.player1
+                    elif game.player2_score > game.player1_score and game.rules == 'score':
                         player2.game_win += 1
                         player1.game_lose += 1
                         game.winner = game.player2
@@ -2049,6 +2128,8 @@ class GameAPIView(APIView):
                         player1.game_draw += 1
                         player2.game_draw += 1
                         game.winner = None
+
+
                     game.status = data.get('gameStatus')
                     logger.debug(f"NEL GAME status fa: {game.status}")
                     logger.debug(f"NEL GAME madonna fa: {game}")
@@ -2113,6 +2194,13 @@ class StatsAPIView(APIView):
             game = get_object_or_404(Game, pk=game_id)
             player1 = UserProfile.objects.get(user=game.player1)
             player2 = UserProfile.objects.get(user=game.player2)
+            if player1 == player2:
+                type = 'local-game'
+            elif game.tournament:
+                type = 'tournament-game'
+            else:
+                type = 'remote-game'
+
             context = {
                 'user': user,
                 'userprofile': user_profile,
@@ -2120,14 +2208,15 @@ class StatsAPIView(APIView):
                     'id': game.id,
                     'name': game.name,
                     'mode': game.mode,
+                    'type': type,
                     'rules': game.rules,
                     'limit': game.limit,
                     'balls': game.balls,
                     'boost': game.boost,
                     'status': game.status,
-                    'winner': game.winner.username if game.winner else None,
-                    'player1': game.player1.username,
-                    'player2': game.player2.username,
+                    'winner': player1.nickname if game.winner == game.player1 else player2.nickname if game.winner == game.player2 else None,
+                    'player1': player1.nickname,
+                    'player2': player2.nickname,
                     'player1_score': game.player1_score,
                     'player2_score': game.player2_score,
                     'player1_hit': game.player1_hit,
@@ -2163,9 +2252,9 @@ class StatsAPIView(APIView):
                 games_data.append({
                     'id': game.id,
                     'name': game.name,
-                    'player1': game.player1.username,
-                    'player2': game.player2.username,
-                    'winner': game.winner.username if game.winner else None,
+                    'player1': player1.nickname,
+                    'player2': player2.nickname,
+                    'winner': player1.nickname if game.winner == game.player1 else player2.nickname if game.winner == game.player2 else None,
                     'player1_score': game.player1_score,
                     'player2_score': game.player2_score,
                     'player1_image': player1.img_profile,
@@ -2185,9 +2274,9 @@ class StatsAPIView(APIView):
                     'boost': tournament.boost,
                     'status': tournament.status,
                     'nb_players': tournament.nb_players,
-                    'owner': tournament.owner.username if tournament.owner else None,
-                    'winner': tournament.winner.username if tournament.winner else None,
-                    'players': [player.username for player in tournament.players.all()],
+                    'owner': UserProfile.objects.get(user=tournament.owner).nickname,
+                    'winner': UserProfile.objects.get(user=tournament.winner).nickname if tournament.winner else None,
+                    'players': [UserProfile.objects.get(user=player).nickname for player in tournament.players.all()],
                     'games': games_data,
                 },
             }

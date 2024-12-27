@@ -66,7 +66,6 @@ function saveProfileIdFromUrl() {
     const path = window.location.pathname; // Ottiene il percorso dell'URL
     const regex = /\/profile\/(\d+)\//; // RegEx per estrarre l'ID dal percorso (es. /profile/9/)
     const match = path.match(regex);
-    console.log("sporcodek");
     if (match && match[1]) {
         const profileId = match[1];
         sessionStorage.setItem('profile_id', profileId);
