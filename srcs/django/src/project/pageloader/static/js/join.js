@@ -4,7 +4,6 @@ joinButtons.forEach(button => {
     button.addEventListener('click', function() {
         const gameId = this.getAttribute('data-game-id');
         const tournamentId = this.getAttribute('data-tournament-id');
-        console.log('Joining game:', gameId, 'Joining tournament:', tournamentId);
         if (gameId) {
             joinGame(gameId);
         } else if (tournamentId) {
@@ -38,13 +37,11 @@ var deleteButtons = document.querySelectorAll('.delete-btn');
 deleteButtons.forEach(button => {
     button.addEventListener('click', function() {
         const tournamentId = this.getAttribute('data-tournament-id');
-        console.log('Deleting 1 tournament with ID:', tournamentId);
         deleteTournament(tournamentId);
     });
 });
 
 function joinGame(gameId) {
-    console.log('Joining game:', gameId);
     let accessToken = localStorage.getItem('accessToken');
     fetch(`/api/join_lobby/`, {
         method: 'POST',
@@ -66,7 +63,6 @@ function joinGame(gameId) {
 }
 
 function joinTournament(tournamentId) {
-    console.log('Joining tournament:', tournamentId);
     let accessToken = localStorage.getItem('accessToken');
     fetch(`/api/join_tournament/`, {
         method: 'POST',
@@ -90,7 +86,6 @@ function joinTournament(tournamentId) {
 
 
 function deleteTournament(tournamentId) {
-    console.log('Deleting tournament with ID:', tournamentId);
     let accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
         console.error('Access token not found.');
@@ -107,7 +102,6 @@ function deleteTournament(tournamentId) {
         }
     })
     .then(response => {
-        console.log('HTTP Status:', response.status);
         if (!response.ok) {
             throw new Error(`Network response was not ok, status: ${response.status}`);
         }
@@ -147,7 +141,6 @@ function getCookie(name) {
 
 function refreshTournamentList() {
     let accessToken = localStorage.getItem('accessToken');
-    console.log('Refreshing tournament list');
     fetch('/api/tournaments/', {
         method: 'GET',
         headers: {
@@ -157,14 +150,12 @@ function refreshTournamentList() {
     })
     .then(response => response.text())  // Cambiato da response.json() a response.text()
     .then(html => {
-        console.log('Response HTML:', html);  // Log di debug per verificare l'HTML di risposta
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const newContent = doc.querySelector('.container.mt-4');
         const tournamentContainer = document.querySelector('.container.mt-4');
         if (newContent) {
             tournamentContainer.innerHTML = newContent.innerHTML;
-            console.log('Tournament list updated');
             setupEventListeners();
         } else {
             console.error('Failed to find new tournament content in response');
@@ -180,7 +171,6 @@ function setupEventListeners() {
         button.addEventListener('click', function() {
             const gameId = this.getAttribute('data-game-id');
             const tournamentId = this.getAttribute('data-tournament-id');
-            console.log('Joining game:', gameId, 'Joining tournament:', tournamentId);
             if (gameId) {
                 joinGame(gameId);
             } else if (tournamentId) {
@@ -193,7 +183,6 @@ function setupEventListeners() {
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const tournamentId = this.getAttribute('data-tournament-id');
-            console.log('Deleting tournament with ID:', tournamentId);
             deleteTournament(tournamentId);
         });
     });

@@ -22,7 +22,6 @@ function initializeNicknameMapFromTemplate() {
                 usernameToNicknameMap[entry.username] = entry.nickname;
             });
 
-            console.log("Initialized usernameToNicknameMap:", usernameToNicknameMap);
         } catch (error) {
             console.error("Error parsing nickname data:", error);
         }
@@ -33,14 +32,12 @@ onPageLoad();
 
 // Gestione dell'apertura del WebSocket
 LobbySocket.onopen = function(e) {
-    console.log('WebSocket connection opened');
     LobbySocket.send(JSON.stringify({ action: "join", round_id_lobby: round_id_lobby, username: username_lobby }));
 };
 
 // Gestione dei messaggi ricevuti dal WebSocket
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    console.log("received data:", data);
 
     switch (data.type) {
         case 'chat_message':
@@ -57,7 +54,6 @@ LobbySocket.onmessage = function(e) {
             updateUserList(data.user_list,data.slots, data.ready_status);
             break;
         case 'block_slots':
-            console.log("Blocking slots and disabling buttons");
             disableButtonsAndSlots(data.players_to_block);
             break;
         case 'reset_ready_statuses':
@@ -65,11 +61,9 @@ LobbySocket.onmessage = function(e) {
             if (readyButton) readyButton.disabled = true;
             break
         case 'join_game_notification':
-            console.log("Join game notification received");
             showJoinGamePopup(data.game_link);
             break;
         case 'tournament_finished':
-            console.log("Tournament finished! Displaying winner popup after delay.");
             setTimeout(() => {
                 disableAllButtonsButLeave();
                 showWinnerPopup(data.winner);
@@ -78,12 +72,10 @@ LobbySocket.onmessage = function(e) {
         case 'start_countdown':
             if (data.authorized_client === username_lobby) {
                 // Solo il client autorizzato esegue il countdown
-                console.log("You are authorized to start the countdown.");
                 startTournamentCountdown();
             }
             break;
         default:
-            console.log("Unrecognized action:", data.type);
             break;
     }
 };
@@ -94,13 +86,11 @@ LobbySocket.onerror = function(e) {
 };
 
 LobbySocket.onclose = function(e) {
-    console.log('WebSocket connection closed:', e);
 };
 
 // Funzione di inizializzazione della pagina della lobby
 function onPageLoad() {
     initializeNicknameMapFromTemplate();
-    console.log("Pagina lobby torneo caricata");
     const tournamentDataElement = document.getElementById('tournament-data');
     const roundsDataElement = document.getElementById('rounds-data');
     const currentUserElement = document.getElementById('current-user');
@@ -113,14 +103,43 @@ function onPageLoad() {
     };
     const currentUser = currentUserElement.dataset.username;
     const currentUserNick = currentUserNickElement.dataset.nickname;
-
-    console.log('Tournament data:', tournament);
-    console.log('Current user:', currentUser);
-    console.log('Current user Nickname:', currentUserNick);
+    disableDashboard();
 
     generateBracket(tournament);
     setupSlotSelection(tournament, currentUser);
 
+}
+
+function disableDashboard() {
+    const profileButton = document.getElementById('profile');
+    const settingsButton = document.getElementById('settings');
+    const logoutButton = document.getElementById('logout');
+
+    if (profileButton) {
+        profileButton.disabled = true;
+    }
+    if (settingsButton) {
+        settingsButton.disabled = true;
+    }
+    if (logoutButton) {
+        logoutButton.disabled = true;
+    }
+}
+
+function reactivateDashboard() {
+    const profileButton = document.getElementById('profile');
+    const settingsButton = document.getElementById('settings');
+    const logoutButton = document.getElementById('logout');
+
+    if (profileButton) {
+        profileButton.disabled = false;;
+    }
+    if (settingsButton) {
+        settingsButton.disabled = false;
+    }
+    if (logoutButton) {
+        logoutButton.disabled = false;
+    }
 }
 
 function checkUserSlotAndReadyState(roundsSlots) {
@@ -151,7 +170,6 @@ function checkUserSlotAndReadyState(roundsSlots) {
         return;
     }
 
-    console.log(`Max round detected: ${maxRoundKey}`);
 
     // Recupera gli slot del round massimo
     const maxRoundSlots = roundsSlots[maxRoundKey];
@@ -160,7 +178,6 @@ function checkUserSlotAndReadyState(roundsSlots) {
         readyButton.disabled = true;
         return;
     }
-    console.log(`Slots for max round (${maxRoundKey}):`, maxRoundSlots);
 
     // Verifica se tutti gli slot del round massimo sono validi
     Object.values(maxRoundSlots).forEach(slot => {
@@ -229,7 +246,6 @@ function generateBracket(tournament) {
     let teamIndex = 1; // Tiene traccia del numero del team progressivo
 
     while (round <= totalRounds) {
-        console.log(`Generating round ${round}`); 
         const roundElement = document.createElement('div');
         roundElement.classList.add('round');
         roundElement.setAttribute('data-round', round);
@@ -344,7 +360,6 @@ function generateBracket(tournament) {
         winnerIndex = 1; // Reset dell'indice dei vincitori per il prossimo round
     }
 
-    console.log('Bracket generated');
 }
 
 // Funzione per ottenere il nome del round
@@ -363,14 +378,12 @@ function getRoundName(totalRounds, currentRound, mode) {
 
 // Funzione per aggiornare tutti gli slot di più round
 function updateAllSlots(roundsSlots) {
-    console.log('Updating all slots for rounds:', roundsSlots);
 
     // Itera su ogni round
     Object.keys(roundsSlots).forEach(roundKey => {
         const slots = roundsSlots[roundKey];
         const roundNumber = roundKey.split('_')[1]; // Estrae il numero del round
 
-        console.log(`Updating slots for round ${roundNumber}:`, slots);
 
         // Itera su ogni slot del round
         Object.keys(slots).forEach(slotKey => {
@@ -402,7 +415,6 @@ function updateSlot(roundNumber, slotKey, slotData) {
             slotElement.textContent = `Player ${slotKey}`;
             slotElement.style.pointerEvents = ''; // Riabilita i clic
         }
-        console.log(`Updated slot ${slotKey} in round ${roundNumber} with data:`, slotData);
     } else {
         console.error(`Slot element not found for round ${roundNumber}, slot ${slotKey}. Verify HTML structure.`);
     }
@@ -465,7 +477,6 @@ function updateSlotOnServer(action, slot, username) {
         username: username,
         player_id: player_id,
     };
-    console.log("Sending data to server:", data);
     LobbySocket.send(JSON.stringify(data));
 }
 
@@ -569,6 +580,7 @@ var leaveButton = document.getElementById('leave');
 if (leaveButton) {
     leaveButton.addEventListener('click', async (e) => {
         e.preventDefault();
+        reactivateDashboard();
         await leaveLobby();
     });
 }
@@ -664,8 +676,6 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     const userItems = userList.getElementsByTagName('li');
     const currentUser = username_lobby;
 
-    console.log("Slots received:", slots);
-    console.log("Ready status received:", readyStatus);
 
     // Aggiorna la lista utenti con lo stato "ready"
     Array.from(userItems).forEach(item => {
@@ -739,14 +749,12 @@ function disableAllButtonsButLeave() {
 function disableButtonsAndSlots(playersToBlock) {
     // Recupera userId dal localStorage
     const userId = Number(localStorage.getItem('userId')); // Assumi che l'ID sia memorizzato come stringa numerica
-    console.log(userId);
 
     const readyButton = document.querySelector('.lobby-ready');
     const leaveButton = document.querySelector('.lobby-leave');
 
     if (!playersToBlock.includes(userId)) {
         // Se l'userId non è tra quelli da bloccare, esci dalla funzione
-        console.log(`Utente con ${userId} non e' da bloccare: playerstoblock = ${playersToBlock}`)
         if (leaveButton) leaveButton.disabled = false;
         return;
     }
@@ -767,7 +775,6 @@ if (startTournament) {
 
 
 function startTournamentLogic() {
-    console.log("Starting the tournament...");
 
     // Disabilita i pulsanti
     const startTournament = document.getElementById("start");
@@ -797,7 +804,6 @@ function startTournamentCountdown() {
 
         if (countdown <= 0) {
             clearInterval(countdownInterval);
-            console.log("Countdown finished. Tournament is starting!");
 
             // Invia il messaggio per confermare che il countdown è terminato
             LobbySocket.send(JSON.stringify({
@@ -810,7 +816,6 @@ function startTournamentCountdown() {
 
 // Funzione per mostrare il popup per joinare il game
 function showJoinGamePopup(gameLink) {
-    console.log("Showing game popup with link:", gameLink);  // Log per controllare che la funzione venga chiamata correttamente
 
     // Creazione del popup
     const popup = document.createElement('div');
@@ -826,7 +831,6 @@ function showJoinGamePopup(gameLink) {
     // Trova il contenitore in cui appenderlo. Assicurati che esista o creane uno.
     const container = document.getElementById('main-container'); // Usa un container specifico se esiste
     container.appendChild(popup);
-    console.log("Popup created and appended to the DOM");  // Verifica che il popup sia stato aggiunto al DOM
 
     // Aggiungi uno stile di base per il popup (puoi migliorarlo con CSS)
     popup.style.position = 'fixed';
@@ -840,18 +844,16 @@ function showJoinGamePopup(gameLink) {
 
     // Al click del pulsante, usa loadPage per caricare la pagina del game
     document.getElementById('join-game-btn').addEventListener('click', function() {
-        console.log("Join Game button clicked. Loading game page:", gameLink);  // Log per verificare che il pulsante sia stato cliccato
         container.removeChild(popup);  // Rimuove il popup
+        reactivateDashboard();
         loadPage(gameLink);  // Usa loadPage per caricare la pagina
     });
 }
 
 function showWinnerPopup(winner) {
-    console.log("Showing winner popup for:", winner); // Log per controllare che la funzione venga chiamata correttamente
 
     // Controlla se il popup esiste già
     if (document.querySelector('.popup')) {
-        console.log("Popup already exists. Not creating a new one.");
         return; // Evita di crearne un altro
     }
 
@@ -876,7 +878,6 @@ function showWinnerPopup(winner) {
         return;
     }
     container.appendChild(popup);
-    console.log("Winner popup created and appended to the DOM"); // Verifica che il popup sia stato aggiunto al DOM
 
     // Aggiungi uno stile di base per il popup (puoi migliorarlo con CSS)
     popup.style.position = 'fixed';
@@ -891,7 +892,6 @@ function showWinnerPopup(winner) {
 
     // Aggiungi un gestore di eventi al pulsante di chiusura
     document.getElementById('close-popup-btn').addEventListener('click', function() {
-        console.log("Close button clicked. Removing popup."); // Log per verificare che il pulsante sia stato cliccato
         container.removeChild(popup); // Rimuove il popup
     });
 }

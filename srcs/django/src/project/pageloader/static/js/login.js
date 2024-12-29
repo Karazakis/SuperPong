@@ -25,7 +25,6 @@ document.getElementById("login-form").addEventListener("submit", function(event)
         return response.json();
     })
     .then(data => {
-        console.log(data);
         if (data.error) {
             if (data.error === "Username does not exist") {
                 usernameErrorDiv.textContent = "Nome utente non esiste.";

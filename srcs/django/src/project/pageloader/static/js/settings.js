@@ -38,7 +38,6 @@ document.getElementById('game-settings-btn').addEventListener('click', function(
     formData.append('shoot4', document.getElementById('keyInput43').value);
     formData.append('boost4', document.getElementById('keyInput44').value);
     
-    console.log(formData);
 
     fetch('/api/settings/', {
         method: 'POST',
@@ -54,7 +53,6 @@ document.getElementById('game-settings-btn').addEventListener('click', function(
         if (data.success) {
             loadPage("api/settings/");
         } else {
-            console.log("Data not succedeed");
             alert(data.message);
         }
     })
@@ -166,7 +164,6 @@ function validatePassword(password) {
 }
 
 function displayError(elementId, message) {
-    console.log(elementId, message);
     document.getElementById(elementId).innerText = message;
     
 }

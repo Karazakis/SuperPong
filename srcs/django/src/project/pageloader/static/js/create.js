@@ -1,5 +1,4 @@
 
-
 function toggleRuleInput() {
     const ruleSelect = document.getElementById('rule');
     const timeOptions = document.getElementById('timeOptions');
@@ -202,3 +201,19 @@ document.getElementById('create').addEventListener('click', function(event) {
 });
 
 toggleRuleInput();
+
+
+var createButton = document.getElementById('create');
+var nameInput = document.getElementById('name');
+
+
+createButton.disabled = true;
+
+
+nameInput.addEventListener('input', function () {
+    if (nameInput.value.length >= 3) {
+        createButton.disabled = false;
+    } else {
+        createButton.disabled = true;
+    }
+});

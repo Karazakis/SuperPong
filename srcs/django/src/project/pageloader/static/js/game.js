@@ -1,14 +1,13 @@
 
 import { Corner } from "/static/js/game/src/Corner.js";
-//import { Ball2 } from "/static/js/game/src/Ball2.js";
 import {init} from "/static/js/game/src/Init.js";
 import { Model3D } from "/static/js/game/src/Model3D.js";
-//import { Pad } from "/static/js/game/src/Pad.js";
 import { BotTop } from "/static/js/game/src/BotTop.js";
 import { BotSide } from "/static/js/game/src/BotSide.js";
-import {Mesh} from "/static/js/game/module/three.module.js";
+import {Mesh, SphereGeometry } from "/static/js/game/module/three.module.js";
 
 import { cornerCollision, penetrationDepthCorner2, ballCollision, penetrationDepth, collisionResponse, ballPadCollisionResponse } from "/static/js/game/src/Collision.js";
+
 
 
 document.addEventListener('cleanupGameEvent', function() {
@@ -1303,7 +1302,6 @@ let ballToRemoveHost = new Map();
 
 let gameEnded = false;
 
-import { SphereGeometry } from "/static/js/game/module/three.module.js";
 
 
 const MATERIALBALL = new THREE.MeshStandardMaterial({
@@ -1657,9 +1655,9 @@ if(gametype == 'remote-game' || gametype == 'tournament')
             ballsUpdate = {};
             if (gameEnded !== true) {
                 document.getElementById('leavegame').disabled = true;
+                startConnectionCountdown();
             }
             document.getElementById("wait-modal").style.display = "block";
-            startConnectionCountdown();
         }
         else if (data.action === 'player_rejoin')
         {

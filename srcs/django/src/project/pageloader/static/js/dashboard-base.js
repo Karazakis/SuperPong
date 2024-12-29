@@ -616,10 +616,8 @@ async function recoverUser(id) {
 	if (id == null) {
 		return;
 	}
-	console.log("ID NEL RECOVER USER: ",id);
     let accessToken = localStorage.getItem("accessToken");
 	const checkAndRefreshToken = async () => {
-		console.log("ID NEL CHECK AND REFRESH TOKEN : ",id);
         try {
             const response = await fetch(`/api/token/refresh/?token=${accessToken}`, {
                 method: 'GET',
@@ -665,7 +663,6 @@ async function recoverUser(id) {
                 "Authorization": `Bearer ${accessToken}`
             }
         });
-		console.log("RESPONSE NEL RECOVER USER DOPO FETCH: ",response);
         const text = await response.text();  // Otteniamo il testo grezzo della risposta
 
         if (!response.ok) {
