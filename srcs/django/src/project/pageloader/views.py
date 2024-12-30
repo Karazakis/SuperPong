@@ -2169,12 +2169,9 @@ class GameAPIView(APIView):
             
             if 'local' in request.path:
                 data = request.data
-                logger.debug(f"NEL GAME data fa: {data}")
-
                 user = get_object_or_404(User, pk=request.user.id)
                 user_profile = get_object_or_404(UserProfile, user=user)
                 boosts = data.get('boosts', 0)
-                logger.debug(f"NEL COSA CREA DIOCANE {data}")
                 player1_score = data.get('scorePlayer1', '0')
                 player2_score = data.get('scorePlayer2', '0')
                 if boosts == "true":
@@ -2200,7 +2197,9 @@ class GameAPIView(APIView):
                     status='finished',
                 )
                 user_profile.game_played.add(game)
-                
+                user_profile.save()
+                game.save()
+                player1 = UserProfile.objects.get(user=game.player1)
                 abandon = data.get('abandon', 0)
                 if abandon != 0:
                         if abandon == 1:
@@ -2211,7 +2210,8 @@ class GameAPIView(APIView):
                             player1.game_win += 1
                             player2.game_abandon += 1
                             game.winner = game.player1
-                elif game.player1_score < game.player2_score and game.rules == 'time':
+
+                if game.player1_score < game.player2_score and game.rules == 'time':
                     player1.game_win += 1
                     game.winner = game.player1
                 elif game.player2_score < game.player1_score and game.rules == 'time':
@@ -2226,7 +2226,8 @@ class GameAPIView(APIView):
                 else:
                     player1.game_draw += 1
                     game.winner = None
-                user_profile.save()
+                
+                player1.save()
                 game.save()
 
                 return Response({'success': game.id}, status=status.HTTP_200_OK)

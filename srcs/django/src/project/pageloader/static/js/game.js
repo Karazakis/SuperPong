@@ -459,6 +459,7 @@ endgameOnline(isLeft = false, isHostLeft = false) {
 export function 
 
 endgameLocal() {
+    console.log("endgame local")
     const accessToken = localStorage.getItem("accessToken");
 	const csrfToken = getCookie('csrftoken');
     let url = "/api/game/local/";
