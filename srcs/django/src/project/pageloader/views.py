@@ -300,19 +300,22 @@ def normalize_statistics(individual_stats, global_stats):
 
     normalized_stats['precision'] = round(normalized_precision, 2)
 
-    # Leadership: Special calculation based on individual wins and matches
+    # Leadership: Normalize based on individual win ratio compared to 50% global mean
     individual_wins = individual_stats.get('leadership_wins', 0)
     individual_matches = individual_stats.get('leadership_matches', 0)
-    global_leadership = global_stats.get('leadership', 1)  # Avoid division by zero
+    global_mean_leadership = 0.5  # Assume 50% win rate globally
 
     if individual_matches > 0:
         individual_leadership_ratio = individual_wins / individual_matches
-        normalized_leadership = 5 * (individual_leadership_ratio / global_leadership)
-        normalized_stats['leadership'] = round(clamp(normalized_leadership, 0, 5), 2)
+        deviation_leadership = individual_leadership_ratio - global_mean_leadership
+        normalized_leadership = 2.50 + (deviation_leadership / global_mean_leadership) * 2.50
+        normalized_leadership = clamp(normalized_leadership, 0, 5)
+        normalized_stats['leadership'] = round(normalized_leadership, 2)
     else:
-        normalized_stats['leadership'] = 0  # No matches played
+        normalized_stats['leadership'] = 2.50  # Neutral value if no matches played
+
     logger.debug(f"Leadership: individual_wins={individual_wins}, individual_matches={individual_matches}, "
-                 f"global_leadership={global_leadership}, normalized_leadership={normalized_stats['leadership']}")
+                 f"global_mean_leadership={global_mean_leadership}, normalized_leadership={normalized_stats['leadership']}")
 
     # Normalize other stats
     for key, individual_value in individual_stats.items():
