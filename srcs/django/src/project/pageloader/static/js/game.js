@@ -458,8 +458,10 @@ endgameOnline(isLeft = false, isHostLeft = false) {
 
 export function 
 
-endgameLocal() {
+endgameLocal(abandon = false) {
+
     console.log("endgame local")
+    console.log("abandon is :"+abandon)
     const accessToken = localStorage.getItem("accessToken");
 	const csrfToken = getCookie('csrftoken');
     let url = "/api/game/local/";
@@ -473,7 +475,7 @@ endgameLocal() {
 	
 			if (data.message === 'Token valido') {
 			// Token valido, procedi con la richiesta effettiva
-			await performRequest(accessToken, url);
+			await performRequest(accessToken, url, abandon);
 			} else if (data.message === 'Token non valido') {
 			// Token non valido, prova a rinfrescare
 			const newAccessToken = await refreshAccessToken();
@@ -492,7 +494,7 @@ endgameLocal() {
 			console.error('Errore durante la verifica del token:', error);
 		}
 		}
-		const performRequest = async (token, url) => {
+		const performRequest = async (token, url, abandon) => {
             try {
                 let gameName = document.querySelector("#dashbase .small strong").textContent;
                 let gameMode = gameSettings.gameMode;
@@ -502,10 +504,13 @@ endgameLocal() {
                 let gameBoosts = gameSettings.gameBoosts;
                 let scorePlayer1 = document.getElementById('player0score').textContent;
                 let scorePlayer2 = document.getElementById('player1score').textContent;
-                let hitPlayer1 = paddle1.hit;
-                let hitPlayer2 = paddle2.hit;
-                let keyCountPlayer1 = paddle1.keyPressCount;
-                let keyCountPlayer2 = paddle2.keyPressCount;
+                
+                // Controllo su paddle1 e paddle2
+                let hitPlayer1 = paddle1 ? paddle1.hit : 0;
+                let hitPlayer2 = paddle2 ? paddle2.hit : 0;
+                let keyCountPlayer1 = paddle1 ? paddle1.keyPressCount : 0;
+                let keyCountPlayer2 = paddle2 ? paddle2.keyPressCount : 0;
+
                 let ballCount = ballC;
                 let data = {
                     scorePlayer1: scorePlayer1,
@@ -523,6 +528,10 @@ endgameLocal() {
                     balls: gameBalls,
                     boost: gameBoosts
                 };
+
+                if (abandon === true) {
+                    data.abandon = 1; // Aggiunge il parametro solo se abandon è true
+                }
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -541,6 +550,7 @@ endgameLocal() {
 }
 
 window.endgameOnline = endgameOnline;
+window.gameover = gameover;
 
 function startTimer() {
     // Inizializza il timer del gioco
@@ -886,7 +896,8 @@ function bestOfFour(score) {
     return best;
 }
 
-export function gameover(p1 = -1, p2 = -1, isLeft = false) {
+export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
+    console.log("gameover base")
     if (p1 !== -1 && p2 !== -1) {
         score[0] = p1;
         score[1] = p2;
@@ -896,7 +907,7 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false) {
 
     if (gameSettings.gameType === "local-game")
     {
-        endgameLocal();
+        endgameLocal(abandon);
     }
     
     if(gameSettings.gameRules == "time") {

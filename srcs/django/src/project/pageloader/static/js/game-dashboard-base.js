@@ -1,4 +1,5 @@
 
+
 function joinTournament(tournamentId) {
     let accessToken = localStorage.getItem('accessToken');
     fetch(`/api/join_tournament/`, {
@@ -42,6 +43,8 @@ document.getElementById('leavegame').addEventListener('click', function() {
         window.joinTournament(tournament_id);
     }
     else {
+        console.log("Gametype: "+gameType)
+        gameover(-1, -1, true, true);
         loadPage('api/dashboard/');
     }
 });

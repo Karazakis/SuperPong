@@ -2201,15 +2201,11 @@ class GameAPIView(APIView):
                 game.save()
                 player1 = UserProfile.objects.get(user=game.player1)
                 abandon = data.get('abandon', 0)
+                logger.debug(f"ABANDON: {abandon}")
                 if abandon != 0:
                         if abandon == 1:
                             player1.game_abandon += 1
-                            player2.game_win += 1
                             game.winner = game.player2
-                        elif abandon == 2:
-                            player1.game_win += 1
-                            player2.game_abandon += 1
-                            game.winner = game.player1
 
                 if game.player1_score < game.player2_score and game.rules == 'time':
                     player1.game_win += 1
