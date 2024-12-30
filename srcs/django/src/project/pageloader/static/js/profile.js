@@ -90,14 +90,22 @@ function initializeChart() {
     // Dati delle statistiche
     let precision = document.getElementById("precision").textContent;
     let reactivity = document.getElementById("reactivity").textContent;
-    let luck = document.getElementById("luck").textContent;
+    let patience = document.getElementById("patience").textContent;
     let madness = document.getElementById("madness").textContent;
     let leadership = document.getElementById("leadership").textContent;
+
+    console.log("Valori ricevuti per le statistiche:", {
+        Precision: precision,
+        Reactivity: reactivity,
+        Patience: patience,
+        Madness: madness,
+        Leadership: leadership
+    });
 
     const stats = {
         "Precision": precision,
         "Reactivity": reactivity,
-        "Luck": luck,
+        "Patience": patience,
         "Madness": madness,
         "Leadership": leadership
     };

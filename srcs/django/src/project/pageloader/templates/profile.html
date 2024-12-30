@@ -47,19 +47,19 @@
                     <div class="col-md-4 d-flex flex-column justify-content-center ">
                         <ul class="list-group" id="stat-values">
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Precision</span><span id="precision">{{ relative_game_statistics.precision }}</span>
+                                <span>Precision</span><span id="precision">{{ relative_game_statistics.precision |floatformat:2}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Reactivity</span><span id="reactivity">{{ relative_game_statistics.reactivity }}</span>
+                                <span>Reactivity</span><span id="reactivity">{{ relative_game_statistics.reactivity|floatformat:2 }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Luck</span><span id="luck">{{ relative_game_statistics.luck }}</span>
+                                <span>Patience</span><span id="patience">{{ relative_game_statistics.patience |floatformat:2}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Madness</span><span id="madness">{{ relative_game_statistics.madness }}</span>
+                                <span>Madness</span><span id="madness">{{ relative_game_statistics.madness|floatformat:2 }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Leadership</span><span id="leadership">{{ relative_game_statistics.leadership }}</span>
+                                <span>Leadership</span><span id="leadership">{{ relative_game_statistics.leadership |floatformat:2}}</span>
                             </li>
                         </ul>
                     </div>

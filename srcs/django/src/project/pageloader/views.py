@@ -260,156 +260,274 @@ class DashboardAPIView(APIView):
             return Response(data)
 
 
-def clamp(value):
-    if value < 0:
-        return 0
-    if value > 5:
-        return 5
-    return value
-
 def normalize_statistics(individual_stats, global_stats):
-
+    """
+    Normalizes individual statistics compared to global statistics.
+    If individual equals global, the result is 2.50.
+    Scaled from 0 to 5 based on deviation from the global average.
+    """
     normalized_stats = {}
 
-    for key in individual_stats.keys():
-        global_value = global_stats.get(key, 0)
-        if global_value > 0:
-           
-            normalized_value = (individual_stats[key] / global_value) * 5
-            normalized_stats[key] = round(clamp(normalized_value), 2)
-        else:
-            normalized_stats[key] = 1
+    # Precision: Compare components and normalize
+    precision_time = individual_stats.get('precision_time', None)
+    precision_score = individual_stats.get('precision_score', None)
+    global_precision_time = global_stats.get('precision_time', 0)
+    global_precision_score = global_stats.get('precision_score', 0)
 
+    logger.debug(f"Calculating Precision Normalization: precision_time={precision_time}, precision_score={precision_score}, "
+                 f"global_precision_time={global_precision_time}, global_precision_score={global_precision_score}")
+
+    # Calculate deviations for precision_time and precision_score
+    deviation_time = (
+        (precision_time - global_precision_time) / global_precision_time * 2.50
+        if precision_time is not None and global_precision_time > 0 else 0
+    )
+    deviation_score = (
+        (precision_score - global_precision_score) / global_precision_score * 2.50
+        if precision_score is not None and global_precision_score > 0 else 0
+    )
+
+    logger.debug(f"Deviation Time: {deviation_time}, Deviation Score: {deviation_score}")
+
+    # Combine deviations using simple average
+    combined_deviation = (deviation_time + deviation_score) / 2
+
+    # Normalize precision
+    normalized_precision = 2.50 + combined_deviation
+    normalized_precision = clamp(normalized_precision, 0, 5)
+
+    logger.debug(f"Combined Deviation: {combined_deviation}, Normalized Precision: {normalized_precision}")
+
+    normalized_stats['precision'] = round(normalized_precision, 2)
+
+    # Leadership: Special calculation based on individual wins and matches
+    individual_wins = individual_stats.get('leadership_wins', 0)
+    individual_matches = individual_stats.get('leadership_matches', 0)
+    global_leadership = global_stats.get('leadership', 1)  # Avoid division by zero
+
+    if individual_matches > 0:
+        individual_leadership_ratio = individual_wins / individual_matches
+        normalized_leadership = 5 * (individual_leadership_ratio / global_leadership)
+        normalized_stats['leadership'] = round(clamp(normalized_leadership, 0, 5), 2)
+    else:
+        normalized_stats['leadership'] = 0  # No matches played
+    logger.debug(f"Leadership: individual_wins={individual_wins}, individual_matches={individual_matches}, "
+                 f"global_leadership={global_leadership}, normalized_leadership={normalized_stats['leadership']}")
+
+    # Normalize other stats
+    for key, individual_value in individual_stats.items():
+        if key in ['precision_time', 'precision_score', 'leadership_wins', 'leadership_matches']:
+            continue  # Already handled
+
+        global_value = global_stats.get(key, 0)
+
+        if global_value > 0:
+            deviation = individual_value - global_value
+            normalized_value = 2.50 + (deviation / global_value) * 2.50
+            normalized_stats[key] = round(clamp(normalized_value, 0, 5), 2)
+            logger.debug(f"Normalized {key}: individual={individual_value}, global={global_value}, normalized={normalized_stats[key]}")
+        else:
+            normalized_stats[key] = 2.50 if individual_value == 0 else 5.0
+            logger.debug(f"Global {key} is zero. Defaulting normalized {key} to {normalized_stats[key]}")
+
+    logger.debug(f"Normalized Game Statistics: {normalized_stats}")
     return normalized_stats
+
+
+
+
+
+
+def clamp(value, min_value=0, max_value=5):
+    """Clamps a value between min_value and max_value."""
+    return max(min(value, max_value), min_value)
+
 
 def calculate_global_game_statistics():
     total_games = Game.objects.count()
+    logger.debug(f"Total games: {total_games}")
 
     if total_games == 0:
+        logger.warning("No games found. Returning 'None' for all statistics.")
         return {
-            'precision': 1,  # Evitiamo divisioni per zero
-            'reactivity': 1,
-            'luck': 1,
-            'madness': 1,
-            'leadership': 1,
-            'intensity': 1,
+            'precision_time': None,
+            'precision_score': None,
+            'reactivity': None,
+            'madness': None,
+            'leadership': None,
+            'patience': None,
+            'intensity': None,
         }
 
-    precision_scores = Game.objects.aggregate(
-        avg_player1_score=Avg('player1_score'),
-        avg_player2_score=Avg('player2_score')
-    )
-    precision = (
-        (precision_scores['avg_player1_score'] or 0) +
-        (precision_scores['avg_player2_score'] or 0)
-    ) / 2
+    # Calcolo precisione con distinzione per tipo di gioco
+    time_games = Game.objects.filter(rules='time')
+    score_games = Game.objects.filter(rules='score')
 
+    time_games_count = time_games.count()
+    score_games_count = score_games.count()
+
+    # Calcolo precisione per giochi Time
+    if time_games_count > 0:
+        precision_time = time_games.aggregate(
+            avg_player1_score=Avg('player1_score'),
+            avg_player2_score=Avg('player2_score')
+        )
+        precision_time_value = (
+            (precision_time.get('avg_player1_score') or 0) +
+            (precision_time.get('avg_player2_score') or 0)
+        ) / 2
+    else:
+        precision_time_value = 0
+
+    # Calcolo precisione per giochi Score
+    if score_games_count > 0:
+        precision_score = score_games.aggregate(
+            avg_player1_score=Avg('player1_score'),
+            avg_player2_score=Avg('player2_score')
+        )
+
+        avg_goals_by_player1 = precision_score.get('avg_player2_score') or 0  # Gol subiti da Player 1
+        avg_goals_by_player2 = precision_score.get('avg_player1_score') or 0 
+
+        precision_player1 = 5 - avg_goals_by_player1
+        precision_player2 = 5 - avg_goals_by_player2
+
+        precision_score_value = (precision_player1 + precision_player2) / 2
+    else:
+        precision_score_value = 0
+
+    # Calcolo reattività
     reactivity_hits = Game.objects.aggregate(
         avg_player1_hit=Avg('player1_hit'),
         avg_player2_hit=Avg('player2_hit')
     )
+
     reactivity = (
-        (reactivity_hits['avg_player1_hit'] or 0) +
-        (reactivity_hits['avg_player2_hit'] or 0)
-    ) / 2
+        (reactivity_hits.get('avg_player1_hit') or 0) +
+        (reactivity_hits.get('avg_player2_hit') or 0)
+    ) / 2 if total_games > 0 else None
 
-    luck = Game.objects.filter(boost=True).count() / total_games * 5
-
-    madness = Game.objects.aggregate(
+    # Calcolo Madness
+    madness_data = Game.objects.aggregate(
         avg_balls=Avg('balls')
-    )['avg_balls'] or 0
-
-    leadership = Game.objects.filter(winner__isnull=False).count() / total_games * 5
-
-    intensity_keys = Game.objects.aggregate(
-        avg_player1_keyPress=Avg('player1_keyPressCount'),
-        avg_player2_keyPress=Avg('player2_keyPressCount')
     )
-    intensity = (
-        (intensity_keys['avg_player1_keyPress'] or 0) +
-        (intensity_keys['avg_player2_keyPress'] or 0)
-    ) / 2
+    madness = madness_data.get('avg_balls') or None
 
-    return {
-        'precision': round(precision, 2),
-        'reactivity': round(reactivity, 2),
-        'luck': round(luck, 2),
-        'madness': round(madness, 2),
-        'leadership': round(leadership, 2),
-        'intensity': round(intensity, 2),
+    # Calcolo Leadership
+    leadership = total_games if total_games > 0 else None
+
+    # Calcolo Patience
+    patience = (time_games_count / total_games) * 5 if total_games > 0 else None
+
+    # Calcolo Intensity
+    intensity_keys = Game.objects.aggregate(
+        total_player1_keys=Sum('player1_keyPressCount'),
+        total_player2_keys=Sum('player2_keyPressCount')
+    )
+    total_key_presses = (
+        (intensity_keys.get('total_player1_keys') or 0) +
+        (intensity_keys.get('total_player2_keys') or 0)
+    )
+    total_players = 2 * total_games  # Ogni partita ha 2 giocatori
+
+    intensity = (total_key_presses / total_players) if total_games > 0 else None
+
+    # Risultati finali
+    global_stats = {
+        'precision_time': round(precision_time_value, 2) if precision_time_value is not None else None,
+        'precision_score': round(precision_score_value, 2) if precision_score_value is not None else None,
+        'reactivity': round(reactivity, 2) if reactivity is not None else None,
+        'madness': round(madness, 2) if madness is not None else None,
+        'leadership': round(leadership, 2) if leadership is not None else None,
+        'patience': round(patience, 2) if patience is not None else None,
+        'intensity': round(intensity, 2) if intensity is not None else None,
     }
+    logger.debug(f"Global game statistics: {global_stats}")
+
+    return global_stats
+
+
+
 
 def calculate_individual_game_statistics(user_profile):
+    # Partite giocate dal giocatore
     match_history = user_profile.game_played.all()
     total_games = match_history.count()
+    logger.debug(f"Total games played by {user_profile.user}: {total_games}")
 
     if total_games == 0:
+        logger.warning(f"No games found for user {user_profile.user}. Returning 'None' for all statistics.")
         return {
-            'precision': 0,
-            'reactivity': 0,
-            'luck': 0,
-            'madness': 0,
-            'leadership': 0,
-            'intensity': 0,
+            'precision_time': None,
+            'precision_score': None,
+            'reactivity': None,
+            'madness': None,
+            'leadership': None,
+            'intensity': None,
         }
 
-    total_scores = 0
+    total_time_scores = 0
+    total_time_games = 0
+    total_score_precision = 0
+    total_score_games = 0
     total_hits = 0
-    boost_count = 0
     total_balls = 0
-    win_count = 0
     total_key_presses = 0
-    valid_scores_count = 0
-    valid_hits_count = 0
-    valid_key_presses_count = 0
+    total_wins = 0
 
     for match in match_history:
-        if match.player1_score is not None and match.player2_score is not None:
-            total_scores += match.player1_score + match.player2_score
-            valid_scores_count += 1
+        if match.rules == 'time':
+            if match.player1 == user_profile.user:
+                total_time_scores += match.player1_score or 0
+            elif match.player2 == user_profile.user:
+                total_time_scores += match.player2_score or 0
+            total_time_games += 1
+        elif match.rules == 'score':
+            if match.player1 == user_profile.user:
+                opponent_score = match.player2_score or 0
+            elif match.player2 == user_profile.user:
+                opponent_score = match.player1_score or 0
+            else:
+                opponent_score = 0
+            total_score_precision += max(0, 5 - opponent_score)
+            total_score_games += 1
 
-        if match.player1_hit is not None and match.player2_hit is not None:
-            total_hits += match.player1_hit + match.player2_hit
-            valid_hits_count += 1
-
-        if match.boost:
-            boost_count += 1
-
-        if match.balls is not None:
-            total_balls += match.balls
+        if match.player1 == user_profile.user:
+            total_hits += match.player1_hit or 0
+            total_balls += match.balls or 0
+            total_key_presses += match.player1_keyPressCount or 0
+        elif match.player2 == user_profile.user:
+            total_hits += match.player2_hit or 0
+            total_balls += match.balls or 0
+            total_key_presses += match.player2_keyPressCount or 0
 
         if match.winner == user_profile.user:
-            win_count += 1
+            total_wins += 1
 
-        if match.player1_keyPressCount is not None and match.player2_keyPressCount is not None:
-            total_key_presses += match.player1_keyPressCount + match.player2_keyPressCount
-            valid_key_presses_count += 1
+    # Calcolo delle statistiche
+    precision_time_value = total_time_scores / total_time_games if total_time_games > 0 else None
+    precision_score_value = total_score_precision / total_score_games if total_score_games > 0 else None
+    reactivity_value = total_hits / total_games if total_games > 0 else None
+    madness_value = total_balls / total_games if total_games > 0 else None
+    intensity_value = total_key_presses / total_games if total_games > 0 else None
+    patience_value = (total_time_games / total_games) * 5 if total_games > 0 else None
 
-    precision = total_scores / valid_scores_count if valid_scores_count > 0 else 0
-    reactivity = total_hits / valid_hits_count if valid_hits_count > 0 else 0
-    luck = (boost_count / total_games) * 5
-    madness = total_balls / total_games
-    leadership = (win_count / total_games) * 5
-    intensity = total_key_presses / valid_key_presses_count if valid_key_presses_count > 0 else 0
-
-    return {
-        'precision': round(precision, 2),
-        'reactivity': round(reactivity, 2),
-        'luck': round(luck, 2),
-        'madness': round(madness, 2),
-        'leadership': round(leadership, 2),
-        'intensity': round(intensity, 2),
+    # Risultati finali
+    individual_stats = {
+        'precision_time': round(precision_time_value, 2) if precision_time_value is not None else None,
+        'precision_score': round(precision_score_value, 2) if precision_score_value is not None else None,
+        'reactivity': round(reactivity_value, 2) if reactivity_value is not None else None,
+        'madness': round(madness_value, 2) if madness_value is not None else None,
+        'leadership_wins': total_wins,
+        'leadership_matches': total_games,
+        'intensity': round(intensity_value, 2) if intensity_value is not None else None,
+        'patience': round(patience_value, 2) if patience_value is not None else None,
     }
+    logger.debug(f"Individual game statistics for {user_profile.user}: {individual_stats}")
+
+    return individual_stats
 
 
-def calculate_relative_statistics(individual_stats, global_stats):
-    relative_stats = {}
-    for key in individual_stats.keys():
-        if global_stats[key] != 0:  # Evita la divisione per zero
-            relative_stats[key] = round((individual_stats[key] / global_stats[key]) * 100, 2)
-        else:
-            relative_stats[key] = 0
-    return relative_stats
 
 
 class ProfileAPIView(APIView):
@@ -456,7 +574,7 @@ class ProfileAPIView(APIView):
                 for tournament in user_profile.tournament_played.all()
             ]
 
-            logger.debug(f"DIOCANE L?USER {user_profile.tournament_played.all()}")
+            # si deve aggiungere i game locali a questi dati
             game_wins = user_profile.game_win
             game_losses = user_profile.game_lose
             game_draws = user_profile.game_draw
@@ -471,6 +589,11 @@ class ProfileAPIView(APIView):
             normalized_game_statistics = normalize_statistics(
                 individual_game_statistics, global_game_statistics
             )
+            # Log dettagliato delle statistiche di gioco e torneo
+            logger.debug(f"Global Game Statistics: {global_game_statistics}")
+            logger.debug(f"Individual Game Statistics: {individual_game_statistics}")
+            logger.debug(f"Normalized Game Statistics: {normalized_game_statistics}")
+
             logger.debug(f"tournament_history: {tournamnt_history}")
             context = {
                 'user': user,
@@ -486,7 +609,7 @@ class ProfileAPIView(APIView):
                 'tournament_losses': tournament_losses,
                 'tournament_draws': tournament_draws,
                 'tournament_abandons': tournament_abandons,
-                'relative_game_statistics': normalized_game_statistics,  # Normalizzate
+                'relative_game_statistics': normalized_game_statistics,
             }
             
             html = render_to_string('profile.html', context)
@@ -2074,6 +2197,32 @@ class GameAPIView(APIView):
                     status='finished',
                 )
                 user_profile.game_played.add(game)
+                
+                abandon = data.get('abandon', 0)
+                if abandon != 0:
+                        if abandon == 1:
+                            player1.game_abandon += 1
+                            player2.game_win += 1
+                            game.winner = game.player2
+                        elif abandon == 2:
+                            player1.game_win += 1
+                            player2.game_abandon += 1
+                            game.winner = game.player1
+                elif game.player1_score < game.player2_score and game.rules == 'time':
+                    player1.game_win += 1
+                    game.winner = game.player1
+                elif game.player2_score < game.player1_score and game.rules == 'time':
+                    player1.game_lose += 1
+                    game.winner = game.player2
+                elif game.player1_score > game.player2_score and game.rules == 'score':
+                    player1.game_win += 1
+                    game.winner = game.player1
+                elif game.player2_score > game.player1_score and game.rules == 'score':
+                    player1.game_lose += 1
+                    game.winner = game.player2
+                else:
+                    player1.game_draw += 1
+                    game.winner = None
                 user_profile.save()
                 game.save()
 
