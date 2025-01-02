@@ -61,6 +61,7 @@ document.getElementById("signup-form").addEventListener("submit", function(event
         return;
     }
 
+    
     fetch("/api/signup/", {
         method: "POST",
         headers: {

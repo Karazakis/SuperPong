@@ -6,12 +6,14 @@
     </div>
 
     <!-- Elementi nascosti per passare i dati -->
+    <div id="user-nicknames" data-nicknames="{{ user_nicknames }}"></div>
     <div id="tournament-data" data-mode="{{ tournament.mode }}" data-nb-players="{{ tournament.nb_players }}"
         data-owner="{{ tournament.owner.username }}"></div>
     <div id="rounds-data" style="display: none;">
         {{ rounds|safe }}
     </div>
     <div id="current-user" data-username="{{ user.username }}" style="display: none;"></div>
+    <div id="current-user-nickname" data-nickname="{{ userprofile.nickname }}" style="display: none;"></div>
     <div id="tournament_bracket" class="mt-4 text-center"></div>
 
     <div class="row mt-4">
@@ -26,9 +28,6 @@
         <div class="col-md-4 text-center">
             <h3>Users in Lobby</h3>
             <ul id="users_in_lobby" class="list-unstyled">
-                {% for player in tournament.players.all %}
-                <li id="user_{{ player.username }}">{{ player.username }}</li>
-                {% endfor %}
             </ul>
         </div>
     </div>
@@ -36,7 +35,7 @@
     <div class="row mt-4">
         <div class="col-md-12 text-center">
             {% if user.username == tournament.owner.username %}
-            <button id="start" class="btn btn-success lobby-start" disabled="true">Start Round</button>
+            <button id="start" class="btn btn-success lobby-start" disabled="true" style="display: none;">Start Round</button>
             {% endif %}
             <button id="ready" class="btn btn-success lobby-ready" disabled="true">Ready</button>
             <button id="leave" class="btn btn-danger lobby-leave">Leave Tournament</button>

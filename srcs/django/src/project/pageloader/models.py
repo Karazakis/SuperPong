@@ -64,28 +64,22 @@ class Tournament(models.Model):
         """
         Genera il round successivo se esiste uno stato di round 'not_started' e restituisce messaggi di stato.
         """
-        # Numero massimo di round calcolato una volta in fase di creazione torneo
         max_rounds = self.rounds
 
-        # Recupera il primo round con stato 'not_started'
         current_round = Round.objects.filter(tournament=self, status='not_started').first()
 
-        # Se non ci sono round 'not_started', il torneo è finito
         if not current_round:
             return "No 'not_started' rounds found. The tournament may be complete."
 
         current_round_number = current_round.round_number
         next_round_number = current_round_number + 1
 
-        # Controlla se il prossimo round supera il numero totale di round del torneo
         if next_round_number > max_rounds:
             return f"Reached the final round: current round number: {current_round_number}; next_round_number: {next_round_number}, max_rounds: {max_rounds}"
 
-        # Verifica se il prossimo round esiste già
         if Round.objects.filter(tournament=self, round_number=next_round_number).exists():
             return f"Round {next_round_number} already exists."
 
-        # Calcola il numero di giocatori rimanenti in base alla modalità e al round corrente
         players_remaining = self.calculate_remaining_players(current_round_number)
         games_per_round = players_remaining // (2 if self.mode == '1v1' else 4)
 
@@ -119,8 +113,6 @@ class Tournament(models.Model):
             return max(4, self.nb_players // (4 ** current_round_number))  # Mantiene almeno 4 giocatori
         return 1
 
-    def __str__(self):
-        return f"Tournament: {self.name}"
 
 class Round(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='tournament_rounds')
@@ -134,12 +126,17 @@ class Round(models.Model):
 
     def generate_games(self, num_games, mode, rules, limit, balls, boost):
         """Genera i game per il round in base al numero di game e le regole del torneo."""
+        if rules == 'time':
+            time_left = limit * 60
+        else:
+            time_left = 0
         for i in range(1, num_games + 1):
             game = Game.objects.create(
                 name=f"{self.tournament.name} - Round {self.round_number} - Game {i}",
                 mode=mode,
                 rules=rules,
                 limit=limit,
+                time_left=time_left,
                 balls=balls,
                 boost=boost,
                 tournament=self.tournament,
@@ -172,9 +169,6 @@ class Round(models.Model):
         
         self.save()
 
-
-    def __str__(self):
-        return f"Round {self.round_number} - {self.tournament.name}"
 
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
@@ -213,6 +207,7 @@ class Game(models.Model):
     time_left = models.IntegerField(default=0, null=True, blank=True)
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='games_winner', default=None, null=True, blank=True)
     status = models.CharField(max_length=100, default='not_started')
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
 def user_directory_path(instance, filename):
     # Il file verrà caricato in MEDIA_ROOT / profiles / user_<id> / <filename>

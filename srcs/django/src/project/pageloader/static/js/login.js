@@ -25,11 +25,23 @@ document.getElementById("login-form").addEventListener("submit", function(event)
         return response.json();
     })
     .then(data => {
-        localStorage.setItem("accessToken", data.access);
-        localStorage.setItem("refreshToken", data.refresh);
-        localStorage.setItem('userId', data.userId);
-        localStorage.setItem('username', data.username);
-        loadPage("api/dashboard/");
+        if (data.error) {
+            if (data.error === "Username does not exist") {
+                usernameErrorDiv.textContent = "Nome utente non esiste.";
+            } else if (data.error === "Incorrect password") {
+                passwordErrorDiv.textContent = "Password non corretta.";
+            } else if (data.error === "Username and password are required") {
+                passwordErrorDiv.textContent = "Username e password sono obbligatori.";
+            } else {
+                passwordErrorDiv.textContent = "Errore: " + data.error;
+            }
+        } else {
+            localStorage.setItem("accessToken", data.access);
+            localStorage.setItem("refreshToken", data.refresh);
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('username', data.username);
+            loadPage("api/dashboard/");
+        }
     })
     .catch(error => {
         if (error.error) {

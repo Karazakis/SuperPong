@@ -60,19 +60,15 @@ export function ballPadCollisionResponse(ball, pad, isOnlineGame = false, isHost
         ball.mesh.velocity = velocityTangentialVec.add(newVelocityAlongNormalVec);
         if(pad.id == 1) {
             pad.hit += 1;
-            console.log("id: " + pad.id + " hit: " + pad.hit);
         }
         else if(pad.id == 2) {
             pad.hit += 1;
-            console.log("id: " + pad.id + " hit: " + pad.hit);
         }
         else if(pad.id == 3) {
             pad.hit += 1;
-            console.log("id: " + pad.id + " hit: " + pad.hit);
         }
         else if(pad.id == 4) {
             pad.hit += 1;
-            console.log("id: " + pad.id + " hit: " + pad.hit);
         }
         
 }

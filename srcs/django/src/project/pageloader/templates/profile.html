@@ -33,11 +33,11 @@
 
     <!-- User Stats Section -->
     <div class="col-md-8">
-        <div class="card border rounded shadow my-3 " style="height: 40vh;">
+        <div class="card border rounded shadow my-3 ">
             <div class="card-body" style="max-height: 8vh;">
                 <h4 class="card-title text-center">User Stats</h4>
             </div>
-            <div class="card-footer" style="height: 35vh;">
+            <div class="card-footer">
                 <div class="row">
                     <!-- Chart Column -->
                     <div class="col-md-8">
@@ -47,19 +47,19 @@
                     <div class="col-md-4 d-flex flex-column justify-content-center ">
                         <ul class="list-group" id="stat-values">
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Precision</span><span id="precision">{{ relative_game_statistics.precision }}</span>
+                                <span>Precision</span><span id="precision">{{ relative_game_statistics.precision |floatformat:2}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Reactivity</span><span id="reactivity">{{ relative_game_statistics.reactivity }}</span>
+                                <span>Reactivity</span><span id="reactivity">{{ relative_game_statistics.reactivity|floatformat:2 }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Luck</span><span id="luck">{{ relative_game_statistics.luck }}</span>
+                                <span>Patience</span><span id="patience">{{ relative_game_statistics.patience |floatformat:2}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Madness</span><span id="madness">{{ relative_game_statistics.madness }}</span>
+                                <span>Madness</span><span id="madness">{{ relative_game_statistics.madness|floatformat:2 }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Leadership</span><span id="leadership">{{ relative_game_statistics.leadership }}</span>
+                                <span>Leadership</span><span id="leadership">{{ relative_game_statistics.leadership |floatformat:2}}</span>
                             </li>
                         </ul>
                     </div>
@@ -97,15 +97,57 @@
                 <table class="table table-striped mt-3" id="game-history-table">
                     <thead>
                         <tr>
+                            <th>Created</th>
                             <th>Game Name</th>
-                            <th>Mode</th>
-                            <th>Result</th>
+                            <th>Type</th>
+                            <th>Winner</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="3" class="text-center">No game history available</td>
-                        </tr>
+                        {% if match_history %}
+                            {% for game in match_history %}
+                                <tr>
+                                    <td>{{ game.created }}</td>
+                                    <td><a href="#" class="game-link" data-id="{{ game.id }}">{{ game.name }}</a></td>
+                                    <td>
+                                        {% if game.player1 == game.player2 %}
+                                            Local Game
+                                        {% elif game.tournament %}
+                                            Tournament Game
+                                        {% else %}
+                                            Remote Game
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if game.player1 == game.player2 %}
+                                            {% if game.rules == 'time' %}
+                                                {% if game.player1_score < game.player2_score %}
+                                                    <span class="text-danger">{{ game.winner.nickname }}</span>
+                                                {% elif game.player1_score > game.player2_score %}
+                                                    <span class="text-danger">Local Player 2</span>
+                                                {% else %}
+                                                    <span class="text-success">Draw</span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if game.player1_score > game.player2_score %}
+                                                    <span class="text-success">{{ game.player1 }}</span>
+                                                {% elif game.player1_score < game.player2_score %}
+                                                    <span class="text-success">Local Player 2</span>
+                                                {% else %}
+                                                    <span class="text-danger">Draw</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ game.winner }}
+                                        {% endif %}
+                                    </td>                                    
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center">No game history available</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -139,15 +181,33 @@
                     <thead>
                         <tr>
                             <th>Tournament Name</th>
-                            <th>Mode</th>
                             <th>Status</th>
-                            <th>Result</th>
+                            <th>Winner</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="4" class="text-center">No tournament history available</td>
-                        </tr>
+                        <tbody>
+                            {% if tournamnt_history %}
+                                {% for tournament in tournamnt_history %}
+                                    <tr>
+                                        <td>
+                                            {% if tournament.status == 'finished' %}
+                                                <a href="#" class="tournament-link" data-id="{{ tournament.id }}">{{ tournament.name }}</a>
+                                            {% else %}
+                                                <span class="text-muted">{{ tournament.name }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ tournament.status }}</td>
+                                        <td>{{ tournament.winner|default:"No winner yet" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No tournament history available</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                            
                     </tbody>
                 </table>
             </div>

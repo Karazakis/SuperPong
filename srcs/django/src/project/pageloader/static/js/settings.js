@@ -38,7 +38,6 @@ document.getElementById('game-settings-btn').addEventListener('click', function(
     formData.append('shoot4', document.getElementById('keyInput43').value);
     formData.append('boost4', document.getElementById('keyInput44').value);
     
-    console.log(formData);
 
     fetch('/api/settings/', {
         method: 'POST',
@@ -54,7 +53,6 @@ document.getElementById('game-settings-btn').addEventListener('click', function(
         if (data.success) {
             loadPage("api/settings/");
         } else {
-            console.log("Data not succedeed");
             alert(data.message);
         }
     })
@@ -98,11 +96,33 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     formData.append('username', username);
     formData.append('nickname', nickname);
     formData.append('email', email);
+
     const imgProfileInput = document.getElementById('img_profile');
     if (imgProfileInput.files.length > 0) {
-        const imgProfile = imgProfileInput.files[0]; // Prende il primo file selezionato
-        formData.append('img_profile', imgProfile); // Aggiunge l'immagine al FormData
+        const imgProfile = imgProfileInput.files[0];
+
+        // Controllo del tipo di file
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(imgProfile.type)) {
+            displayError('img-profile-error', "Il file deve essere un'immagine (JPEG, PNG, GIF).");
+            hasError = true;
+        }
+
+        // Controllo della dimensione in byte
+        const maxImageSize = 2 * 1024 * 1024; // 2 MB
+        if (imgProfile.size > maxImageSize) {
+            displayError('img-profile-error', `L'immagine non può superare i 2 MB. Dimensione attuale: ${(imgProfile.size / 1024 / 1024).toFixed(2)} MB`);
+            hasError = true;
+        }
+
+        // Controllo asincrono della dimensione in pixel
+        if (!hasError) {
+            formData.append('img_profile', imgProfile);
+            }
+    } else {
+        // tutto ok con l immagine
     }
+
     formData.append('password', password);
 
     fetch('/api/settings/', {
@@ -117,8 +137,7 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     })
     .then(data => {
         if (data.success) {
-            const event = new CustomEvent('profileUpdated');
-            window.dispatchEvent(event);
+            updateUserProfile();
             loadPage("api/settings/");
         } else {
             handleServerErrors(data.errors);
@@ -126,6 +145,7 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     })
     .catch(error => handleServerErrors(JSON.parse(error.message)));
 });
+
 
 function validateUsername(username) {
     username = username.replace(/[<>]/g, '');
@@ -145,6 +165,7 @@ function validatePassword(password) {
 
 function displayError(elementId, message) {
     document.getElementById(elementId).innerText = message;
+    
 }
 
 function clearErrors() {
@@ -165,3 +186,117 @@ function handleServerErrors(errors) {
     }
     // Aggiungi altri controlli degli errori come necessario
 }
+
+
+
+async function updateUserProfile() {
+    const userId = localStorage.getItem('userId');
+    let accessToken = localStorage.getItem('accessToken');
+
+    if (!userId || !accessToken) {
+        console.error('ID utente o token di accesso mancante');
+        return;
+    }
+
+    // Funzione per verificare la validità del token e, se necessario, rinnovarlo
+    const checkAndRefreshToken = async () => {
+        try {
+            const response = await fetch(`/api/token/refresh/?token=${accessToken}`, {
+                method: 'GET',
+            });
+
+            const data = await response.json();
+
+            if (data.message === 'Token valido') {
+                // Il token è valido, procedi con la richiesta
+                return accessToken;
+            } else if (data.message === 'Token non valido') {
+                // Il token non è valido, tentiamo di rinnovarlo
+                const newAccessToken = await refreshAccessToken();
+                if (newAccessToken) {
+                    localStorage.setItem('accessToken', newAccessToken);
+                    return newAccessToken;
+                } else {
+                    console.error('Impossibile rinnovare il token');
+                    return null;
+                }
+            } else {
+                console.error('Errore durante il controllo del token:', data.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('Errore durante la verifica o il rinnovo del token:', error);
+            return null;
+        }
+    };
+
+    // Verifica la validità del token e procedi con la richiesta se tutto è in ordine
+    accessToken = await checkAndRefreshToken();
+    if (!accessToken) {
+        // Se non è possibile ottenere un token valido, esci
+        return;
+    }
+
+    // Effettua la richiesta per aggiornare il profilo utente
+    try {
+        const response = await fetch(`/api/userinfo/${userId}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Errore durante il recupero dei dati dell\'utente');
+            return;
+        }
+
+        const user = await response.json();
+
+        const nicknameElement = document.getElementById('profile-nickname');
+        const profilePictureElement = document.getElementById('profile-picture');
+
+        if (nicknameElement && profilePictureElement) {
+            nicknameElement.innerHTML = `<h4>${user.nickname}</h4>`;
+            profilePictureElement.src = "/static/" + user.img_profile;
+        } else {
+            console.error('Elementi HTML non trovati');
+        }
+
+    } catch (error) {
+		recoverUser(id);
+        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
+    }
+}
+
+// Funzione per il rinnovo del token
+async function refreshAccessToken() {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+        console.error('Token di refresh mancante');
+        return null;
+    }
+
+    try {
+        const response = await fetch('/api/token/refresh/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refresh: refreshToken })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.access;
+        } else {
+            console.error('Errore durante il rinnovo del token di accesso');
+            return null;
+        }
+    } catch (error) {
+        console.error('Errore durante il rinnovo del token di accesso:', error);
+        return null;
+    }
+}
+
+

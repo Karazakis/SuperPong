@@ -216,7 +216,8 @@ LOGGING = {
     },
 }
 
-
+DATETIME_FORMAT = "d/m/Y H:i"
+USE_L10N = False
 
 """ # Imposta i valori di sicurezza per il browser
 SECURE_BROWSER_XSS_FILTER = True

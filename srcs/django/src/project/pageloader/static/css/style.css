@@ -175,8 +175,8 @@ font-weight: 700;
     position: relative;
     display: block;
     margin: 0 auto;
-    width: 50%;
-    max-width: 600px; /* Limita la larghezza massima */
+    width: 70%;
+    max-width: 900px; /* Limita la larghezza massima */
     height: auto;
 }
 .card-footer {
@@ -192,3 +192,4 @@ font-weight: 700;
     font-size: 1.2em; /* Etichette più grandi */
     font-weight: bold;
 }
+

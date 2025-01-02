@@ -84,7 +84,6 @@ function checkCurrentLobbyandDisable(){
     fetch(url).catch(error => console.log('Errore durante il recupero della pagina:', error))
     .then(response => response.json())
     .then(data => {
-        console.log("nel check",data);
         if(data.game !== null)
         {
             disableJoinGameButton();
@@ -118,21 +117,13 @@ function checkCurrentLobbyandDisable(){
                 .catch(error => console.error('Error:', error));
             };
 
-            console.log("data.game",data.game);
             document.getElementById("rejoin-lobby-btn-leave").dataset.type = "game";
             document.getElementById("rejoin-lobby-btn-leave").dataset.id = data.game.game;
             document.getElementById("rejoin-lobby").style.display = "block";
 
         } else if(data.game === null && data.tournament === null) {
             document.getElementById("rejoin-lobby").style.display = "none";
-        }/* else if(data.tournament !== null) {
-            disableJoinGameButton();
-            document.getElementById("rejoin-lobby-btn-join").dataset.type = "tournament";
-            document.getElementById("rejoin-lobby-btn-join").dataset.id = data.tournament.tournament.id;
-            document.getElementById("rejoin-lobby-btn-leave").dataset.type = "tournament";
-            document.getElementById("rejoin-lobby-btn-leave").dataset.id = data.tournament.tournament.id;
-            document.getElementById("rejoin-lobby").style.display = "block";
-        }  */
+        }
     }).catch(error => console.error('Errore durante il recupero della pagina:', error));
 }
 
@@ -308,11 +299,6 @@ function refreshAccessToken() {
     });
 }
 
-// function isAuthenticated() {
-//     const accessToken = localStorage.getItem("accessToken");
-//     return accessToken !== null;
-// }
-
 function loadPage(url) {
     let accessToken = localStorage.getItem("accessToken");
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
@@ -481,9 +467,7 @@ async function checkUserPermission(page) {
                 let data = await recoverUser(localStorage.getItem("userId"));
                 if (data) {
                     let lobby = data.in_game_lobby;
-                    console.log("data ", data);
-                    console.log("lobbyId ", lobbyId);
-                    console.log("lobby ", lobby);
+        
                     return lobby === lobbyId;
                 }
             }
@@ -513,12 +497,10 @@ async function checkUserPermission(page) {
 document.addEventListener("DOMContentLoaded", function() {
     let page = window.location.pathname;
     checkUserPermission(page).then((check) => {
-        console.log("check ", check, "page ", page);
         
         if (localStorage.getItem("accessToken") === null) {
             loadPage("api/home/");
         } else if ((page.includes("game") || page.includes("lobby")) && check === false) {
-            console.log("page ", page);
             if (page.includes("game")) {
                 loadPage("api/forbidden/game/");
             } else {
@@ -530,10 +512,8 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 if (page.includes("create")) {
                     let parts = page.split("_");
-                    console.log("parts ", parts);
                     const sourcePart = parts[1].replace(/\/$/, "");
                     let apiUrl = `api${parts[0]}/?source=${sourcePart}`;
-                    console.log("apiUrl ", apiUrl);
                     loadPage(apiUrl);
                 } else {
                     loadPage("api" + window.location.pathname);
@@ -548,9 +528,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (page.includes("create")) {
             const parts = page.split("_");
     
-            // Rimuovi eventuali slash finali da parts[1]
             const sourcePart = parts[1].replace(/\/$/, "");
-            console.log("sourcePart ", parts);
     
             const apiUrl = `api${parts[0]}/?source=${sourcePart}`;
             loadPage(apiUrl);

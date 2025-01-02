@@ -6,6 +6,13 @@ var username_lobby = localStorage.getItem('username'); // Assicurati che il nome
 if (typeof lobby === 'undefined') {
   let lobby = null;
 }
+
+if (typeof userList === 'undefined') {
+    let userList = {};
+}
+userList = {};
+
+
 lobby = `wss://${window.location.host}/wss/lobby/${game_id_lobby}/?id=${userId_lobby}`;
 
 if (typeof LobbySocket === 'undefined') {
@@ -28,10 +35,10 @@ LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     if (data.action === 'message') {
         let messages = document.getElementById('lobby_messages');
-        messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2.2vh;"><strong>${data.player}:</strong><p>${data.message}</p></div>`);
+        messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2.2vh;"><strong>${userList[data.player]}:</strong><p>${data.message}</p></div>`);
         messages.scrollTop = messages.scrollHeight;
     } else if (data.action === 'assign_slot') {
-        assignPlayerSlot(data.slot, data.player);
+        assignPlayerSlot(data.slot, userList[data.player]);
     } else if (data.action === 'join') {
         updateTeamSlots(data);
     } else if (data.action === 'user_list') {
@@ -39,6 +46,12 @@ LobbySocket.onmessage = function(e) {
     } else if (data.action === 'start_game') {
         let time = 10;
         let messages = document.getElementById('lobby_messages');
+        let butToDisable = document.querySelectorAll('button');
+        butToDisable.forEach(element => {
+            element.disabled = true;
+        });
+
+
         setInterval(() => {
             time--;
             messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start"><strong>Server:</strong><p>THE GAME WILL START IN ${time}!!!</p></div>`);
@@ -48,13 +61,13 @@ LobbySocket.onmessage = function(e) {
             }
         }, 1000);
     } else if (data.action === 'player_ready') {
-        updateReadyStatus(data.username, data.status);
+        updateReadyStatus(userList[data.username], data.status);
     } else if (data.action === 'leave') {
         for(let i = 1; i <= 4; i++) {
-            if(document.getElementById('player' + i + '_label')?.textContent.includes(data.username)) {
+            if(document.getElementById('player' + i + '_label')?.textContent.includes(userList[data.username])) {
                 document.getElementById('player' + i + '_label').textContent = 'Empty';
             }
-            if(document.getElementById('user' + i + '_lobby')?.textContent.includes(data.username)) {
+            if(document.getElementById('user' + i + '_lobby')?.textContent.includes(userList[data.username])) {
                 document.getElementById('user' + i + '_lobby').textContent = 'Empty';
             }
         }
@@ -64,7 +77,7 @@ LobbySocket.onmessage = function(e) {
             let userLobby = document.getElementById('user' + i + '_lobby');
     
             // Se l'elemento player esiste e il nome utente corrisponde
-            if (playerLabel?.textContent.includes(data.username)) {
+            if (playerLabel?.textContent.includes(userList[data.username])) {
                 // Rimuovi le classi ready o not_ready
                 playerLabel.classList.remove('ready', 'not_ready');
                 
@@ -74,7 +87,7 @@ LobbySocket.onmessage = function(e) {
                 // Rimuovi la classe connect (se presente)
                 playerLabel.classList.remove('connect');
             }
-            if (userLobby?.textContent.includes(data.username)) {
+            if (userLobby?.textContent.includes(userList[data.username])) {
                 // Rimuovi le classi ready o not_ready
                 userLobby.classList.remove('ready', 'not_ready');
                 
@@ -86,16 +99,17 @@ LobbySocket.onmessage = function(e) {
             }
         }
     } else if (data.action === "connected") {
+        userList[data.username] = data.nickname;
         for (let i = 1; i <= 4; i++) {
             let playerLabel = document.getElementById('player' + i + '_label');
             let userLobby = document.getElementById('user' + i + '_lobby');
     
-            if (playerLabel?.textContent.includes(data.username)) {
+            if (playerLabel?.textContent.includes(userList[data.username])) {
                 playerLabel.classList.remove('disconnect');
     
             }
 
-            if (userLobby?.textContent.includes(data.username)) {
+            if (userLobby?.textContent.includes(userList[data.username])) {
                 userLobby.classList.remove('disconnect');
             }
         }
@@ -111,9 +125,9 @@ function updateUserList(users) {
 
     users.forEach(user => {
         const slot = user.slot;
-        const player = user.player;
+        const player = user.nickname;
         const team = user.team;
-
+        userList[user.player] = user.nickname;
         if (slot === 'player1') {
             if (document.getElementById('game_mode').textContent !== '2v2') {
                 document.getElementById('player1_label').textContent = player;

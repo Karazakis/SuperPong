@@ -27,10 +27,8 @@ document.getElementById('leavegame').addEventListener('click', function() {
         setTimeout(resolve, 20);
     });
 
-    
     if (document.getElementById('game-details').dataset.gameStatus !== 'finished' && document.getElementById('gametype').textContent !== 'local-game') {
         if (this.dataset.posit === "p1") {
-
             endgameOnline(true, true);
         }
         window.GameSocket.send(JSON.stringify({ action: "leave" }));
@@ -44,6 +42,7 @@ document.getElementById('leavegame').addEventListener('click', function() {
         window.joinTournament(tournament_id);
     }
     else {
+        gameover(-1, -1, true, true);
         loadPage('api/dashboard/');
     }
 });
@@ -71,7 +70,6 @@ if (game_id_game !== 'single' && game_id_game !== 'local') {
     GameSocket = new WebSocket(game);
     window.GameSocket = null;
     window.GameSocket = GameSocket;
-    console.log('WebSocket connection established');
     GameSocket.onopen = function(e) {
         GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
     };
