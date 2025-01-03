@@ -4,6 +4,21 @@
             <h2>Lobby</h2>
             <h1 id="game_name">{{ game.name }}</h1>
         </div>
+		
+		<p>
+			Click here to open/close the <a href="#actions_details" data-toggle="collapse">game instructions</a>.
+		</p>
+		<div id="actions_details" class="collapse">
+			<p>To start the game:</p>
+			<ul>
+				<li>Wait for a player to join the lobby or invite a friend from the online friends menu.</li>
+				<li>The invited user must click the ready button to indicate they are ready to play.</li>
+				<li>The game host must click start game to begin the countdown.</li>
+				<li>Wait for the countdown, and you’ll enter the game!</li>
+			</ul>
+			<p>You can use the chat to communicate with the other user in the lobby.</p>
+			<p>To close this menu, click the blue text again.</p>
+		</div>		
     </div>
 
     {% if game.mode == "1v1" %}

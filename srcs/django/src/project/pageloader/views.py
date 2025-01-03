@@ -260,6 +260,7 @@ class DashboardAPIView(APIView):
             return Response(data)
 
 
+
 def normalize_statistics(individual_stats, global_stats):
     """
     Normalizes individual statistics compared to global statistics.
@@ -532,7 +533,6 @@ def calculate_individual_game_statistics(user_profile):
 
 
 
-
 class ProfileAPIView(APIView):
 
     def get(self, request, pk):
@@ -577,7 +577,7 @@ class ProfileAPIView(APIView):
                 for tournament in user_profile.tournament_played.all()
             ]
 
-            # si deve aggiungere i game locali a questi dati
+            logger.debug(f"DIOCANE L?USER {user_profile.tournament_played.all()}")
             game_wins = user_profile.game_win
             game_losses = user_profile.game_lose
             game_draws = user_profile.game_draw
@@ -592,11 +592,6 @@ class ProfileAPIView(APIView):
             normalized_game_statistics = normalize_statistics(
                 individual_game_statistics, global_game_statistics
             )
-            # Log dettagliato delle statistiche di gioco e torneo
-            logger.debug(f"Global Game Statistics: {global_game_statistics}")
-            logger.debug(f"Individual Game Statistics: {individual_game_statistics}")
-            logger.debug(f"Normalized Game Statistics: {normalized_game_statistics}")
-
             logger.debug(f"tournament_history: {tournamnt_history}")
             context = {
                 'user': user,
@@ -612,7 +607,7 @@ class ProfileAPIView(APIView):
                 'tournament_losses': tournament_losses,
                 'tournament_draws': tournament_draws,
                 'tournament_abandons': tournament_abandons,
-                'relative_game_statistics': normalized_game_statistics,
+                'relative_game_statistics': normalized_game_statistics,  # Normalizzate
             }
             
             html = render_to_string('profile.html', context)
@@ -2169,6 +2164,8 @@ class GameAPIView(APIView):
             
             if 'local' in request.path:
                 data = request.data
+                logger.debug(f"NEL GAME data fa: {data}")
+
                 user = get_object_or_404(User, pk=request.user.id)
                 user_profile = get_object_or_404(UserProfile, user=user)
                 boosts = data.get('boosts', 0)
@@ -2201,7 +2198,6 @@ class GameAPIView(APIView):
                 game.save()
                 player1 = UserProfile.objects.get(user=game.player1)
                 abandon = data.get('abandon', 0)
-                logger.debug(f"ABANDON: {abandon}")
                 if abandon != 0:
                         if abandon == 1:
                             player1.game_abandon += 1
@@ -2222,7 +2218,7 @@ class GameAPIView(APIView):
                 else:
                     player1.game_draw += 1
                     game.winner = None
-                
+
                 player1.save()
                 game.save()
 

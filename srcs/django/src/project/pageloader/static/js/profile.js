@@ -94,14 +94,6 @@ function initializeChart() {
     let madness = document.getElementById("madness").textContent;
     let leadership = document.getElementById("leadership").textContent;
 
-    console.log("Valori ricevuti per le statistiche:", {
-        Precision: precision,
-        Reactivity: reactivity,
-        Patience: patience,
-        Madness: madness,
-        Leadership: leadership
-    });
-
     const stats = {
         "Precision": precision,
         "Reactivity": reactivity,

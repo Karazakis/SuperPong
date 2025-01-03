@@ -459,9 +459,6 @@ endgameOnline(isLeft = false, isHostLeft = false) {
 export function 
 
 endgameLocal(abandon = false) {
-
-    console.log("endgame local")
-    console.log("abandon is :"+abandon)
     const accessToken = localStorage.getItem("accessToken");
 	const csrfToken = getCookie('csrftoken');
     let url = "/api/game/local/";
@@ -528,9 +525,8 @@ endgameLocal(abandon = false) {
                     balls: gameBalls,
                     boost: gameBoosts
                 };
-
                 if (abandon === true) {
-                    data.abandon = 1; // Aggiunge il parametro solo se abandon è true
+                    data.abandon = 1; 
                 }
                 const response = await fetch(url, {
                     method: 'POST',
@@ -871,6 +867,11 @@ if (gameSettings.gameRules == "time") {
     scoreTeam = [0, 0];
 
     score = [0, 0, 0, 0];
+    let score1String = document.getElementById("player0score").innerText;
+    let score2String = document.getElementById("player1score").innerText
+    score[0] = parseInt(document.getElementById("player0score").innerText);
+    score[1] = parseInt(document.getElementById("player1score").innerText);
+    
 } else {
     let scorebase = 10;
     if (gameSettings.gameScoreLimit) {
@@ -897,7 +898,6 @@ function bestOfFour(score) {
 }
 
 export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
-    console.log("gameover base")
     if (p1 !== -1 && p2 !== -1) {
         score[0] = p1;
         score[1] = p2;
@@ -1083,7 +1083,7 @@ export let scoreP4 = document.getElementById("player3score");
 export let scoreTeam1 = document.getElementById("team1score");
 export let scoreTeam2 = document.getElementById("team2score");
 
-
+console.log("lo score e'", scoreP1, scoreP2);
 
 function checkScore(ball){
 
@@ -1206,6 +1206,12 @@ function checkScoreHost(ball){
     if (gameEnded === true) {
         return 0;
     }
+    console.log("aasdasd");
+    if (gamePaused == true)
+    {
+        return;
+    }
+    
     let scoreTeam1 = document.getElementById("team1score");
     let scoreTeam2 = document.getElementById("team2score");
     if(scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null && scoreTeam1 === null && scoreTeam2 === null){
@@ -1229,6 +1235,7 @@ function checkScoreHost(ball){
         maxBalls++;
         ballToRemoveHost.set(ball.ballId, true);
         if (gameSettings.gameRules == "time") {
+            console.log("quiquiqui ", gamePaused);
             score[1] = score[1] + 1;
             scoreTeam[0]++;
         } else {
@@ -1244,6 +1251,7 @@ function checkScoreHost(ball){
         maxBalls++;
         ballToRemoveHost.set(ball.ballId, true)
         if (gameSettings.gameRules == "time") {
+            console.log("quiquiqui ", gamePaused);
             score[0] = score[0] + 1;
             scoreTeam[0]++;
         } else {
@@ -1656,10 +1664,15 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         {
             gamePaused = true;
             gameIsStarting = true;
-            BALLS.forEach(ball => { ball.destroy(); });
+            BALLS.forEach(ball => { ball.destroy(); ball = null; });
+            BALLS =  [];
             ballToRemove.clear();
             ballToRemoveHost.clear();
             maxBalls = gameSettings.gameBalls;
+            paddle1.mesh.spawn = new THREE.Vector2(0, -20);
+            paddle1.mesh.position.set(paddle1.mesh.spawn.x, paddle1.mesh.spawn.y);
+            paddle2.mesh.spawn = new THREE.Vector2(0, 20);
+            paddle2.mesh.position.set(paddle2.mesh.spawn.x, paddle2.mesh.spawn.y);
             ballCounter = 0;
             ball_is_ready = false;
             collision_is_ready = false;
@@ -1901,7 +1914,7 @@ function animateonline(){
     if (isHost === true) {
 
         for (let i = 0; i < BALLS.length; i++) {
-            if (BALLS[i]) {
+            if (BALLS[i] && gamePaused === false) {
                
                 if (checkScoreHost(BALLS[i]) == 1) {
 

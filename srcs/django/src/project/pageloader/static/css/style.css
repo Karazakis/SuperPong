@@ -7,6 +7,14 @@ h1, h2, h3, h4, h5, h6, p, div {
 font-family: 'Titillium Web', sans-serif !important;
 font-weight: 700;
 }
+#chat_details {
+	display: none;
+}
+
+#info-icon:hover + #chat_details {
+	display: block;
+}
+
 .context-menu {
     background-color: #f9f9f9;
     border: 1px solid #ccc;
