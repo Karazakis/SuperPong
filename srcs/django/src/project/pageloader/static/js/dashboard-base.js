@@ -171,9 +171,11 @@ function initializeWebSocket() {
 		} else if (data.type === 'friend_request') {
 			handleFriendRequest(data, accessToken, csrfToken);
 		} else if (data.type === 'accept') {
-			updateFriendshipStatus(data);
+			updateRequestStatus(data);
+		} else if (data.type === 'decline') {
+			updateRequestStatus(data);
 		} else if (data.type === 'remove') {
-			updateFriendshipStatus(data);
+			updateRequestStatus(data);
 		} else if (data.type === 'pending_request') {
 			if (data.request_type === 'game') {
 			    handleGameInvite(data);
@@ -213,7 +215,7 @@ initializeWebSocket();
 
     let actualRequestingUser = await recoverUser(data.requesting_user)
     console.log(actualRequestingUser)    
-    let invite = confirm(`${actualRequestingUser.nickname} ti ha invitato a giocare`);
+    let invite = window.confirm(`${actualRequestingUser.nickname} ti ha invitato a giocare`);
     if (invite) {
 		let pathname = window.location.pathname;
 		if (pathname.includes('lobby') === true) {
@@ -223,8 +225,8 @@ initializeWebSocket();
 		joinGame(data.target_lobby);
     } else {
 		chatSocket.send(JSON.stringify({
-			'type': 'remove',
-			'pending_request': 'remove',
+			'type': 'decline',
+			'pending_request': 'decline',
 			'target_user': data.requesting_user,
 			'requesting_user': data.target_user,
 			'lobby_id': data.target_lobby
@@ -257,7 +259,7 @@ async function handleTournamentInvite(data, accessToken, csrfToken) {
 	}
 	
     let actualRequestingUser = await recoverUser(data.requesting_user)        
-    let invite = confirm(`${actualRequestingUser.nickname} ti ha invitato ad un torneo`);
+    let invite = window.confirm(`${actualRequestingUser.nickname} ti ha invitato ad un torneo`);
     if (invite) {
 		let pathname = window.location.pathname;
 		if (pathname.includes('lobby') === true) {
@@ -267,8 +269,8 @@ async function handleTournamentInvite(data, accessToken, csrfToken) {
 		joinTournament(data.target_lobby);
     } else {
 		chatSocket.send(JSON.stringify({
-			'type': 'remove',
-			'pending_request': 'remove',
+			'type': 'decline',
+			'pending_request': 'decline',
 			'target_user': data.requesting_user,
 			'requesting_user': data.target_user,
 			'lobby_id': data.target_lobby
@@ -296,7 +298,7 @@ async function updateGameInviteStatus(data) {
 
 async function handleFriendRequest(data, accessToken, csrfToken) {
     let actualRequestingUser = await recoverUser(data.requesting_user)    
-    let request = confirm(`${actualRequestingUser.nickname} vuole aggiungerti come amico`);
+    let request = window.confirm(`${actualRequestingUser.nickname} vuole aggiungerti come amico`);
     if (request) {
         processFriendRequest('accept', data, accessToken, csrfToken);
 		updateFriendListFromServer();
@@ -376,10 +378,11 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 	updateFriendListFromServer();
 }
 
-async function updateFriendshipStatus(data) {
+async function updateRequestStatus(data) {
     let actualRequestingUser = await recoverUser(data.requesting_user)
     let actualTargetUser = await recoverUser(data.target_user)
     let message;
+    console.log(`${data.request_type}`)
     switch (data.type) {
         case 'accept':
             message = `${actualTargetUser.nickname} ha accettato la tua richiesta`;
@@ -388,8 +391,8 @@ async function updateFriendshipStatus(data) {
             message = `${actualTargetUser.nickname} ha rifiutato la tua richiesta`;
             break;
         case 'remove':
-            message = `${actualTargetUser.nickname} ha rimosso l'amicizia`;
-            break;
+		message = `${actualTargetUser.nickname} ha rimosso l'amicizia`;
+		break;
         default:
             console.error('Unhandled status update:', data.type);
             return;

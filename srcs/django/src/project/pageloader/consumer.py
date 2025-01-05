@@ -1024,15 +1024,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         logger.info(f"Disconnecting from tournament room: {self.room_group_name} with close code: {close_code}")
-
-        if not getattr(self, 'user_left', False):
-            await self.handle_disconnect_cleanup()
-
+        userleft = getattr(self, 'user_left', False)
         # Verifica se l'utente ha già eseguito il leave
-        if getattr(self, 'user_left', True):
+        if userleft == True:
 
             # Rimuovi il client dal gruppo del torneo
             await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+            return
+        else:
+            logger.info("User left is False. Performing cleanup. pippinino")
+            await self.handle_disconnect_cleanup()
 
 
     async def receive(self, text_data):
@@ -1498,6 +1499,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         """
         try:
             # Recupera la lista completa degli utenti
+            #tournament = await self.get_tournament()
+
+            #status = tournament.status
+            
             user_list = await self.get_user_list()
 
             # Ottieni gli utenti nella lobby specifica del torneo corrente

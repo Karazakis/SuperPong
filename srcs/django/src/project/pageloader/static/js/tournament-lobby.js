@@ -82,7 +82,6 @@ LobbySocket.onmessage = function(e) {
                 let leaveButton = document.querySelector('.lobby-leave');
                 console.log(leaveButton);
                 if (leaveButton) leaveButton.disabled = false;
-                // setAllUnready(); // Esegui azioni per resettare gli stati dei pulsanti
             }
             break;
         default:
@@ -850,6 +849,7 @@ function showJoinGamePopup(gameLink) {
         console.log('Popup already exists. Skipping creation.');
         return;
     }
+
 
     const popup = document.createElement('div');
     popup.classList.add('popup');

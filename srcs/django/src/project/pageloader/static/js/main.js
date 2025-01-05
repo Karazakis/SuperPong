@@ -355,7 +355,8 @@ function loadPage(url) {
                 }
             })
             .catch(error => {
-                console.error('Errore durante il recupero della pagina:', error);
+                loadPage("api/dashboard/");
+                console.warn('Errore durante il recupero della pagina:', error);
             });
         }
     };
@@ -498,10 +499,10 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     window.onpopstate = function(event) {
-        console.log('popstate', event.state, window.previousUrl);
+        console.log('popstate', event, window.previousUrl);
         event.preventDefault();
         
-        if (window.previousUrl.includes("game")) {
+        if (window.previousUrl.includes("game") && !window.previousUrl.includes("forbidden")) {
             
             let confirmLeave = confirm("Are you sure you want to leave the game?");
             if (confirmLeave) {
@@ -531,6 +532,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     loadPage('api/dashboard/');
                 }
+                return;
             } else {
                 let cleanUrl = window.previousUrl.replace("api", "");
                 console.log('il previous', cleanUrl);
@@ -539,6 +541,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
         }
+
+        if (event.state === null) {
+            loadPage("api/dashboard/");
+            return;
+        }
+
         let page = event.state.page;
         if (page.includes("create")) {
             const parts = page.split("_");

@@ -201,3 +201,6 @@ font-weight: 700;
     font-weight: bold;
 }
 
+.text-center {
+	text-align: center; /* Allinea il testo al centro */
+}

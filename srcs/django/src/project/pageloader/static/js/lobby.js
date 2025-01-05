@@ -31,7 +31,12 @@ LobbySocket.onopen = function(e) {
     console.log('Errore durante la creazione:', error);
 }
 
-let intervalCountdown = null;
+if (typeof intervalCountdown === 'undefined') {
+    let intervalCountdown = null;
+} else if (intervalCountdown !== null) {
+    clearInterval(intervalCountdown);
+    intervalCountdown = null;
+}
 
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
