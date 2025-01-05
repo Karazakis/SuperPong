@@ -14,18 +14,54 @@ document.getElementById("signup-form").addEventListener("submit", function(event
     const passwordInput = document.getElementById("password");
 
     function isValidUsername(username) {
-        return username.length >= 3;
+        username = username.replace(/[<>]/g, '');
+    
+        if (/\s/.test(username)) {
+            return "Username cannot contain spaces.";
+        }
+        if (username.length < 3) {
+            return "Username must be at least 3 characters long.";
+        }
+        if (username.length > 20) {
+			return "Username cannot be over 20 characters long.";
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            return "Username can contain only letters, numbers and underscore.";
+        }
+        return "";
     }
+    
 
     function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+        email = email.replace(/[<>]/g, '');
+    
+        if (email.length > 40) {
+            return "Email address cannot be over 40 characters long.";
+        }
+        if (!/^(?!.*\.\.)[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+            return "Insert a valid email address.";
+        }
+        return "";
     }
+    
+    
 
     function isValidPassword(password) {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
-        return passwordRegex.test(password);
+        if (password.length < 8) {
+            return "Password must have at least 8 characters";
+        }
+        if (!/[A-Z]/.test(password)) {
+            return "Password must have at least one uppercase character.";
+        }
+        if (!/[a-z]/.test(password)) {
+            return "Password must have at least one lowercase character.";
+        }
+        if (!/\W/.test(password)) {
+            return "Password must have at least one special character.";
+        }
+        return "";
     }
+    
 
     usernameErrorDiv.textContent = "";
     emailErrorDiv.textContent = "";
@@ -33,25 +69,28 @@ document.getElementById("signup-form").addEventListener("submit", function(event
 
     let isFormValid = true;
 
-    if (!isValidUsername(username)) {
-        usernameErrorDiv.textContent = "Il nome utente deve avere almeno 3 caratteri.";
-        usernameInput.classList.remove("valid");
+    const usernameError = isValidUsername(username);
+    if (usernameError) {
+        usernameErrorDiv.textContent = usernameError;
+        usernameInput.classList.add("invalid");
         isFormValid = false;
     } else {
         usernameInput.classList.add("valid");
     }
 
-    if (!isValidEmail(email)) {
-        emailErrorDiv.textContent = "Inserisci un'email valida.";
-        emailInput.classList.remove("valid");
+    const emailError = isValidEmail(email);
+    if (emailError) {
+        emailErrorDiv.textContent = emailError;
+        emailInput.classList.add("invalid");
         isFormValid = false;
     } else {
         emailInput.classList.add("valid");
     }
 
-    if (!isValidPassword(password)) {
-        passwordErrorDiv.textContent = "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola e un carattere speciale.";
-        passwordInput.classList.remove("valid");
+    const passwordError = isValidPassword(password);
+    if (passwordError) {
+        passwordErrorDiv.textContent = passwordError;
+        passwordInput.classList.add("invalid");
         isFormValid = false;
     } else {
         passwordInput.classList.add("valid");
@@ -88,7 +127,6 @@ document.getElementById("signup-form").addEventListener("submit", function(event
                 }
             }
         } else {
-            // Esegui altre azioni, ad esempio reindirizzare l'utente
             loadPage("api/login/");
         }
     })

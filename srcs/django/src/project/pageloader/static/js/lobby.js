@@ -31,8 +31,11 @@ LobbySocket.onopen = function(e) {
     console.log('Errore durante la creazione:', error);
 }
 
+let intervalCountdown = null;
+
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
+    console.log("on message ",data);
     if (data.action === 'message') {
         let messages = document.getElementById('lobby_messages');
         messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2.2vh;"><strong>${userList[data.player]}:</strong><p>${data.message}</p></div>`);
@@ -52,11 +55,12 @@ LobbySocket.onmessage = function(e) {
         });
 
 
-        setInterval(() => {
+        intervalCountdown = setInterval(() => {
             time--;
             messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start"><strong>Server:</strong><p>THE GAME WILL START IN ${time}!!!</p></div>`);
             messages.scrollTop = messages.scrollHeight;
             if (time === 0) {
+                LobbySocket.send(JSON.stringify({ action: 'start_game_host', username: username_lobby }));
                 loadPage('/api/game/' + game_id_lobby + '/');
             }
         }, 1000);
@@ -72,32 +76,43 @@ LobbySocket.onmessage = function(e) {
             }
         }
     } else if (data.action === "disconnected") {
-        for (let i = 1; i <= 4; i++) {
+        
+        for (let i = 1; i <= 2; i++) {
             let playerLabel = document.getElementById('player' + i + '_label');
             let userLobby = document.getElementById('user' + i + '_lobby');
     
-            // Se l'elemento player esiste e il nome utente corrisponde
+            playerLabel.classList.remove('ready', 'not_ready');
             if (playerLabel?.textContent.includes(userList[data.username])) {
-                // Rimuovi le classi ready o not_ready
-                playerLabel.classList.remove('ready', 'not_ready');
                 
-                // Aggiungi la classe disconnect
                 playerLabel.classList.add('disconnect');
     
-                // Rimuovi la classe connect (se presente)
                 playerLabel.classList.remove('connect');
             }
+            userLobby.classList.remove('ready', 'not_ready');
             if (userLobby?.textContent.includes(userList[data.username])) {
-                // Rimuovi le classi ready o not_ready
-                userLobby.classList.remove('ready', 'not_ready');
                 
-                // Aggiungi la classe disconnect
                 userLobby.classList.add('disconnect');
     
-                // Rimuovi la classe connect (se presente)
                 userLobby.classList.remove('connect');
             }
         }
+        
+        if (intervalCountdown !== null)
+        {
+            clearInterval(intervalCountdown);
+            let buttonToEnable = document.querySelectorAll('button');
+            buttonToEnable.forEach(element => {
+                element.disabled = false;
+            });
+        }
+        
+        if (document.getElementById('start') === null) {
+            document.getElementById('ready').textContent = 'Ready';
+            document.getElementById('ready').style.backgroundColor = 'green';
+        } else {
+            document.getElementById('start').disabled = true;
+        }
+        
     } else if (data.action === "connected") {
         userList[data.username] = data.nickname;
         for (let i = 1; i <= 4; i++) {
@@ -106,13 +121,15 @@ LobbySocket.onmessage = function(e) {
     
             if (playerLabel?.textContent.includes(userList[data.username])) {
                 playerLabel.classList.remove('disconnect');
-    
             }
 
             if (userLobby?.textContent.includes(userList[data.username])) {
                 userLobby.classList.remove('disconnect');
             }
         }
+    } else if (data.action === 'delete') {
+        LobbySocket.close();
+        loadPage('/api/remote/');
     }
     
 };
@@ -430,6 +447,9 @@ if (deleteButton) {
             })
             .then(response => {
                 if (response.ok) {
+                    console.log('Lobby eliminata con successo');
+                    LobbySocket.send(JSON.stringify({ action: 'delete', username: username_lobby }));
+                    LobbySocket.close();
                     loadPage('/api/remote/');
                 } else {
                     return response.json().then(data => { throw new Error(data.error); });

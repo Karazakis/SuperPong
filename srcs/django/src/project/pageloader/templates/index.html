@@ -49,6 +49,7 @@
     </div>
     <script defer>
         // import { THREE } from '/static/js/game/module/three.module.js';
+        window.previousUrl = null;
         window.initStarSky = function () {
             window.starScene = new THREE.Scene();
             window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);

@@ -1,23 +1,21 @@
-// Inizializzazione delle variabili
 var urlPathLobby = window.location.pathname;
 var round_id_lobby = urlPathLobby.split('/').filter(part => part !== '').pop();
 var userId_lobby = localStorage.getItem('userId');
 var username_lobby = localStorage.getItem('username');
 var slotSelectionLocked = false;
-// Configurazione del WebSocket
 var lobby = `wss://${window.location.host}/wss/tournament/${round_id_lobby}/?id=${userId_lobby}`;
 var LobbySocket = new WebSocket(lobby);
 
 var usernameToNicknameMap = {};
+var countdownActive = false;
+var countdownInterval = null;
 
-// Aggiungi il nickname del client corrente durante l'inizializzazione
 function initializeNicknameMapFromTemplate() {
     const nicknameElement = document.getElementById('user-nicknames');
     if (nicknameElement) {
         try {
             const nicknamesArray = JSON.parse(nicknameElement.dataset.nicknames);
 
-            // Itera sull'array per costruire una mappa username -> nickname
             nicknamesArray.forEach(entry => {
                 usernameToNicknameMap[entry.username] = entry.nickname;
             });
@@ -30,14 +28,14 @@ function initializeNicknameMapFromTemplate() {
 
 onPageLoad();
 
-// Gestione dell'apertura del WebSocket
 LobbySocket.onopen = function(e) {
+	console.log("Ciao")
     LobbySocket.send(JSON.stringify({ action: "join", round_id_lobby: round_id_lobby, username: username_lobby }));
 };
 
-// Gestione dei messaggi ricevuti dal WebSocket
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
+	console.log("Action:", data);
 
     switch (data.type) {
         case 'chat_message':
@@ -75,6 +73,15 @@ LobbySocket.onmessage = function(e) {
                 startTournamentCountdown();
             }
             break;
+		case 'disconnected':
+			if (countdownInterval !== null)
+			{
+				clearInterval(countdownInterval);
+			}
+			if (data.authorized === 'false')
+			{
+				setAllUnready();
+			}
         default:
             break;
     }
@@ -86,6 +93,16 @@ LobbySocket.onerror = function(e) {
 };
 
 LobbySocket.onclose = function(e) {
+	console.log("Bye")
+	// Blocca il countdown se è attivo
+    if (countdownActive) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        countdownActive = false;
+
+        // Ripristina i pulsanti o altri elementi della UI
+        //resetUIState();
+    }
 };
 
 // Funzione di inizializzazione della pagina della lobby
@@ -586,7 +603,7 @@ if (leaveButton) {
 }
 
 
-async function leaveLobby() {
+async function leaveLobby(isMe = false) {
     let accessToken = localStorage.getItem("accessToken");
 
     // Funzione per verificare la validità del token
@@ -776,25 +793,22 @@ if (startTournament) {
 
 function startTournamentLogic() {
 
-    // Disabilita i pulsanti
     const startTournament = document.getElementById("start");
     const leaveTournament = document.getElementById("leave");
     if (startTournament) startTournament.disabled = true;
     if (leaveTournament) leaveTournament.disabled = true;
 
-    // Invio del messaggio per iniziare il processo di round
     LobbySocket.send(JSON.stringify({
         action: 'start_tournament_preparation'
     }));
 }
 
 function startTournamentCountdown() {
-    // Countdown lato client inviato come messaggi di chat
-    let countdown = 10; // Countdown di 10 secondi
-    const countdownInterval = setInterval(function () {
+	countdownActive = true;
+    let countdown = 10;
+    countdownInterval = setInterval(function () {
         countdown--;
 
-        // Invio del messaggio di chat con "SYSTEM" come username
         const message = {
             action: 'chat_message',
             username: 'SYSTEM',
@@ -804,20 +818,19 @@ function startTournamentCountdown() {
 
         if (countdown <= 0) {
             clearInterval(countdownInterval);
+			countdownActive = false;
+			countdownInterval = null;
 
-            // Invia il messaggio per confermare che il countdown è terminato
             LobbySocket.send(JSON.stringify({
                 action: 'countdown_complete'
             }));
         }
-    }, 1000); // Aggiorna il countdown ogni secondo
+    }, 1000);
 }
 
 
-// Funzione per mostrare il popup per joinare il game
 function showJoinGamePopup(gameLink) {
 
-    // Creazione del popup
     const popup = document.createElement('div');
     popup.classList.add('popup');
     popup.innerHTML = `
@@ -828,11 +841,9 @@ function showJoinGamePopup(gameLink) {
         </div>
     `;
 
-    // Trova il contenitore in cui appenderlo. Assicurati che esista o creane uno.
-    const container = document.getElementById('main-container'); // Usa un container specifico se esiste
+    const container = document.getElementById('main-container');
     container.appendChild(popup);
 
-    // Aggiungi uno stile di base per il popup (puoi migliorarlo con CSS)
     popup.style.position = 'fixed';
     popup.style.top = '50%';
     popup.style.left = '50%';
@@ -840,26 +851,23 @@ function showJoinGamePopup(gameLink) {
     popup.style.backgroundColor = '#fff';
     popup.style.padding = '20px';
     popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-    popup.style.zIndex = '9999'; // Assicura che il popup sia in cima a tutti gli altri elementi
+    popup.style.zIndex = '9999';
 
-    // Al click del pulsante, usa loadPage per caricare la pagina del game
     document.getElementById('join-game-btn').addEventListener('click', function() {
-        container.removeChild(popup);  // Rimuove il popup
+        container.removeChild(popup);
         reactivateDashboard();
-        loadPage(gameLink);  // Usa loadPage per caricare la pagina
+        loadPage(gameLink);
     });
 }
 
 function showWinnerPopup(winner) {
 
-    // Controlla se il popup esiste già
     if (document.querySelector('.popup')) {
-        return; // Evita di crearne un altro
+        return;
     }
 
     const winnerNickname = usernameToNicknameMap[winner.username] || winner.username;
 
-    // Creazione del popup
     const popup = document.createElement('div');
     popup.classList.add('popup');
     popup.innerHTML = `
@@ -871,15 +879,13 @@ function showWinnerPopup(winner) {
         </div>
     `;
 
-    // Trova il contenitore in cui appenderlo. Assicurati che esista o creane uno.
-    const container = document.getElementById('main-container'); // Usa un container specifico se esiste
+    const container = document.getElementById('main-container');
     if (!container) {
         console.error("Main container not found. Popup cannot be displayed.");
         return;
     }
     container.appendChild(popup);
 
-    // Aggiungi uno stile di base per il popup (puoi migliorarlo con CSS)
     popup.style.position = 'fixed';
     popup.style.top = '50%';
     popup.style.left = '50%';
@@ -887,12 +893,11 @@ function showWinnerPopup(winner) {
     popup.style.backgroundColor = '#fff';
     popup.style.padding = '20px';
     popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-    popup.style.zIndex = '9999'; // Assicura che il popup sia in cima a tutti gli altri elementi
-    popup.style.textAlign = 'center'; // Per centratura del testo
+    popup.style.zIndex = '9999';
+    popup.style.textAlign = 'center';
 
-    // Aggiungi un gestore di eventi al pulsante di chiusura
     document.getElementById('close-popup-btn').addEventListener('click', function() {
-        container.removeChild(popup); // Rimuove il popup
+        container.removeChild(popup);
     });
 }
 

@@ -447,8 +447,6 @@ endgameOnline(isLeft = false, isHostLeft = false) {
                     },
                     body: JSON.stringify(data)
                 });
-
-
             } catch (error) {
                 console.error('Errore durante la richiesta:', error);
             }
@@ -550,6 +548,7 @@ window.gameover = gameover;
 
 function startTimer() {
     // Inizializza il timer del gioco
+    console.log("START TIMER")
     if (gameEnded === true) {
         return;
     }
@@ -751,6 +750,7 @@ let maxBalls = gameSettings.gameBalls;
 let ballC = 0;
 
 function launchBall(n2online = 0, ballId = null) {
+    console.log("lancio palla");
     let direction;
     let n = 0;
     let n2 = Math.floor(Math.random() * 4);
@@ -866,12 +866,22 @@ let scoreTeam = [20, 20]
 if (gameSettings.gameRules == "time") {
     scoreTeam = [0, 0];
 
-    score = [0, 0, 0, 0];
-    let score1String = document.getElementById("player0score").innerText;
-    let score2String = document.getElementById("player1score").innerText
-    score[0] = parseInt(document.getElementById("player0score").innerText);
-    score[1] = parseInt(document.getElementById("player1score").innerText);
-    
+    const player0Element = document.getElementById("player0score");
+    const player1Element = document.getElementById("player1score");
+
+    if (!player0Element || !player1Element) {
+        console.error("Gli elementi player0score o player1score non esistono nel DOM.");
+    } else {
+        console.log("player0score:", player0Element.innerText);
+        console.log("player1score:", player1Element.innerText);
+    }
+
+
+    score = [0, 0];
+    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament") {
+        score[0] = parseInt(document.getElementById("player0score").innerText);
+        score[1] = parseInt(document.getElementById("player1score").innerText);
+    }
 } else {
     let scorebase = 10;
     if (gameSettings.gameScoreLimit) {
@@ -880,7 +890,10 @@ if (gameSettings.gameRules == "time") {
     let scorebaseteam = scorebase * 2;
     score = [scorebase, scorebase, scorebase, scorebase];
     scoreTeam = [scorebaseteam, scorebaseteam];
-    
+    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament") {
+        score[0] = parseInt(document.getElementById("player0score").innerText);
+        score[1] = parseInt(document.getElementById("player1score").innerText);
+    }
 }
 
 let isPaused = false;
@@ -907,7 +920,12 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
 
     if (gameSettings.gameType === "local-game")
     {
-        endgameLocal(abandon);
+        if (abandon === false) {
+            endgameLocal(abandon);
+        } else {
+            return;
+        }
+
     }
     
     if(gameSettings.gameRules == "time") {
@@ -918,19 +936,19 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
                 showModal("You Win!", "Congratulations");
             } else if (posit == "p1" || gameSettings.gameType === "local-game" || gameSettings.gameType === "single-game") {
                 if (score[0]  < score[1]) {
-                    showModal("You Win!", "Congratulations, Player 1!");
+                    showModal("You win!", "Congratulations, Player 1!");
                 } else if (score[0] == score[1]) {
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else {
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             } else if (posit == "p2"){
                 if (score[1] < score[0]) {
                     showModal("You Win!", "Congratulations, Player 2!");
                 } else if (score[0] == score[1]){
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else{
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             }
         } else if (gameSettings.gameMode == "2v2") {
@@ -963,7 +981,7 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
             } else if (score[0] > 0 && walls[0] === false) {
                 showModal("You Win!", "Congratulations, Player 1!");
             } else {
-                showModal("You lose!", "You suck! Go kill yourself!");
+                showModal("You lose!", "You'll have better luck next time!");
             }
         }
         else if (counter === 2 && document.getElementById("gamemode").textContent === "1v1") {
@@ -976,9 +994,9 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
                 } else if (score[0] > 0 && score[0] > score[1]) {
                     showModal("You Win!", "Congratulations, Player 1!");
                 }else if (score[0] == score[1]){
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else {
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             } else if (posit == "p2") {
                 if (isLeft === true){
@@ -986,9 +1004,9 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
                 } else if (score[1] > 0 && score[1] > score[0]){
                     showModal("You Win!", "Congratulations, Player 1!");
                 }else if (score[0] == score[1]){
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else {
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             }
             walls[0] = true;
@@ -1204,6 +1222,7 @@ function checkScore(ball){
 
 function checkScoreHost(ball){
     if (gameEnded === true) {
+        console.log("GAME OVER NICCULO DI MATTIA");
         return 0;
     }
     console.log("aasdasd");
@@ -1243,8 +1262,11 @@ function checkScoreHost(ball){
             scoreTeam[0]--;
         }
 
-        if(score[1] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[1] == 0 && gameSettings.gameRules == "score" || goldenGoal === true) {
+            console.log("LUCAZZO");
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            
+        }
         return(1);     
     }
     else if(ball.mesh.position.y < -21 && ballToRemoveHost.get(ball.ballId) != true){
@@ -1259,8 +1281,11 @@ function checkScoreHost(ball){
             scoreTeam[0]--;
         }
    
-        if(score[0] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[0] == 0 && gameSettings.gameRules == "score" || goldenGoal === true) {
+            console.log("LUCAZZO");
+
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+        }
         return(1);
     }
     else if(ball.mesh.position.x > 21 && ((scoreP3 && scoreP4) || scoreTeam2)){
@@ -1272,8 +1297,11 @@ function checkScoreHost(ball){
             score[2]--;
             scoreTeam[1]--;
         }
-        if(score[2] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[2] == 0 && gameSettings.gameRules == "score" || goldenGoal === true){
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            console.log("LUCAZZO");
+
+        }
         return(1);
     }
     else if(ball.mesh.position.x < -21 && ((scoreP3 && scoreP4) || scoreTeam2)){
@@ -1285,8 +1313,11 @@ function checkScoreHost(ball){
             score[3]--;
             scoreTeam[1]--;
         }
-        if(score[3] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[3] == 0 && gameSettings.gameRules == "score" || goldenGoal === true){
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            console.log("LUCAZZO");
+
+        }
         return(1);
     }
 }
@@ -1498,12 +1529,10 @@ export function updateBall(ballId, position, velocity) {
 }
 
 export function addCollisionCorrection(ballId, ballId2 = -1, type, correction) {
-    // Se l'oggetto ballId non esiste ancora, crealo
     if (!collisionMap[ballId]) {
         collisionMap[ballId] = {};
     }
     
-    // Aggiungi o aggiorna la correzione per il tipo specifico
     collisionMap[ballId][type] = correction;
     if (ballId2 !== null && ballId2 !== -1) {
         collisionMap[ballId]["ballId2"] = ballId2;
@@ -1511,14 +1540,10 @@ export function addCollisionCorrection(ballId, ballId2 = -1, type, correction) {
 }
 
 export function removeCollisionCorrection(ballId, type) {
-    // Controlla se il ballId esiste nella mappa
     if (collisionMap[ballId]) {
-        // Controlla se esiste una correzione per il tipo specificato
         if (collisionMap[ballId][type]) {
-            // Rimuovi la correzione per quel tipo
             delete collisionMap[ballId][type];
 
-            // Se non ci sono più correzioni per questo ballId, rimuovi anche il ballId
             if (Object.keys(collisionMap[ballId]).length === 0) {
                 delete collisionMap[ballId];
             }
@@ -1635,7 +1660,10 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         } else if (data.action === "game_over") {
             if (isHost === true) {
                 endgameOnline();
+            } else {
+                document.getElementById('game-details').dataset.gameStatus = "finished";
             }
+            console.log("GAME OVER ALLE SPALLE DI MATTIA");
             gameEnded = true;
             gameover(data.p1, data.p2);
         } else if (data.action === "score_update") {
@@ -1681,6 +1709,9 @@ if(gametype == 'remote-game' || gametype == 'tournament')
             if (gameEnded !== true) {
                 document.getElementById('leavegame').disabled = true;
                 startConnectionCountdown();
+                if (intervalCountdown !== null) {
+                    clearInterval(intervalCountdown);
+                }
             }
             document.getElementById("wait-modal").style.display = "block";
         }
@@ -1735,11 +1766,16 @@ if(gametype == 'remote-game' || gametype == 'tournament')
     window.addEventListener('keyup', window.handleKeyUp);
 }
 
+let intervalCountdown = null;
 function startCountdown() {
+    console.log("START COUNTDOWN")
     let countdown = -10;
     let countdownElement = document.getElementById('countdown');
     window.timer = document.getElementById('countdown').textContent;
-    let intervalCountdown = setInterval(() => {
+    if (intervalCountdown !== null) {
+        clearInterval(intervalCountdown);
+    }
+    intervalCountdown = setInterval(() => {
         countdownElement.innerText = countdown;
         countdown++;
         GameSocket.send(JSON.stringify({ action: "time_update", time: countdown }));
@@ -1975,14 +2011,16 @@ if (gameSettings.gameType === "local-game") {
 }
 
 function animate() {
+    console.log("ANIMATE")
     if (window.gameScene === undefined || window.gameScene === null || gameEnded === true) {
         return;
     }
     if(gameSettings.gameRules == "time" && flagTimer == true && gameEnded === false) {
         flagTimer = false;
+        console.log("set timer")
         setTimeout(() => {            
             startTimer();
-        } , 7000);        
+        } , 3000);        
     }
 
     if (isPaused) {

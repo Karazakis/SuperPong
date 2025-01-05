@@ -42,7 +42,12 @@
         <div id="game-timer" data-timer="{{game_info.time}}">
             <span id="countdown"></span>
         </div>
-        <h6>Players score:</h6>
+        <h6>Players score:
+		<span id="info-icon" style="cursor: pointer; color: #007bff;" data-toggle="tooltip" 
+				  title="The player that take the least amount of goals wins. -Time type games: ends when the timer goes to zero, the player with less points wins. -Score type games: ends when a player take the setted amount of goals, the player that reach zero loses.">
+				game rules
+			</span>
+	</h6>
         <div class="row justify-content-center">
                 {% if game_info.mode == '2v2' %}
                     <div class="col-4 text-center">

@@ -128,9 +128,11 @@ class Round(models.Model):
         """Genera i game per il round in base al numero di game e le regole del torneo."""
         if rules == 'time':
             time_left = limit * 60
+            player_limit = 0
         else:
             time_left = 0
-        for i in range(1, num_games + 1):
+            player_limit = limit
+        for i in range(1, num_games + 1):                
             game = Game.objects.create(
                 name=f"{self.tournament.name} - Round {self.round_number} - Game {i}",
                 mode=mode,
@@ -140,7 +142,9 @@ class Round(models.Model):
                 balls=balls,
                 boost=boost,
                 tournament=self.tournament,
-                status='not_started'
+                status='not_started',
+                player1_score=player_limit,
+                player2_score=player_limit,
             )
             self.games.add(game)
         self.save()

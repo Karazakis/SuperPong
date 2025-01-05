@@ -259,8 +259,6 @@ class DashboardAPIView(APIView):
             }
             return Response(data)
 
-
-
 def normalize_statistics(individual_stats, global_stats):
     """
     Normalizes individual statistics compared to global statistics.
@@ -354,13 +352,13 @@ def calculate_global_game_statistics():
     if total_games == 0:
         logger.warning("No games found. Returning 'None' for all statistics.")
         return {
-            'precision_time': None,
-            'precision_score': None,
-            'reactivity': None,
-            'madness': None,
-            'leadership': None,
-            'patience': None,
-            'intensity': None,
+            'precision_time': 1,
+            'precision_score': 1,
+            'reactivity': 1,
+            'madness': 1,
+            'leadership': 1,
+            'patience': 1,
+            'intensity': 1,
         }
 
     # Calcolo precisione con distinzione per tipo di gioco
@@ -454,7 +452,7 @@ def calculate_global_game_statistics():
 
 
 def calculate_individual_game_statistics(user_profile):
-    # Partite giocate dal giocatore
+    
     match_history = user_profile.game_played.all()
     total_games = match_history.count()
     logger.debug(f"Total games played by {user_profile.user}: {total_games}")
@@ -462,12 +460,12 @@ def calculate_individual_game_statistics(user_profile):
     if total_games == 0:
         logger.warning(f"No games found for user {user_profile.user}. Returning 'None' for all statistics.")
         return {
-            'precision_time': None,
-            'precision_score': None,
-            'reactivity': None,
-            'madness': None,
-            'leadership': None,
-            'intensity': None,
+            'precision_time': 1,
+            'precision_score': 1,
+            'reactivity': 1,
+            'madness': 1,
+            'leadership': 1,
+            'intensity': 1,
         }
 
     total_time_scores = 0
@@ -508,7 +506,6 @@ def calculate_individual_game_statistics(user_profile):
         if match.winner == user_profile.user:
             total_wins += 1
 
-    # Calcolo delle statistiche
     precision_time_value = total_time_scores / total_time_games if total_time_games > 0 else None
     precision_score_value = total_score_precision / total_score_games if total_score_games > 0 else None
     reactivity_value = total_hits / total_games if total_games > 0 else None
@@ -516,7 +513,6 @@ def calculate_individual_game_statistics(user_profile):
     intensity_value = total_key_presses / total_games if total_games > 0 else None
     patience_value = (total_time_games / total_games) * 5 if total_games > 0 else None
 
-    # Risultati finali
     individual_stats = {
         'precision_time': round(precision_time_value, 2) if precision_time_value is not None else None,
         'precision_score': round(precision_score_value, 2) if precision_score_value is not None else None,
@@ -607,7 +603,7 @@ class ProfileAPIView(APIView):
                 'tournament_losses': tournament_losses,
                 'tournament_draws': tournament_draws,
                 'tournament_abandons': tournament_abandons,
-                'relative_game_statistics': normalized_game_statistics,  # Normalizzate
+                'relative_game_statistics': normalized_game_statistics,
             }
             
             html = render_to_string('profile.html', context)
@@ -1047,8 +1043,13 @@ class CreateAPIView(APIView):
             else:
                 if request.data.get('rules', '') == 'time':
                     timelimit = int(request.data.get('limit', 0)) * 60
+                    player1_score = 0
+                    player2_score = 0
                 else:
                     timelimit = 0
+                    player1_score = request.data.get('limit', 0)
+                    player2_score = request.data.get('limit', 0)
+                
                 game = Game.objects.create(
                     name=request.data.get('name', ''),
                     mode=request.data.get('mode', ''),
@@ -1057,6 +1058,8 @@ class CreateAPIView(APIView):
                     balls=int(request.data.get('balls', 1)),
                     boost=request.data.get('boost', False),
                     time_left=timelimit,
+                    player1_score=player1_score,
+                    player2_score=player2_score,
                 )
                 if request.data.get('mode', '') == '1v1':
                     game.player_limit = 2
@@ -2169,8 +2172,8 @@ class GameAPIView(APIView):
                 user = get_object_or_404(User, pk=request.user.id)
                 user_profile = get_object_or_404(UserProfile, user=user)
                 boosts = data.get('boosts', 0)
-                player1_score = data.get('scorePlayer1', '0')
-                player2_score = data.get('scorePlayer2', '0')
+                player1_score = data.get('scorePlayer1', 0)
+                player2_score = data.get('scorePlayer2', 0)
                 if boosts == "true":
                     boosts = True
                 else:

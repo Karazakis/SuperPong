@@ -53,7 +53,7 @@
                                 <span>Reactivity</span><span id="reactivity">{{ relative_game_statistics.reactivity|floatformat:2 }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Patience</span><span id="patience">{{ relative_game_statistics.patience |floatformat:2}}</span>
+                                <span>Patience</span><span id="patience">{{ relative_game_statistics.patience|default:"2.50"  |floatformat:2}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Madness</span><span id="madness">{{ relative_game_statistics.madness|floatformat:2 }}</span>
@@ -122,23 +122,27 @@
                                         {% if game.player1 == game.player2 %}
                                             {% if game.rules == 'time' %}
                                                 {% if game.player1_score < game.player2_score %}
-                                                    <span class="text-danger">{{ game.winner.nickname }}</span>
+                                                    <span class="text-success">{{ game.winner.nickname }}</span>
                                                 {% elif game.player1_score > game.player2_score %}
                                                     <span class="text-danger">Local Player 2</span>
                                                 {% else %}
-                                                    <span class="text-success">Draw</span>
+                                                    <span>Draw</span>
                                                 {% endif %}
                                             {% else %}
                                                 {% if game.player1_score > game.player2_score %}
                                                     <span class="text-success">{{ game.player1 }}</span>
                                                 {% elif game.player1_score < game.player2_score %}
-                                                    <span class="text-success">Local Player 2</span>
+                                                    <span class="text-danger">Local Player 2</span>
                                                 {% else %}
-                                                    <span class="text-danger">Draw</span>
+                                                    <span">Draw</span>
                                                 {% endif %}
                                             {% endif %}
                                         {% else %}
-                                            {{ game.winner }}
+											{% if game.winner == userprofile.nickname %}
+												<span class="text-success">{{ game.winner }}</span>
+											{% else %}
+												<span class="text-danger">{{ game.winner }}</span>
+											{% endif %}
                                         {% endif %}
                                     </td>                                    
                                 </tr>
@@ -198,7 +202,18 @@
                                             {% endif %}
                                         </td>
                                         <td>{{ tournament.status }}</td>
-                                        <td>{{ tournament.winner|default:"No winner yet" }}</td>
+                                        <td>
+											{% if tournament.winner %}
+												{% if tournament.winner == userprofile.nickname %}
+													<span class="text-success">{{ tournament.winner }}</span>
+												{% else %}
+													<span class="text-danger">{{ tournament.winner }}</span>
+												{% endif %}
+											{% else %}
+												<span>No winner yet</span>
+											{% endif %}
+										</td>
+										
                                     </tr>
                                 {% endfor %}
                             {% else %}

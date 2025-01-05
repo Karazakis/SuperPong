@@ -22,6 +22,7 @@ function joinTournament(tournamentId) {
 
 document.getElementById('leavegame').addEventListener('click', function() {
     // Emissione dell'evento custom
+    console.log('leavegame'); 
     gameEnded = true;
     new Promise(resolve => {
         setTimeout(resolve, 20);
@@ -32,17 +33,19 @@ document.getElementById('leavegame').addEventListener('click', function() {
             endgameOnline(true, true);
         }
         window.GameSocket.send(JSON.stringify({ action: "leave" }));
+        console.log('leave');
     }
-    
+
     const event = new Event('cleanupGameEvent');
     document.dispatchEvent(event);
     let gameType = document.getElementById('gametype').textContent;
     if (gameType === 'tournament') {
         let tournament_id = document.getElementById('gametype').dataset.tournament;
         window.joinTournament(tournament_id);
-    }
-    else {
+    } else if (gameType === 'local-game') {
         gameover(-1, -1, true, true);
+        loadPage('api/dashboard/');
+    } else {
         loadPage('api/dashboard/');
     }
 });

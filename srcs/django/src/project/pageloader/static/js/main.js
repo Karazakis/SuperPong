@@ -95,30 +95,6 @@ function checkCurrentLobbyandDisable(){
             };
             document.getElementById("rejoin-lobby-btn-join").dataset.type = "game";
             document.getElementById("rejoin-lobby-btn-join").dataset.id = data.game.game;
-            document.getElementById("rejoin-lobby-btn-leave").onclick = function() {
-                let game_id_lobby = document.getElementById("rejoin-lobby-btn-join").dataset.id;
-                let accessToken = localStorage.getItem("accessToken");
-                fetch(`/api/lobby/${game_id_lobby}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        "Authorization": `Bearer ${accessToken}`,
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({ action: 'leave' })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        document.getElementById("rejoin-lobby").style.display = "none";
-                    } else {
-                        return response.json().then(data => { throw new Error(data.error); });
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            };
-
-            document.getElementById("rejoin-lobby-btn-leave").dataset.type = "game";
-            document.getElementById("rejoin-lobby-btn-leave").dataset.id = data.game.game;
             document.getElementById("rejoin-lobby").style.display = "block";
 
         } else if(data.game === null && data.tournament === null) {
@@ -304,7 +280,7 @@ function loadPage(url) {
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
     const refreshUrl = `${window.location.origin}/api/token/refresh/`; // URL per verificare e refreshare il token
     // Funzione per eseguire la richiesta effettiva di caricamento della pagina
-
+    window.previousUrl = url;
     if(window.LobbySocket !== undefined)
     {
         window.LobbySocket.close();
@@ -366,7 +342,7 @@ function loadPage(url) {
             })
             .then(data => {
                 if (data.status === 'not_logged') {
-                    loadPage("api/login/");
+                    loadPage("api/home/");
                     return;
                 }
                 renderHtml(url, data.html, data.dash_base, function() {
@@ -384,27 +360,22 @@ function loadPage(url) {
         }
     };
 
-    // Funzione per eseguire la verifica e il refresh del token
     function checkTokenValidity(url) {
-        // Rimuovi l'intestazione Authorization per la richiesta GET di verifica del token
         fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
             method: "GET"
         })
         .then(response => response.json())
         .then(data => {
             if (data.message === 'Token valido') {
-                // Token valido, procedi con la richiesta effettiva
                 performRequest(accessToken, url);
             } else if (data.message === 'Token non valido') {
-                // Token non valido, prova a rinfrescare
                 return refreshAccessToken().then(newAccessToken => {
                     if (newAccessToken) {
-                        accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+                        accessToken = newAccessToken;
                         localStorage.setItem("accessToken", newAccessToken);
-                        // Richiesta effettiva con nuovo token
                         performRequest(newAccessToken, url);
                     } else {
-                        loadPage("api/login/");
+                        loadPage("api/home/");
                     }
                 });
             } else {
@@ -417,15 +388,13 @@ function loadPage(url) {
     }
     
 
-    // Controllo URL per decidere se fare la richiesta pilota
     if (url !== "api/home/" && url !== "api/login/" && url !== "api/signup/") {
         checkTokenValidity(url);
     } else {
-        performRequest(accessToken, url); // Carica direttamente se è una delle pagine libere
+        performRequest(accessToken, url);
     }
 }
 
-// Funzione per rinfrescare il token di accesso
 function refreshAccessToken() {
     const refreshToken = localStorage.getItem("refreshToken"); // Supponendo che tu abbia memorizzato il refresh token
     return fetch(`${window.location.origin}/api/token/refresh/`, {
@@ -459,6 +428,7 @@ async function checkUserPermission(page) {
     } else {
         if (url.includes("lobby")) {
             if (url.includes("tournament")) {
+                //qui andrebbe fatto: recuperato l'id dek torneo attuale, recuperata la lista dei tornei giocati e vedere se l'id e negli id della lista
                 return true;
             } else {
                 let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
@@ -496,6 +466,11 @@ async function checkUserPermission(page) {
 
 document.addEventListener("DOMContentLoaded", function() {
     let page = window.location.pathname;
+    if (page.includes("home") || page.includes("login") || page.includes("signup")) {
+       loadPage("api" + page);
+       return;
+    }
+
     checkUserPermission(page).then((check) => {
         
         if (localStorage.getItem("accessToken") === null) {
@@ -523,13 +498,51 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     window.onpopstate = function(event) {
+        console.log('popstate', event.state, window.previousUrl);
         event.preventDefault();
+        
+        if (window.previousUrl.includes("game")) {
+            
+            let confirmLeave = confirm("Are you sure you want to leave the game?");
+            if (confirmLeave) {
+                console.log('leavegame'); 
+                gameEnded = true;
+                new Promise(resolve => {
+                    setTimeout(resolve, 20);
+                });
+
+                if (document.getElementById('game-details').dataset.gameStatus !== 'finished' && document.getElementById('gametype').textContent !== 'local-game') {
+                    if (document.getElementById("leavegame").dataset.posit === "p1") {
+                        endgameOnline(true, true);
+                    }
+                    window.GameSocket.send(JSON.stringify({ action: "leave" }));
+                    console.log('leave');
+                }
+                history.pushState({ page: window.previousUrl }, window.previousUrl, window.previousUrl);
+                const event = new Event('cleanupGameEvent');
+                document.dispatchEvent(event);
+                let gameType = document.getElementById('gametype').textContent;
+                if (gameType === 'tournament') {
+                    let tournament_id = document.getElementById('gametype').dataset.tournament;
+                    window.joinTournament(tournament_id);
+                } else if (gameType === 'local-game') {
+                    gameover(-1, -1, true, true);
+                    loadPage('api/dashboard/');
+                } else {
+                    loadPage('api/dashboard/');
+                }
+            } else {
+                let cleanUrl = window.previousUrl.replace("api", "");
+                console.log('il previous', cleanUrl);
+                window.previousUrl = event.state.page;
+                history.pushState({ page: cleanUrl }, cleanUrl, cleanUrl);
+                return;
+            }
+        }
         let page = event.state.page;
         if (page.includes("create")) {
             const parts = page.split("_");
-    
             const sourcePart = parts[1].replace(/\/$/, "");
-    
             const apiUrl = `api${parts[0]}/?source=${sourcePart}`;
             loadPage(apiUrl);
         } else if (page.includes("game") || page.includes("lobby")) {
@@ -550,7 +563,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         else
         {
-            // Se la stringa non contiene "create", carica la pagina con l'URL standard
             loadPage("api" + page);
         }
     };

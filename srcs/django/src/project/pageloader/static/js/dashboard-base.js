@@ -10,8 +10,7 @@ document.getElementById('profile').addEventListener('click', function() {
 
 document.getElementById('settings').addEventListener('click', function() {
     loadPage("api/settings/");
-}
-);
+});
 
 document.getElementById('logout').addEventListener('click', function() {
     fetch("/api/logout/")
@@ -30,6 +29,7 @@ document.getElementById('logout').addEventListener('click', function() {
                 const container = document.getElementById('body');
                 const basescript = document.getElementById('dashboard-base');  
                 container.removeChild(basescript);
+				chatSocket.close();
                 loadPage("api/home/");
             }
         })
@@ -98,7 +98,7 @@ function initializeWebSocket() {
 	
 					if (!isBlocked) {
 						if (data.message.startsWith('@')) {
-							handlePrivateMessage(data, actualUser.username);
+							handlePrivateMessage(data, actualUser.nickname);
 						} else {
 							displayMessage(data, 'black');
 						}
@@ -188,7 +188,7 @@ function initializeWebSocket() {
 
 initializeWebSocket();
 
-function handleGameInvite(data, accessToken, csrfToken) {
+ async function handleGameInvite(data, accessToken, csrfToken) {
 
 	function joinGame(gameId) {
 		let accessToken = localStorage.getItem('accessToken');
@@ -210,8 +210,10 @@ function handleGameInvite(data, accessToken, csrfToken) {
 		})
 		.catch(error => console.error('Error joining game:', error));
 	}
-	
-    let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
+
+    let actualRequestingUser = await recoverUser(data.requesting_user)
+    console.log(actualRequestingUser)    
+    let invite = confirm(`${actualRequestingUser.nickname} ti ha invitato a giocare`);
     if (invite) {
 		let pathname = window.location.pathname;
 		if (pathname.includes('lobby') === true) {
@@ -231,7 +233,7 @@ function handleGameInvite(data, accessToken, csrfToken) {
 }
 
 
-function handleTournamentInvite(data, accessToken, csrfToken) {
+async function handleTournamentInvite(data, accessToken, csrfToken) {
 
 	function joinTournament(tournamentId) {
 		let accessToken = localStorage.getItem('accessToken');
@@ -254,7 +256,8 @@ function handleTournamentInvite(data, accessToken, csrfToken) {
 		.catch(error => console.error('Error joining tournament:', error));
 	}
 	
-    let invite = confirm(`${data.requesting_user} ti ha invitato ad un torneo`);
+    let actualRequestingUser = await recoverUser(data.requesting_user)        
+    let invite = confirm(`${actualRequestingUser.nickname} ti ha invitato ad un torneo`);
     if (invite) {
 		let pathname = window.location.pathname;
 		if (pathname.includes('lobby') === true) {
@@ -274,14 +277,15 @@ function handleTournamentInvite(data, accessToken, csrfToken) {
 }
 
 
-function updateGameInviteStatus(data) {
+async function updateGameInviteStatus(data) {
+    let actualTargetUser = await recoverUser(data.target_user)	
     let message;
     switch (data.type) {
         case 'accept':
-            message = `${data.target_user} ha accettato l'invito a giocare`;
+            message = `${actualTargetUser.nickname} ha accettato l'invito a giocare`;
             break;
         case 'decline':
-            message = `${data.target_user} ha rifiutato l'invito a giocare`;
+            message = `${actualTargetUser.nickname} ha rifiutato l'invito a giocare`;
             break;
         default:
             console.error('Unhandled game status update:', data.type);
@@ -290,8 +294,9 @@ function updateGameInviteStatus(data) {
     alert(message);
 }
 
-function handleFriendRequest(data, accessToken, csrfToken) {
-    let request = confirm(`${data.requesting_user} vuole aggiungerti come amico`);
+async function handleFriendRequest(data, accessToken, csrfToken) {
+    let actualRequestingUser = await recoverUser(data.requesting_user)    
+    let request = confirm(`${actualRequestingUser.nickname} vuole aggiungerti come amico`);
     if (request) {
         processFriendRequest('accept', data, accessToken, csrfToken);
 		updateFriendListFromServer();
@@ -371,17 +376,19 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 	updateFriendListFromServer();
 }
 
-function updateFriendshipStatus(data) {
+async function updateFriendshipStatus(data) {
+    let actualRequestingUser = await recoverUser(data.requesting_user)
+    let actualTargetUser = await recoverUser(data.target_user)
     let message;
     switch (data.type) {
         case 'accept':
-            message = `${data.target_user} ha accettato la tua richiesta`;
+            message = `${actualTargetUser.nickname} ha accettato la tua richiesta`;
             break;
         case 'decline':
-            message = `${data.target_user} ha rifiutato la tua richiesta`;
+            message = `${actualTargetUser.nickname} ha rifiutato la tua richiesta`;
             break;
         case 'remove':
-            message = `${data.target_user} ha rimosso l'amicizia`;
+            message = `${actualTargetUser.nickname} ha rimosso l'amicizia`;
             break;
         default:
             console.error('Unhandled status update:', data.type);
@@ -433,18 +440,18 @@ async function updateFriendListFromServer() {
 
 
 
-function handlePrivateMessage(data, currentUsername) {
+function handlePrivateMessage(data, currentNickname) {
     const endOfUsernameIndex = data.message.indexOf(' ');
-    const targetUsername = data.message.substring(1, endOfUsernameIndex);
+    const targetNickname = data.message.substring(1, endOfUsernameIndex);
     const messageContent = data.message.substring(endOfUsernameIndex + 1);
 
     // Se l'utente corrente è il destinatario, mostra il messaggio senza il nome del destinatario
-    if (currentUsername === targetUsername) {
+    if (currentNickname === targetNickname) {
         displayMessage({ player: data.player, message: messageContent }, 'green');
     }
     // Se l'utente corrente è il mittente, mostra il messaggio con il nome del destinatario in parentesi
-    if (data.player === currentUsername) {
-        const formattedMessage = `(a ${targetUsername}) ${messageContent}`;
+    if (data.player === currentNickname) {
+        const formattedMessage = `(a ${targetNickname}) ${messageContent}`;
         displayMessage({ player: data.player, message: formattedMessage }, 'green');
     }
 }
@@ -523,6 +530,13 @@ function showContextMenu(event, id, isblocked = false) {
     const viewpfoilecontext = document.getElementById("viewprofilecontext");
     const blockusercontext = document.getElementById("blockusercontext");
     // Posiziona il menu contestuale in base alla posizione del clic
+    let pathname = window.location.pathname;
+    if (pathname.includes('lobby') === true) {
+	viewpfoilecontext.style.display = "none";
+    }
+    else {
+	viewpfoilecontext.style.display = "block";
+    }
 
     addfriendcontext.dataset.id = id;
     viewpfoilecontext.dataset.id = id;

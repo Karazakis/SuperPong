@@ -4,8 +4,20 @@
             <h2>Lobby</h2>
             <h1 id="game_name">{{ game.name }}</h1>
         </div>
-		
-		<p>
+		<h6>Game Rules - 
+			<span id="info-icon" style="cursor: pointer; color: #007bff;" data-toggle="tooltip" 
+				title="To start the game: Wait for a player to join the lobby or invite a friend from the online friends menu.The invited user must click the ready button to indicate they are ready to play. The game host must click start game to begin the countdown. Wait for the countdown, and you’ll enter the game!">
+				Hold to info
+			</span>
+		</h6>		
+		<div id="chat_details" class="collapse">
+			<p>To start the game:</p>
+			<p>-Wait for a player to join the lobby or invite a friend from the online friends menu.</p>
+			<p>-The invited user must click the ready button to indicate they are ready to play.</p>
+			<p>-The game host must click start game to begin the countdown.</p>
+			<p>-Wait for the countdown, and you’ll enter the game!</p>
+		</div>
+		<!-- <p>
 			Click here to open/close the <a href="#actions_details" data-toggle="collapse">game instructions</a>.
 		</p>
 		<div id="actions_details" class="collapse">
@@ -18,7 +30,7 @@
 			</ul>
 			<p>You can use the chat to communicate with the other user in the lobby.</p>
 			<p>To close this menu, click the blue text again.</p>
-		</div>		
+		</div>		 -->
     </div>
 
     {% if game.mode == "1v1" %}

@@ -43,6 +43,7 @@ document.getElementById('create').addEventListener('click', function(event) {
     } else if (actual_url.includes('single')) {
         Type = 'single-game';
     }
+    
     let limit;
     if (document.getElementById('rule').value === 'time') {
         limit = parseInt(document.getElementById('timelimit').value, 10);

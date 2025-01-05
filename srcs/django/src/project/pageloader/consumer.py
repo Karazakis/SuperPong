@@ -324,8 +324,9 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             logger.info('Starting game')
             if await self.all_players_ready():
                 logger.info('All players ready')
-                await self.start_game_db()
                 await self.start_game()
+        elif action == 'start_game_host':
+            await self.start_game_db()
         elif action == 'message':
             await self.lobby_chat(data['message'], username)
         elif action == 'join':
@@ -346,6 +347,21 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         elif action == 'leave':
             await self.leave_lobby(username)
             await self.leave_lobby_db(username)
+        elif action == 'delete':
+            await self.delete_game()
+
+    async def delete_game(self):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'handle_delete',
+            }
+        )
+
+    async def handle_delete(self, event):
+        await self.send(text_data=json.dumps({
+            'action': 'delete'
+        }))
 
     async def user_disconnected(self, event):
         username = event['username']
@@ -999,7 +1015,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         logger.info(f"Disconnecting from tournament room: {self.room_group_name} with close code: {close_code}")
-
+		#authorized = //checca se e' ancora in gioco 
+        
+		#await self.channel_layer.group_send(
+        #    self.room_group_name,
+        #    {
+        #        'type': 'user_disconnected',
+        #        'username': self.user.username,
+        #        'authorized': authorized
+        #    }
+        #)
         # Verifica se l'utente ha già eseguito il leave
         if getattr(self, 'user_left', True):
 
