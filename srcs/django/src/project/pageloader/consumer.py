@@ -1067,6 +1067,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 await self.add_user_to_lobby()
                 await self.send_lobby_update()  # Invia aggiornamento della lobby
                 await self.send_slot_status_update_to_group()  # Invia aggiornamento degli slot
+                if self.tournament.status == 'notifying_players':
+                    logger.info("Tournament is in notifying players state. Restarting notifications.")
+                    #await self.reset_ready_statuses()
+                    await self.notify_players_to_join()
 
             elif action == 'player_joined_game':
                 username = data.get('username')

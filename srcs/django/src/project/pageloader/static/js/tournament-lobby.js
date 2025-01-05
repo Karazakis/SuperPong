@@ -840,16 +840,16 @@ function startTournamentCountdown() {
 
 function showJoinGamePopup(gameLink) {
 
+    const readyButton = document.querySelector('.lobby-ready');
+    const leaveButton = document.querySelector('.lobby-leave');
+    if (readyButton) readyButton.disabled = true; 
+    if (leaveButton) leaveButton.disabled = true;
+
     const existingPopup = document.querySelector('.popup');
     if (existingPopup) {
         console.log('Popup already exists. Skipping creation.');
         return;
     }
-
-    const readyButton = document.querySelector('.lobby-ready');
-    const leaveButton = document.querySelector('.lobby-leave');
-    if (readyButton) readyButton.disabled = true; 
-    if (leaveButton) leaveButton.disabled = true;
 
     const popup = document.createElement('div');
     popup.classList.add('popup');
