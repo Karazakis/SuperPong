@@ -828,7 +828,7 @@ class JoinAPIView(APIView):
                 games = Game.objects.filter(status='not_started', tournament__isnull=True)
             elif 'join_tournament' in current_url:
                 tournaments = Tournament.objects.filter(status='not_started')
-                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'preparing_next_round', 'waiting_for_round'], players__in=[user])
+                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','countdown_started','notifying_players'], players__in=[user])
 
             context = {
                 'user': user,
@@ -906,7 +906,7 @@ class JoinAPIView(APIView):
 
                         return Response({'success': True}, status=status.HTTP_200_OK)
 
-                    elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','finished']:
+                    elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','finished','countdown_started','notifying_players']:
                         # Tornei in corso: logica di re-join
                         if user in tournament.players.all():
                             # L'utente è già nel torneo, esegui il re-join

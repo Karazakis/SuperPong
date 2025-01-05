@@ -73,15 +73,18 @@ LobbySocket.onmessage = function(e) {
                 startTournamentCountdown();
             }
             break;
-		case 'disconnected':
-			if (countdownInterval !== null)
-			{
-				clearInterval(countdownInterval);
-			}
-			if (data.authorized === 'false')
-			{
-				setAllUnready();
-			}
+        case 'disconnected':
+            if (data.authorized === 'false') {
+                // Interrompi il countdown solo se l'utente non è autorizzato
+                console.log("Countdown interrupted: unauthorized user disconnected.");
+                clearInterval(countdownInterval);
+                countdownInterval = null; // Resetta la variabile
+                let leaveButton = document.querySelector('.lobby-leave');
+                console.log(leaveButton);
+                if (leaveButton) leaveButton.disabled = false;
+                // setAllUnready(); // Esegui azioni per resettare gli stati dei pulsanti
+            }
+            break;
         default:
             break;
     }
@@ -93,16 +96,7 @@ LobbySocket.onerror = function(e) {
 };
 
 LobbySocket.onclose = function(e) {
-	console.log("Bye")
-	// Blocca il countdown se è attivo
-    if (countdownActive) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
-        countdownActive = false;
 
-        // Ripristina i pulsanti o altri elementi della UI
-        //resetUIState();
-    }
 };
 
 // Funzione di inizializzazione della pagina della lobby
@@ -503,6 +497,8 @@ function updateUserList(users, slots, readyStatus) {
     const userList = document.getElementById('users_in_lobby');
     userList.innerHTML = '';
 
+    let allReady = true; // Variabile per verificare se tutti i giocatori sono ready
+
     users.forEach(user => {
         // Trova lo slot associato all'utente
         let userSlot = null;
@@ -518,15 +514,28 @@ function updateUserList(users, slots, readyStatus) {
         // Controlla se l'utente è ready
         let isReady = false;
         if (userSlot && readyStatus[userSlot]) {
-            isReady = readyStatus[userSlot];  // true o false
+            isReady = readyStatus[userSlot]; // true o false
         }
 
-        const readyIcon = isReady ? '✔️' : '';  // Aggiungi l'icona se l'utente è pronto
+        // Aggiorna lo stato "allReady" se uno degli utenti non è pronto
+        if (!isReady) {
+            allReady = false;
+        }
+
+        const readyIcon = isReady ? '✔️' : ''; // Aggiungi l'icona se l'utente è pronto
 
         // Aggiungi l'utente alla lista con l'icona ready se applicabile
         userList.insertAdjacentHTML('beforeend', `<li id="user_${user.username}">${nickname} ${readyIcon}</li>`);
     });
+
+    // Aggiorna lo stato del pulsante "leave"
+    const leaveButton = document.getElementById('leave_button');
+    if (leaveButton) {
+        leaveButton.disabled = allReady ? true : false; // Disabilita se tutti sono ready, altrimenti abilita
+    }
 }
+
+
 
 
 // Gestione dell'invio dei messaggi in chat
@@ -831,6 +840,17 @@ function startTournamentCountdown() {
 
 function showJoinGamePopup(gameLink) {
 
+    const existingPopup = document.querySelector('.popup');
+    if (existingPopup) {
+        console.log('Popup already exists. Skipping creation.');
+        return;
+    }
+
+    const readyButton = document.querySelector('.lobby-ready');
+    const leaveButton = document.querySelector('.lobby-leave');
+    if (readyButton) readyButton.disabled = true; 
+    if (leaveButton) leaveButton.disabled = true;
+
     const popup = document.createElement('div');
     popup.classList.add('popup');
     popup.innerHTML = `
@@ -854,6 +874,12 @@ function showJoinGamePopup(gameLink) {
     popup.style.zIndex = '9999';
 
     document.getElementById('join-game-btn').addEventListener('click', function() {
+
+        LobbySocket.send(JSON.stringify({
+            action: 'player_joined_game',
+            username: username_lobby
+        }));
+
         container.removeChild(popup);
         reactivateDashboard();
         loadPage(gameLink);
