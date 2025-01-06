@@ -31,7 +31,6 @@ document.getElementById('leavegame').addEventListener('click', function() {
             endgameOnline(true, true);
         }
         window.GameSocket.send(JSON.stringify({ action: "leave" }));
-        console.log('leave');
     }
 
     const event = new Event('cleanupGameEvent');

@@ -146,9 +146,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             recipient_channel = user_channel_mapping.get(recipient)
             logger.info(f'Sending request to {recipient}')
             if recipient_channel:
-                logger.debug(f'Sending request data ++++++ {data}')
                 targetLobby = data.get('target_lobby')
-                logger.debug(f'targetLobby ---------------: {targetLobby}')
                 if targetLobby:
                     await self.channel_layer.send(recipient_channel, {
                         'type': 'pending_request',
@@ -1125,7 +1123,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     slot_username = slot_data.get('username')
                     if slot_username and slot_username not in TournamentConsumer.pending_players[self.tournament_id]:
                         all_players_ready = False
-                        logger.debug(f"Slot {slot} is not ready. User {slot_username} is not in pending_players.")
                         break
 
                 if all_players_ready:
@@ -1232,8 +1229,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if not current_round:
             logger.error("Current round not found.")
             return
-
-        logger.debug(f"Current round slots: {current_round.slots}")
 
         current_slot_user = current_round.slots.get(str(slot), {}).get('username')
 
@@ -1601,14 +1596,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if not round:
             logger.error("Current round not found.")
             return
-        
-        logger.debug(f"Round {round.round_number} retrieved with slots: {round.slots}")
 
         slots = round.slots
         players_to_block = []
         first_slot_user = None
         for slot_key, slot_data in slots.items():
-            logger.debug(f"Processing slot {slot_key}: {slot_data}")
             if slot_data.get('player_id'):
                 slot_data['locked'] = True
                 players_to_block.append(slot_data['player_id'])
@@ -1663,7 +1655,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             logger.info(f"Notifying players for round {round.round_number}.")
 
             games = await database_sync_to_async(list)(round.games.all())
-            logger.debug(f"Games in round {round.round_number}: {[game.name for game in games]}")
 
             slots = list(round.slots.items())
             players_per_game = len(slots) // len(games) if games else 0
@@ -1680,12 +1671,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     end_idx = start_idx + players_per_game
                     game_slots = slots[start_idx:end_idx]
 
-                    logger.debug(f"Assigning slots {start_idx} to {end_idx} for game {game.name}.")
-
                     for player_idx, (slot, slot_data) in enumerate(game_slots):
                         player_id = slot_data.get('player_id')
                         username = slot_data.get('username')
-                        logger.debug(f"Slot {slot}: player_id={player_id}, username={username}")
 
                         if player_id:
                             try:
@@ -1703,7 +1691,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                                 await database_sync_to_async(playerprofile.game_played.add)(game)
                                 await database_sync_to_async(playerprofile.save)()
                                 await database_sync_to_async(game.save)()
-                                logger.debug(f"Assigned {player.username} to game {game.name} (ID: {game.id}) as player{player_idx + 1}")
                             except User.DoesNotExist:
                                 logger.error(f"Player with ID {player_id} not found for slot {slot}.")
                                 all_games_assigned = False
@@ -1723,17 +1710,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
             for game in games:
                 await database_sync_to_async(game.save)()
-                logger.debug(f"Game {game.name} saved with players.")
 
             for idx, game in enumerate(games):
                 for player_idx in range(players_per_game):
                     player = getattr(game, f"player{player_idx + 1}", None)
-                    logger.debug(f" ###### Player {player_idx + 1}: {player.username if player else None}")
-                    logger.debug(f" ###### Game {game.id} - {game.player1} - {game.player2}")
                     if player:
                         is_pending = player.username in TournamentConsumer.pending_players.get(self.tournament_id, set())
                         flag = True 
-                        logger.debug(f"+++++++++ PUZZADICAZZO Player {player.username} is pending: {is_pending} is game id: {game.id} +++++++++++++++++")
                         message = {
                             'type': 'join_game_notification',
                             'slot': f"{idx * players_per_game + player_idx + 1}",
@@ -1749,7 +1732,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                                 'message': message
                             }
                         )
-                        logger.debug(f"Notification sent to {player.username} for game {game.name}.")
 
             logger.info("Notifications sent to all players to join the game.")
         except Exception as e:
@@ -1771,13 +1753,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 for player_idx in range(2):
                     player = getattr(game, f"player{player_idx + 1}", None)
                     if player:
-                        logger.debug(f" ###### Player {player_idx + 1}: {player.username if player else None}")
-                        logger.debug(f" ###### Game {game.id} - {game.player1} - {game.player2}")
                         
                         is_pending = player.username in TournamentConsumer.pending_players[self.tournament_id]
-                        logger.debug(f" POPPENEGRE i player pending sono {TournamentConsumer.pending_players[self.tournament_id]}")
                         flag = not is_pending 
-                        logger.debug(f"+++++++++ PUZZADICAZZO Player {player.username} is pending: {is_pending} is game id: {game.id} +++++++++++++++++")
                         
                         message = {
                             'type': 'join_game_notification',
@@ -1794,7 +1772,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                                 'message': message
                             }
                         )
-                        logger.debug(f"Notification sent to {player.username} for game {game.name}.")
             logger.info(f"All pending notifications resent for tournament {tournament_id}.")
         
         except Exception as e:
@@ -1880,8 +1857,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     return
                 else:
                     logger.warning("Final game is not finished or has no winner.")
-                    logger.debug(f"Final game status: {final_game.status}")
-                    logger.debug(f"Final game winner: {final_game.winner}")
                     return
 
             else:

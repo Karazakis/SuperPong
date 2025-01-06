@@ -16,11 +16,9 @@ export function penetrationDepthCorner2(ball, corner, isOnlineGame = false, isHo
         if (penetrationDepth > 0) {
             let correction = dist.normalize().multiplyScalar(penetrationDepth);
             ball.mesh.position.add(correction);
-            //corner.mesh.position.add(correction.multiplyScalar(0));
         }
 }
 
-//       ******    BALL    ******
 
 export function ballCollision(ball2, ball3){
     if(!ball2 || !ball3 || !ball2.mesh || !ball3.mesh || ball2 === ball3)

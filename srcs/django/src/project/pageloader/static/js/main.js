@@ -288,6 +288,11 @@ function loadPage(url) {
             window.initStarSky();
             window.animateStarSky();
         }
+    } else {
+        if (window.chatSocket !== null) {
+            
+            window.chatSocket.close();
+        }
     }
     const performRequest = (token, url) => {
         

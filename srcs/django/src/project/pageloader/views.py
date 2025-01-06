@@ -30,6 +30,8 @@ from django.db.models import Avg, Sum, Count
 import re
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from asgiref.sync import sync_to_async
+
 
 
 
@@ -46,8 +48,8 @@ class GLTFserverAPIView(APIView):
         file_path = os.path.join(settings.MEDIA_ROOT, 'gltf_files', filename)
         if os.path.exists(file_path):
             with open(file_path, 'rb') as f:
-                response = HttpResponse(f.read(), content_type='model/gltf+json')  # Modifica il Content-Type qui
-                response['Content-Disposition'] = 'inline; filename=' + filename  # Facoltativo: fornisce il nome del file
+                response = HttpResponse(f.read(), content_type='model/gltf+json')
+                response['Content-Disposition'] = 'inline; filename=' + filename
                 return response
         else:
             return HttpResponse(status=404)
@@ -55,7 +57,6 @@ class GLTFserverAPIView(APIView):
 class HomePageAPIView(APIView):
     permission_classes = [AllowAny]
     def get(self, request, format=None):
-        # Controlla se l'utente è autenticato
         if request.user.is_authenticated:
             html = render_to_string('dashboard.html')
             user = User.objects.get(pk=request.user.id)
@@ -137,7 +138,6 @@ class CreateUserAPIView(APIView):
                     'type': form.fields[field].__class__.__name__
                 } for field, messages in form.errors.items()
             }
-            logger.warning(f"Errori di validazione: {errors_with_field_type}")
             return Response({'errors': errors_with_field_type}, status=status.HTTP_200_OK)
 
 
@@ -198,12 +198,12 @@ class LoginUserAPIView(APIView):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
-        response.set_cookie('csrftoken', csrf_token)  # Imposta il token CSRF nel cookie
+        response.set_cookie('csrftoken', csrf_token)
         return response
 
 
 class RefreshTokenAPIView(APIView):
-    permission_classes = [AllowAny]  # Permetti l'accesso a chiunque
+    permission_classes = [AllowAny]
     def post(self, request):
         try:
             refresh = RefreshToken(request.data['refresh'])
@@ -219,7 +219,7 @@ class RefreshTokenAPIView(APIView):
 
         try:
             access_token = AccessToken(token)
-            access_token.verify()  # Metodo che verifica se il token è valido
+            access_token.verify()
 
             return Response({'message': 'Token valido'}, status=status.HTTP_200_OK)
         except TokenError as e:
@@ -267,16 +267,11 @@ def normalize_statistics(individual_stats, global_stats):
     """
     normalized_stats = {}
 
-    # Precision: Compare components and normalize
     precision_time = individual_stats.get('precision_time', None)
     precision_score = individual_stats.get('precision_score', None)
     global_precision_time = global_stats.get('precision_time', 0)
     global_precision_score = global_stats.get('precision_score', 0)
 
-    logger.debug(f"Calculating Precision Normalization: precision_time={precision_time}, precision_score={precision_score}, "
-                 f"global_precision_time={global_precision_time}, global_precision_score={global_precision_score}")
-
-    # Calculate deviations for precision_time and precision_score
     deviation_time = (
         (precision_time - global_precision_time) / global_precision_time * 2.50
         if precision_time is not None and global_precision_time > 0 else 0
@@ -286,23 +281,18 @@ def normalize_statistics(individual_stats, global_stats):
         if precision_score is not None and global_precision_score > 0 else 0
     )
 
-    logger.debug(f"Deviation Time: {deviation_time}, Deviation Score: {deviation_score}")
 
-    # Combine deviations using simple average
     combined_deviation = (deviation_time + deviation_score) / 2
 
-    # Normalize precision
     normalized_precision = 2.50 + combined_deviation
     normalized_precision = clamp(normalized_precision, 0, 5)
 
-    logger.debug(f"Combined Deviation: {combined_deviation}, Normalized Precision: {normalized_precision}")
 
     normalized_stats['precision'] = round(normalized_precision, 2)
 
-    # Leadership: Normalize based on individual win ratio compared to 50% global mean
     individual_wins = individual_stats.get('leadership_wins', 0)
     individual_matches = individual_stats.get('leadership_matches', 0)
-    global_mean_leadership = 0.5  # Assume 50% win rate globally
+    global_mean_leadership = 0.5
 
     if individual_matches > 0:
         individual_leadership_ratio = individual_wins / individual_matches
@@ -311,15 +301,11 @@ def normalize_statistics(individual_stats, global_stats):
         normalized_leadership = clamp(normalized_leadership, 0, 5)
         normalized_stats['leadership'] = round(normalized_leadership, 2)
     else:
-        normalized_stats['leadership'] = 2.50  # Neutral value if no matches played
+        normalized_stats['leadership'] = 2.50
 
-    logger.debug(f"Leadership: individual_wins={individual_wins}, individual_matches={individual_matches}, "
-                 f"global_mean_leadership={global_mean_leadership}, normalized_leadership={normalized_stats['leadership']}")
-
-    # Normalize other stats
     for key, individual_value in individual_stats.items():
         if key in ['precision_time', 'precision_score', 'leadership_wins', 'leadership_matches']:
-            continue  # Already handled
+            continue
 
         global_value = global_stats.get(key, 0)
 
@@ -327,12 +313,8 @@ def normalize_statistics(individual_stats, global_stats):
             deviation = individual_value - global_value
             normalized_value = 2.50 + (deviation / global_value) * 2.50
             normalized_stats[key] = round(clamp(normalized_value, 0, 5), 2)
-            logger.debug(f"Normalized {key}: individual={individual_value}, global={global_value}, normalized={normalized_stats[key]}")
         else:
             normalized_stats[key] = 2.50 if individual_value == 0 else 5.0
-            logger.debug(f"Global {key} is zero. Defaulting normalized {key} to {normalized_stats[key]}")
-
-    logger.debug(f"Normalized Game Statistics: {normalized_stats}")
     return normalized_stats
 
 
@@ -347,10 +329,8 @@ def clamp(value, min_value=0, max_value=5):
 
 def calculate_global_game_statistics():
     total_games = Game.objects.count()
-    logger.debug(f"Total games: {total_games}")
 
     if total_games == 0:
-        logger.warning("No games found. Returning 'None' for all statistics.")
         return {
             'precision_time': 1,
             'precision_score': 1,
@@ -361,14 +341,12 @@ def calculate_global_game_statistics():
             'intensity': 1,
         }
 
-    # Calcolo precisione con distinzione per tipo di gioco
     time_games = Game.objects.filter(rules='time')
     score_games = Game.objects.filter(rules='score')
 
     time_games_count = time_games.count()
     score_games_count = score_games.count()
 
-    # Calcolo precisione per giochi Time
     if time_games_count > 0:
         precision_time = time_games.aggregate(
             avg_player1_score=Avg('player1_score'),
@@ -381,14 +359,13 @@ def calculate_global_game_statistics():
     else:
         precision_time_value = 0
 
-    # Calcolo precisione per giochi Score
     if score_games_count > 0:
         precision_score = score_games.aggregate(
             avg_player1_score=Avg('player1_score'),
             avg_player2_score=Avg('player2_score')
         )
 
-        avg_goals_by_player1 = precision_score.get('avg_player2_score') or 0  # Gol subiti da Player 1
+        avg_goals_by_player1 = precision_score.get('avg_player2_score') or 0 
         avg_goals_by_player2 = precision_score.get('avg_player1_score') or 0 
 
         precision_player1 = 5 - avg_goals_by_player1
@@ -398,7 +375,6 @@ def calculate_global_game_statistics():
     else:
         precision_score_value = 0
 
-    # Calcolo reattività
     reactivity_hits = Game.objects.aggregate(
         avg_player1_hit=Avg('player1_hit'),
         avg_player2_hit=Avg('player2_hit')
@@ -409,19 +385,15 @@ def calculate_global_game_statistics():
         (reactivity_hits.get('avg_player2_hit') or 0)
     ) / 2 if total_games > 0 else None
 
-    # Calcolo Madness
     madness_data = Game.objects.aggregate(
         avg_balls=Avg('balls')
     )
     madness = madness_data.get('avg_balls') or None
 
-    # Calcolo Leadership
     leadership = total_games if total_games > 0 else None
 
-    # Calcolo Patience
     patience = (time_games_count / total_games) * 5 if total_games > 0 else None
 
-    # Calcolo Intensity
     intensity_keys = Game.objects.aggregate(
         total_player1_keys=Sum('player1_keyPressCount'),
         total_player2_keys=Sum('player2_keyPressCount')
@@ -430,11 +402,10 @@ def calculate_global_game_statistics():
         (intensity_keys.get('total_player1_keys') or 0) +
         (intensity_keys.get('total_player2_keys') or 0)
     )
-    total_players = 2 * total_games  # Ogni partita ha 2 giocatori
+    total_players = 2 * total_games  
 
     intensity = (total_key_presses / total_players) if total_games > 0 else None
 
-    # Risultati finali
     global_stats = {
         'precision_time': round(precision_time_value, 2) if precision_time_value is not None else None,
         'precision_score': round(precision_score_value, 2) if precision_score_value is not None else None,
@@ -444,7 +415,6 @@ def calculate_global_game_statistics():
         'patience': round(patience, 2) if patience is not None else None,
         'intensity': round(intensity, 2) if intensity is not None else None,
     }
-    logger.debug(f"Global game statistics: {global_stats}")
 
     return global_stats
 
@@ -455,10 +425,8 @@ def calculate_individual_game_statistics(user_profile):
     
     match_history = user_profile.game_played.all()
     total_games = match_history.count()
-    logger.debug(f"Total games played by {user_profile.user}: {total_games}")
 
     if total_games == 0:
-        logger.warning(f"No games found for user {user_profile.user}. Returning 'None' for all statistics.")
         return {
             'precision_time': 1,
             'precision_score': 1,
@@ -523,7 +491,6 @@ def calculate_individual_game_statistics(user_profile):
         'intensity': round(intensity_value, 2) if intensity_value is not None else None,
         'patience': round(patience_value, 2) if patience_value is not None else None,
     }
-    logger.debug(f"Individual game statistics for {user_profile.user}: {individual_stats}")
 
     return individual_stats
 
@@ -536,7 +503,6 @@ class ProfileAPIView(APIView):
             user = User.objects.get(pk=pk)
             user_profile = UserProfile.objects.get(user=user)
             friends = user_profile.user_friend_list.all()
-            logger.debug(f"User profile: {user_profile.game_played}")
 
             match_history = [
                 {
@@ -573,7 +539,6 @@ class ProfileAPIView(APIView):
                 for tournament in user_profile.tournament_played.all()
             ]
 
-            logger.debug(f"DIOCANE L?USER {user_profile.tournament_played.all()}")
             game_wins = user_profile.game_win
             game_losses = user_profile.game_lose
             game_draws = user_profile.game_draw
@@ -588,7 +553,6 @@ class ProfileAPIView(APIView):
             normalized_game_statistics = normalize_statistics(
                 individual_game_statistics, global_game_statistics
             )
-            logger.debug(f"tournament_history: {tournamnt_history}")
             context = {
                 'user': user,
                 'userprofile': user_profile,
@@ -746,7 +710,6 @@ class LogoutAPIView(APIView):
             refresh = request.COOKIES.get('refresh')
             token = RefreshToken(refresh)
             token.blacklist()
-            # Cancella il cookie di refresh
             response = Response({'success': 'Logout effettuato con successo.'}, status=status.HTTP_200_OK)
             response.delete_cookie('refresh')
             return response
@@ -869,16 +832,14 @@ class JoinAPIView(APIView):
             current_url = request.path
 
             if 'join_lobby' in current_url:
-                # Logica per unire l'utente a un gioco
                 game_id = data.get('game_id')
                 if game_id:
                     game = get_object_or_404(Game, pk=game_id, status='not_started', tournament__isnull=True)
                     if game.player_inlobby < game.player_limit:
-                        game.players.add(user)  # Aggiungi il giocatore al gioco
-                        game.player_inlobby += 1  # Incrementa il numero di giocatori in lobby
+                        game.players.add(user)  
+                        game.player_inlobby += 1  
                         game.save()
 
-                        # Aggiorna il profilo dell'utente
                         user_profile.in_game_lobby = game
                         user_profile.save()
 
@@ -892,7 +853,6 @@ class JoinAPIView(APIView):
                     tournament = get_object_or_404(Tournament, pk=tournament_id)
 
                     if tournament.status == 'not_started':
-                        # Tornei non iniziati: esegui il normale join
                         if tournament.players_in_lobby >= tournament.nb_players:
                             return Response({'success': False, 'message': 'Tournament is full'}, status=status.HTTP_400_BAD_REQUEST)
                         if user not in tournament.players.all():
@@ -907,9 +867,7 @@ class JoinAPIView(APIView):
                         return Response({'success': True}, status=status.HTTP_200_OK)
 
                     elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','finished','countdown_started','notifying_players']:
-                        # Tornei in corso: logica di re-join
                         if user in tournament.players.all():
-                            # L'utente è già nel torneo, esegui il re-join
                             return Response({'success': True, 'message': 'Rejoined the tournament'}, status=status.HTTP_200_OK)
                         else:
                             return Response({'success': False, 'message': 'Cannot join, tournament already started'}, status=status.HTTP_400_BAD_REQUEST)
@@ -942,17 +900,14 @@ class JoinAPIView(APIView):
                     if tournament.players.filter(id=user.id).exists():
                         tournament.players.remove(user)
                         tournament.save()
-                    # Se il torneo non è iniziato, rimuovilo anche da tournament_played
                     if tournament.status == 'not_started':
                         user_profile.tournament_played.remove(tournament)
                         user_profile.save()
                     return Response({'success': True})
                 except Tournament.DoesNotExist:
-                    # Se il torneo è stato cancellato, rimuovi comunque il giocatore bloccato
                     user = get_object_or_404(User, pk=request.user.id)
                     user_profile = get_object_or_404(UserProfile, user=user)
 
-                    # Rimuovi il riferimento al torneo (anche se non esiste più)
                     user_profile.tournament_played.filter(id=tournament_id).delete()
                     user_profile.save()
 
@@ -967,7 +922,7 @@ class CreateAPIView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             source = request.query_params.get('source', 'default')
-            user = request.user  # Utilizza direttamente request.user
+            user = request.user 
             user_profile = UserProfile.objects.get(user=user)
 
             if source == 'remote':
@@ -983,7 +938,7 @@ class CreateAPIView(APIView):
                 url = 'create_tournament/'
                 title = 'Create Tournament'
             else:
-                url = 'create_single/'  # Default URL
+                url = 'create_single/' 
                 title = 'Create Game'
 
             context = {
@@ -1030,7 +985,7 @@ class CreateAPIView(APIView):
                     rules=request.data.get('rules', ''), 
                     owner=user
                 )
-                tournament.players.add(user)  # Aggiungi l'utente all'elenco dei giocatori
+                tournament.players.add(user)
                 tournament.players_in_lobby += 1
                 tournament.save()
 
@@ -1175,9 +1130,8 @@ class LobbyAPIView(APIView):
             try:
                 if 'tournament_lobby' in current_url:
                     tournament = Tournament.objects.get(pk=pk)
-                    if tournament.owner == request.user:  # Assume che ci sia un campo `owner` in `Tournament`
+                    if tournament.owner == request.user:
                         tournament.delete()
-                        logger.info(f"Tournament {pk} deleted")  # Log di debug
                         return Response({'success': True}, status=status.HTTP_200_OK)
                     else:
                         return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
@@ -1189,7 +1143,6 @@ class LobbyAPIView(APIView):
                     else:
                         return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
             except (Game.DoesNotExist, Tournament.DoesNotExist) as e:
-                logger.error(f"Error: {str(e)}")
                 return Response({'error': 'Game or Tournament not found'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1200,7 +1153,6 @@ class LobbyAPIView(APIView):
             user_profile = UserProfile.objects.get(user=user)
             try:
                 if 'tournament_lobby' in current_url:
-                    # tournament = Tournament.objects.get(pk=pk)
                     return Response({'success': True}, status=status.HTTP_200_OK)
                 else:
                     game = Game.objects.get(pk=pk)
@@ -1249,14 +1201,11 @@ class UserStatusAPIView(APIView):
 
 logger = logging.getLogger(__name__)
 class UserInfoAPIView(APIView):
-    #logica da rivedere, alcuni campi non esistono nei modelli e vanno recuperati in modo diverso
     def get(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
             user_profile = UserProfile.objects.get(user=user)
             game_played = user_profile.game_played.all()
-            logger.debug(f"User profile: {user_profile.game_played}")
-            logger.debug(f"Game history: {game_played}")
 
             game_history = [
                 {
@@ -1284,7 +1233,7 @@ class UserInfoAPIView(APIView):
                 }
                 for tournament in user_profile.tournament_played.all()
             ]
-            # Serializzare le richieste pendenti
+
             pending_requests = [
                 {
                     'id': req.id,
@@ -1299,7 +1248,6 @@ class UserInfoAPIView(APIView):
                 for req in user_profile.pending_requests.all()
             ]
 
-            # Serializzare la lista di amici
             user_friend_list = [
                 {
                     'id': friend.user.id,
@@ -1309,7 +1257,6 @@ class UserInfoAPIView(APIView):
                 for friend in user_profile.user_friend_list.all()
             ]
 
-            # Serializzare la lista degli utenti bloccati
             blocked_userslist = [
                 {
                     'id': blocked_user.id,
@@ -1318,7 +1265,6 @@ class UserInfoAPIView(APIView):
                 }
                 for blocked_user in user_profile.blocked_users.all()
             ]
-            logger.debug(f"User profile DIODOIDOIDOIDOIDOIDOIDOaasdasd")
             data = {
                 'id': user.id,
                 'username': user.username,
@@ -1351,15 +1297,12 @@ class UserInfoAPIView(APIView):
             return Response(data)
         
         except User.DoesNotExist:
-            logger.error(f"User with ID {user_id} does not exist.")
             return Response({"error": "Utente non trovato."}, status=status.HTTP_404_NOT_FOUND)
         
         except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile for user ID {user_id} does not exist.")
             return Response({"error": "Profilo utente non trovato."}, status=status.HTTP_404_NOT_FOUND)
         
         except Exception as e:
-            logger.error(f"Error occurred: {e}", exc_info=True)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -1371,46 +1314,38 @@ class UserRequestAPIView(APIView):
         try:
             request_data = request.data
             user = request.user
-            logger.debug(f"Request data: {request_data}, Request type: {request_type}, ID: {id}")
 
             if request_type not in ['friend', 'game', 'tournament']:
                 return Response({'error': 'Tipo di richiesta non valido.'}, status=status.HTTP_400_BAD_REQUEST)
+
             try:
                 user = User.objects.get(pk=id)
             except User.DoesNotExist:
                 logger.error(f"L'utente con ID {id} non esiste.")
                 return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
 
-            # Ottieni l'oggetto User per il requesting_user
             if request_data.get('request') == "remove":
                 username = User.objects.get(username=request_data.get('target_user'))
             elif request_data.get('request') in ["accept", "decline"]:
-                logger.debug(f"qui ci entra dio merda user: {request_data.get('requesting_user')}")
                 if request_data.get('request') == "accept":
-                    logger.debug(f"Requesting user asdasd: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(pk=request_data.get('requesting_user'))
                     target_user = User.objects.get(pk=request_data.get('target_user'))
                 elif request_data.get('request') == "decline":
-                    logger.debug(f"Requesting user noxxxx: {request_data.get('requesting_user')}")
                     requesting_user = User.objects.get(pk=request_data.get('requesting_user'))
             else:
                 requesting_user = User.objects.get(username=request_data.get('requesting_user'))
 
             if request_type == 'friend':
-                # Controlla se l'utente è già un amico
-                usertocheck = UserProfile.objects.get(user=user)
-                user_profile = UserProfile.objects.get(user=requesting_user)
-                if usertocheck in user_profile.user_friend_list.all():
-                    return Response({'message': 'Utente gia amico.', 'already_friend': True}, status=status.HTTP_200_OK)
-                logger.debug(f"Request  nel requesttipe : {request_data}")
+                user_profile = UserProfile.objects.get(user=user)
+
                 if request_data.get('request') == 'accept':
                     return self.accept_request(request, target_user, requesting_user)
                 elif request_data.get('request') == 'decline':
                     return self.decline_request(request, id, requesting_user)
                 elif request_data.get('request') == 'remove':
-                    return self.remove_friend( id, username)
+                    return self.remove_friend(id, username)
 
-                # Controlla se esiste già una richiesta pendente
+
                 if PendingRequest.objects.filter(
                     target_user=user,
                     requesting_user=requesting_user,
@@ -1418,14 +1353,17 @@ class UserRequestAPIView(APIView):
                 ).exists():
                     return Response({'message': 'La richiesta è già presente.', 'already_exists': True}, status=status.HTTP_200_OK)
 
-                # Creazione di una nuova richiesta
+                usertocheck = UserProfile.objects.get(user=user)
+                user_profile_check = UserProfile.objects.get(user=requesting_user)
+                if usertocheck in user_profile_check.user_friend_list.all():
+                    return Response({'message': 'Utente già amico', 'already_friend': True}, status=status.HTTP_200_OK)
+                
                 new_request = PendingRequest.objects.create(
                     request_type=request_type,
                     target_user=user,
                     requesting_user=requesting_user,
                     request=request_data.get('request'),
                 )
-                # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
                 target_user_profile = UserProfile.objects.get(user=user)
                 target_user_profile.pending_requests.add(new_request)
                 return Response({'success': 'Richiesta inviata con successo.'}, status=status.HTTP_200_OK)
@@ -1438,7 +1376,6 @@ class UserRequestAPIView(APIView):
                 elif request_data.get('request') == 'decline':
                     return self.decline_game_request(request, id, requesting_user)
 
-                # Controlla se esiste già una richiesta pendente di tipo 'game'
                 if PendingRequest.objects.filter(
                     target_user=user,
                     requesting_user=requesting_user,
@@ -1446,20 +1383,17 @@ class UserRequestAPIView(APIView):
                 ).exists():
                     return Response({'error': 'La richiesta è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
 
-                # Creazione di una nuova richiesta di invito a giocare
                 new_request = PendingRequest.objects.create(
                     request_type=request_type,
                     target_user=user,
                     requesting_user=requesting_user,
                     request=request_data.get('request'),
                 )
-
-                # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
                 target_user_profile = UserProfile.objects.get(user=user)
                 target_user_profile.pending_requests.add(new_request)
 
                 return Response({'success': 'Invito a giocare inviato con successo.'}, status=status.HTTP_200_OK)
-            
+
             elif request_type == 'tournament':
                 user_profile = UserProfile.objects.get(user=user)
 
@@ -1468,7 +1402,6 @@ class UserRequestAPIView(APIView):
                 elif request_data.get('request') == 'decline':
                     return self.decline_tournement_request(request, id, requesting_user)
 
-                # Controlla se esiste già una richiesta pendente di tipo 'game'
                 if PendingRequest.objects.filter(
                     target_user=user,
                     requesting_user=requesting_user,
@@ -1476,15 +1409,12 @@ class UserRequestAPIView(APIView):
                 ).exists():
                     return Response({'error': 'La richiesta è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
 
-                # Creazione di una nuova richiesta di invito a giocare
                 new_request = PendingRequest.objects.create(
                     request_type=request_type,
                     target_user=user,
                     requesting_user=requesting_user,
                     request=request_data.get('request'),
                 )
-
-                # Aggiungi la nuova richiesta pendente al profilo dell'utente di destinazione
                 target_user_profile = UserProfile.objects.get(user=user)
                 target_user_profile.pending_requests.add(new_request)
 
@@ -1499,168 +1429,11 @@ class UserRequestAPIView(APIView):
             logger.error(f"Errore durante la creazione della richiesta pendente: {e}", exc_info=True)
             return Response({'error': 'Errore durante la creazione della richiesta.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def accept_torunement_request(self, request, id, requesting_user):
-        try:
-            # Verifica se l'utente è autenticato
-            if not request.user.is_authenticated:
-                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            # Recupera l'utente target
-            target_user_base = User.objects.get(pk=id)
-            target_user = UserProfile.objects.get(user=target_user_base)
-
-            # Trova tutte le richieste pendenti
-            pending_requests = PendingRequest.objects.filter(
-                target_user=target_user.user,
-                requesting_user=requesting_user,
-                request_type='tournament'
-            )
-
-            if not pending_requests.exists():
-                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
-
-            # Elimina tutte le richieste pendenti trovate
-            pending_requests.delete()
-            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
-
-            logger.info(f"Invito accettato tra {requesting_user_profile.user.username} e {target_user.user.username}")
-            return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
-
-        except User.DoesNotExist:
-            logger.error(f"L'utente con ID {id} non esiste.")
-            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
-            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except AttributeError as e:
-            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
-            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def accept_game_request(self, request, id, requesting_user):
-        try:
-            # Verifica se l'utente è autenticato
-            if not request.user.is_authenticated:
-                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            # Recupera l'utente target
-            target_user_base = User.objects.get(pk=id)
-            target_user = UserProfile.objects.get(user=target_user_base)
-
-            # Trova tutte le richieste pendenti
-            pending_requests = PendingRequest.objects.filter(
-                target_user=target_user.user,
-                requesting_user=requesting_user,
-                request_type='game'
-            )
-
-            if not pending_requests.exists():
-                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
-
-            # Elimina tutte le richieste pendenti trovate
-            pending_requests.delete()
-            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
-
-            logger.info(f"Invito accettato tra {requesting_user_profile.user.username} e {target_user.user.username}")
-            return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
-
-        except User.DoesNotExist:
-            logger.error(f"L'utente con ID {id} non esiste.")
-            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
-            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except AttributeError as e:
-            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
-            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def decline_tournement_request(self, request, id, requesting_user):
-        try:
-            # Verifica se l'utente è autenticato
-            if not request.user.is_authenticated:
-                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            # Recupera l'utente target
-            target_user_base = User.objects.get(pk=id)
-            target_user = UserProfile.objects.get(user=target_user_base)
-
-            # Trova tutte le richieste pendenti
-            pending_requests = PendingRequest.objects.filter(
-                target_user=target_user.user,
-                requesting_user=requesting_user,
-                request_type='tournament'
-            )
-
-            if not pending_requests.exists():
-                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
-
-            # Elimina tutte le richieste pendenti trovate
-            pending_requests.delete()
-            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
-
-            logger.info(f"Richiesta di invito rifiutata {requesting_user_profile.user.username} e {target_user.user.username}")
-            return Response({'success': 'Richiesta rifiutata con successo.'}, status=status.HTTP_200_OK)
-
-        except User.DoesNotExist:
-            logger.error(f"L'utente con ID {id} non esiste.")
-            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
-            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except AttributeError as e:
-            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
-            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def decline_game_request(self, request, id, requesting_user):
-        try:
-            # Verifica se l'utente è autenticato
-            if not request.user.is_authenticated:
-                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-            # Recupera l'utente target
-            target_user_base = User.objects.get(pk=id)
-            target_user = UserProfile.objects.get(user=target_user_base)
-
-            # Trova tutte le richieste pendenti
-            pending_requests = PendingRequest.objects.filter(
-                target_user=target_user.user,
-                requesting_user=requesting_user,
-                request_type='game'
-            )
-
-            if not pending_requests.exists():
-                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
-
-            # Elimina tutte le richieste pendenti trovate
-            pending_requests.delete()
-            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
-
-            logger.info(f"Richiesta di invito rifiutata {requesting_user_profile.user.username} e {target_user.user.username}")
-            return Response({'success': 'Richiesta rifiutata con successo.'}, status=status.HTTP_200_OK)
-
-        except User.DoesNotExist:
-            logger.error(f"L'utente con ID {id} non esiste.")
-            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
-            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except AttributeError as e:
-            logger.error(f"Errore durante la gestione dell'invito: {e}", exc_info=True)
-            return Response({'error': 'Errore durante la gestione dell\'invito.'}, status=status.HTTP_400_BAD_REQUEST)
-
     def accept_request(self, request, target_user, requesting_user):
         try:
             if not request.user.is_authenticated:
                 return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            
             pending_requests = PendingRequest.objects.filter(
                 target_user=target_user,
                 requesting_user=requesting_user,
@@ -1670,66 +1443,24 @@ class UserRequestAPIView(APIView):
             if not pending_requests.exists():
                 return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
 
-            # Elimina tutte le richieste pendenti trovate
             pending_requests.delete()
             requesting_user_profile = UserProfile.objects.get(user=requesting_user)
 
-            # Aggiungi il target_user alla lista amici di requesting_user_profile
             target_user_profile = UserProfile.objects.get(user=target_user)
             requesting_user_profile.user_friend_list.add(target_user_profile)
 
-            logger.info(f"Amicizia accettata tra {requesting_user_profile.user.username} e {target_user_profile.user.username}")
             return Response({'success': 'Richiesta accettata con successo.'}, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
-            logger.error(f"L'utente con ID {id} non esiste.")
+            logger.error(f"L'utente con ID {target_user.id} non esiste.")
             return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-
         except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            logger.error(f"UserProfile per l'utente con ID {target_user.id} non esiste.")
             return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
-
         except AttributeError as e:
             logger.error(f"Errore durante la gestione dell'amicizia: {e}", exc_info=True)
             return Response({'error': 'Errore durante la gestione dell\'amicizia.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-    def decline_request(self, request, id, requesting_user):
-        try:
-            # Verifica se l'utente è autenticato
-            if not request.user.is_authenticated:
-                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            # Recupera l'utente target
-            target_user_base = User.objects.get(pk=id)
-            target_user = UserProfile.objects.get(user=target_user_base)
-
-            # Trova tutte le richieste pendenti
-            pending_requests = PendingRequest.objects.filter(
-                target_user=target_user.user,
-                requesting_user=requesting_user,
-                request_type='friend'
-            )
-
-            # Elimina tutte le richieste pendenti trovate
-            if pending_requests.exists():
-                pending_requests.delete()
-            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
-
-            logger.info(f"Richiesta di amicizia rifiutata {requesting_user_profile.user.username} e {target_user.user.username}")
-            return Response({'success': 'Richiesta rifiutata con successo.'}, status=status.HTTP_200_OK)
-
-        except User.DoesNotExist:
-            logger.error(f"L'utente con ID {id} non esiste.")
-            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
-            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
-
-        except AttributeError as e:
-            logger.error(f"Errore durante la gestione dell'amicizia: {e}", exc_info=True)
-            return Response({'error': 'Errore durante la gestione dell\'amicizia.'}, status=status.HTTP_400_BAD_REQUEST)
-    
     def remove_friend(self, id, username):
         try:
             user = User.objects.get(pk=id)
@@ -1740,14 +1471,47 @@ class UserRequestAPIView(APIView):
             user_profile.user_friend_list.remove(friend_profile)
             friend_profile.user_friend_list.remove(user_profile)
 
-            logger.info(f"Amicizia rimossa tra {user.username} e {friend.username}")
             return Response({'success': 'Amico rimosso con successo.'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
         except UserProfile.DoesNotExist:
             return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            logger.error(f"Errore durante la rimozione dell'amicizia: {e}")
             return Response({'error': 'Errore durante la rimozione dell\'amico.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def decline_request(self, request, id, requesting_user):
+        try:
+            if not request.user.is_authenticated:
+                return Response({'error': 'Utente non autenticato.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            target_user_base = User.objects.get(pk=id)
+            target_user = UserProfile.objects.get(user=target_user_base)
+
+            pending_requests = PendingRequest.objects.filter(
+                target_user=target_user.user,
+                requesting_user=requesting_user,
+                request_type='friend'
+            )
+
+            if pending_requests.exists():
+                pending_requests.delete()
+            requesting_user_profile = UserProfile.objects.get(user=requesting_user)
+
+            return Response({'success': 'Richiesta rifiutata con successo.'}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            logger.error(f"L'utente con ID {id} non esiste.")
+            return Response({'error': 'L\'utente non esiste.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile per l'utente con ID {id} non esiste.")
+            return Response({'error': 'Profilo utente non trovato.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except AttributeError as e:
+            logger.error(f"Errore durante la gestione dell'amicizia: {e}", exc_info=True)
+            return Response({'error': 'Errore durante la gestione dell\'amicizia.'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class UserResponseAPIView(APIView):
@@ -1784,7 +1548,6 @@ class BlockUserAPIView(APIView):
             
         blocked_users = user_profile.blocked_users.all()
         blocked_usernames = [user_profile_to_block.user.username for user in blocked_users]
-        logger.debug(f"Blocked users: {blocked_usernames}")
 
         return Response({'detail': f"User {user_to_block.username} has been blocked."}, status=status.HTTP_200_OK)
 
@@ -2166,7 +1929,6 @@ class GameAPIView(APIView):
             
             if 'local' in request.path:
                 data = request.data
-                logger.debug(f"NEL GAME data fa: {data}")
 
                 user = get_object_or_404(User, pk=request.user.id)
                 user_profile = get_object_or_404(UserProfile, user=user)
@@ -2230,14 +1992,12 @@ class GameAPIView(APIView):
 
                 try:
                     
-                    # Recupera l'istanza del gioco usando `pk` invece di `data.get('id')`
                     game = Game.objects.get(id=pk)
                     player1 = UserProfile.objects.get(user=game.player1)
                     player2 = UserProfile.objects.get(user=game.player2)
 
                     abandon = data.get('abandon', 0)
                     winner = data.get('winner', None)
-                    # Aggiorna i campi solo se i dati sono presenti
                     game.player1_score = data.get('scorePlayer1', game.player1_score)
                     game.player2_score = data.get('scorePlayer2', game.player2_score)
                     game.player1_hit = data.get('player1_hit', game.player1_hit)
@@ -2259,12 +2019,10 @@ class GameAPIView(APIView):
                         player1.game_win += 1
                         player2.game_lose += 1
                         game.winner = game.player1
-                        logger.debug(f"NEL GAME WINNER DIO CAN SCORE 1 {game.player1_score}  SCORE 2 {game.player2_score} e winner fa: {game.winner}")
                     elif game.player2_score < game.player1_score and game.rules == 'time':
                         player2.game_win += 1
                         player1.game_lose += 1
                         game.winner = game.player2
-                        logger.debug(f"NEL GAME WINNER DIO SPORCO SCORE 1 {game.player1_score}  SCORE 2 {game.player2_score} e winner fa: {game.winner}")
                     elif game.player1_score > game.player2_score and game.rules == 'score':
                         player1.game_win += 1
                         player2.game_lose += 1
@@ -2280,9 +2038,6 @@ class GameAPIView(APIView):
 
 
                     game.status = data.get('gameStatus')
-                    logger.debug(f"NEL GAME status fa: {game.status}")
-                    logger.debug(f"NEL GAME madonna fa: {game}")
-                    # Salva le modifiche
                     player1.save()
                     player2.save()
                     game.save()
@@ -2339,7 +2094,6 @@ class StatsAPIView(APIView):
         user_profile = get_object_or_404(UserProfile, user=user)
 
         if game_id:
-            # Recupera i dettagli del gioco
             game = get_object_or_404(Game, pk=game_id)
             player1 = UserProfile.objects.get(user=game.player1)
             player2 = UserProfile.objects.get(user=game.player2)
@@ -2389,7 +2143,6 @@ class StatsAPIView(APIView):
             return Response(data)
 
         if tournament_id:
-            # Recupera i dettagli del torneo
             tournament = get_object_or_404(Tournament, pk=tournament_id)
 
             games = Game.objects.filter(tournament=tournament)

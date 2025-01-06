@@ -140,7 +140,7 @@ function initializeChart() {
         ctx.stroke();
 
         ctx.fillStyle = "#000";
-        ctx.textAlign = "center";
+        ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         ctx.font = "bold 18px Arial";
 

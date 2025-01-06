@@ -34,6 +34,7 @@ services:
       DB_PASSWORD: ${DJANGO_DB_PASSWORD}
       DB_HOST: ${DJANGO_DB_HOST}
       DB_PORT: ${DJANGO_DB_PORT}
+      SECRET_KEY: ${SECRET_KEY}
     depends_on:
       - postgres
     restart: always

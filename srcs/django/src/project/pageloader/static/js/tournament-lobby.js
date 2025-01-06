@@ -172,7 +172,7 @@ function checkUserSlotAndReadyState(roundsSlots) {
         return;
     }
 
-    const roundKeys = Object.keys(roundsSlots).filter(key => roundsSlots[key]); // Filtra solo i round definiti
+    const roundKeys = Object.keys(roundsSlots).filter(key => roundsSlots[key]);
     const maxRoundKey = roundKeys.reduce((max, key) => {
         const roundNumber = parseInt(key.split('_')[1], 10);
         return (!max || roundNumber > parseInt(max.split('_')[1], 10)) ? key : max;

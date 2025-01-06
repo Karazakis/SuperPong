@@ -29,7 +29,7 @@ document.getElementById('logout').addEventListener('click', function() {
                 const container = document.getElementById('body');
                 const basescript = document.getElementById('dashboard-base');  
                 container.removeChild(basescript);
-				chatSocket.close();
+				window.chatSocket.close();
                 loadPage("api/home/");
             }
         })
@@ -37,17 +37,17 @@ document.getElementById('logout').addEventListener('click', function() {
 }
 );
 
-var chatSocket;
+window.chatSocket = null;
 function initializeWebSocket() {
-	if (chatSocket) {
-        chatSocket.close();
+	if (window.chatSocket !== null) {
+        window.chatSocket.close();
     }
 	let id = localStorage.getItem('userId');
 	let url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
-	chatSocket = new WebSocket(url);
-	chatSocket.onopen = async function(event) {
+	window.chatSocket = new WebSocket(url);
+	window.chatSocket.onopen = async function(event) {
 		var id = localStorage.getItem('userId');
-		chatSocket.send(JSON.stringify({
+		window.chatSocket.send(JSON.stringify({
 			'user_list': 'get',
 		}));
 		try {
@@ -66,7 +66,7 @@ function initializeWebSocket() {
 		
 	};
 
-	chatSocket.onmessage = function(e) {
+	window.chatSocket.onmessage = function(e) {
 		let data = JSON.parse(e.data);
 	    
 		const accessToken = localStorage.getItem("accessToken");
@@ -96,7 +96,6 @@ function initializeWebSocket() {
 					if (!isBlocked) {
 						if (data.message.startsWith('@')) {
 							actualUser = await recoverUser(actualUserId)
-							console.log(actualUser.nickname)
 							handlePrivateMessage(data, actualUser.nickname, actualUser.username);
 						} else {
 							displayMessage(data, 'black');
@@ -108,8 +107,7 @@ function initializeWebSocket() {
 			})();
 		} else if (data.type === 'user_list') {
 		    let listElementId = 'users';
-		    const listElement = document.getElementById(listElementId);
-	    
+		    let listElement = document.getElementById(listElementId);
 		    if (listElement) {
 			(async function() {
 			    const itemList = data.list;
@@ -153,14 +151,12 @@ function initializeWebSocket() {
 			    elementsToAdd.forEach(element => {
 					if (!listElement.querySelector(`#${element.id}`)) {
 						listElement.appendChild(element);
-					} else {
-						console.log(`Elemento con id "${element.id}" già presente.`);
 					}
 				});
 				
 			})();
 		    } else {
-			console.error("L'elemento users non esiste");
+				
 		    }
 		} else if (data.type === 'invite_game') {
 			handleGameInvite(data, accessToken, csrfToken);		    
@@ -210,7 +206,6 @@ initializeWebSocket();
 	}
 
     let actualRequestingUser = await recoverUser(data.requesting_user)
-    console.log(actualRequestingUser)    
     let invite = window.confirm(`${actualRequestingUser.nickname} invited you to a game`);
     if (invite) {
 		let pathname = window.location.pathname;
@@ -220,7 +215,7 @@ initializeWebSocket();
 		}
 		joinGame(data.target_lobby);
     } else {
-		chatSocket.send(JSON.stringify({
+		window.chatSocket.send(JSON.stringify({
 			'type': 'decline',
 			'pending_request': 'decline',
 			'target_user': data.requesting_user,
@@ -264,7 +259,7 @@ async function handleTournamentInvite(data, accessToken, csrfToken) {
 		}
 		joinTournament(data.target_lobby);
     } else {
-		chatSocket.send(JSON.stringify({
+		window.chatSocket.send(JSON.stringify({
 			'type': 'decline',
 			'pending_request': 'decline',
 			'target_user': data.requesting_user,
@@ -293,22 +288,28 @@ async function updateGameInviteStatus(data) {
 }
 
 async function handleFriendRequest(data, accessToken, csrfToken) {
+	let pathname = window.location.pathname;
     let actualRequestingUser = await recoverUser(data.requesting_user)
 	let user = await recoverUser(data.target_user)    
     let request = window.confirm(`${actualRequestingUser.nickname} wants to add you as a friend`);
     if (request) {
         processFriendRequest('accept', data, accessToken, csrfToken);
-		updateFriendListFromServer();
+		if (pathname.includes('game') === false){
+			updateFriendListFromServer();
+		}
     } else {
         processFriendRequest('decline', data, accessToken, csrfToken);
 		if (user.pending_requests !== undefined) {
-			UpdateRequestList(user);
+			if (pathname.includes('game') === false) {
+				UpdateRequestList(user);
+			}
 		}
     }
 }
 
 async function processFriendRequest(action, data, accessToken, csrfToken) {
-	
+	let pathname = window.location.pathname;
+
 	const requestData = {
         target_user: data.target_user,
         requesting_user: data.requesting_user,
@@ -323,15 +324,12 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 		const data = await response.json();
     
 		if (data.message === 'Token valido') {
-		    // Token valido, procedi con la richiesta effettiva
 		    return;
 		} else if (data.message === 'Token non valido') {
-		    // Token non valido, prova a rinfrescare
 		    const newAccessToken = await refreshAccessToken();
 		    if (newAccessToken) {
-			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+			accessToken = newAccessToken;
 			localStorage.setItem("accessToken", newAccessToken);
-			// Richiesta effettiva con nuovo token
 		    } else {
 			loadPage("api/login/");
 		    }
@@ -362,7 +360,7 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 			alert(`Errore durante l'invio della risposta: ${errorMessage.error}`);
 	    } else {
 		
-			chatSocket.send(JSON.stringify({
+			window.chatSocket.send(JSON.stringify({
 				'type': action,
 				'pending_request': action,
 				'target_user': data.requesting_user,
@@ -373,44 +371,15 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 	    console.error('Errore durante la fetch:', error);
 	    alert('Errore durante la fetch: ' + error.message);
 	}
-
-
-
-	/* 
-    let request_url = `/api/request/friend/${data.target_user}/`;
-    
-
-    fetch(request_url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify(requestData)
-    }).then(response => {
-		chatSocket.send(JSON.stringify({
-			'type': action,
-			'pending_request': action,
-			'target_user': data.requesting_user,
-			'requesting_user': data.target_user,
-		}));
-        if (response.ok) {
-            alert(`Hai ${action === 'accept' ? 'accettato' : 'rifiutato'} la richiesta di amicizia!`);
-        } else {
-            throw new Error('Failed to process friend request');
-        }
-    }).catch(error => {
-        console.error('Error processing friend request:', error);
-    }); */
-	updateFriendListFromServer();
+	if (pathname.includes('game') === false) {
+		updateFriendListFromServer();
+	}
 }
 
 async function updateRequestStatus(data) {
     let actualRequestingUser = await recoverUser(data.requesting_user)
     let actualTargetUser = await recoverUser(data.target_user)
     let message;
-    console.log(`${data.request_type}`)
     switch (data.type) {
         case 'accept':
             message = `${actualTargetUser.nickname} accepted your request`;
@@ -427,8 +396,11 @@ async function updateRequestStatus(data) {
     }
     alert(message);
 
-    // Aggiorna la lista degli amici dopo l'aggiornamento dello stato dell'amicizia
-    updateFriendListFromServer();
+
+    let pathname = window.location.pathname;
+    if (pathname.includes('game') === false) {
+	updateFriendListFromServer();
+    }
 }
 
 
@@ -443,7 +415,7 @@ async function updatePendingRequestsFromServer() {
         if (!response.ok) throw new Error('Failed to fetch pending requests');
         const pendingRequests = await response.json();
         const listElement = document.getElementById('pending-requests');
-        listElement.innerHTML = ''; // Clear existing list
+        listElement.innerHTML = '';
 
         pendingRequests.forEach(request => {
             const item = document.createElement('li');
@@ -460,7 +432,7 @@ async function updatePendingRequestsFromServer() {
 async function updateFriendListFromServer() {
     const userId = localStorage.getItem('userId');
     try {
-        const user = await recoverUser(userId); // Recupera l'utente aggiornato dal server
+        const user = await recoverUser(userId);
         if (!user) {
             throw new Error('Errore durante il recupero dei dati utente');
         }
@@ -470,10 +442,8 @@ async function updateFriendListFromServer() {
             return;
         }
 
-        // Svuota la lista amici
         friendListElement.innerHTML = '';
 
-        // Aggiorna la lista amici
         for (let friend of user.user_friend_list) {
             let itemElement = document.createElement('li');
             itemElement.id = `friend_${friend.id}`;
@@ -501,15 +471,14 @@ function handlePrivateMessage(data, currentNickname, currenteUsername) {
     const targetNickname = data.message.substring(1, endOfUsernameIndex);
     const messageContent = data.message.substring(endOfUsernameIndex + 1);
 
-    // Se l'utente corrente è il destinatario, mostra il messaggio senza il nome del destinatario
+
     if (currentNickname === targetNickname) {
-        displayMessage({ player: data.nickname, message: messageContent }, 'green');
+        displayMessage({ player: data.nickname, nickname: data.nickname, message: messageContent }, 'green');
     }
-    // Se l'utente corrente è il mittente, mostra il messaggio con il nome del destinatario in parentesi
-    console.log(data.player)
+
     if (data.player === currenteUsername) {
         const formattedMessage = `(a ${targetNickname}) ${messageContent}`;
-        displayMessage({ player: currentNickname, message: formattedMessage }, 'green');
+        displayMessage({ player: data.nickname, nickname: data.nickname, message: formattedMessage }, 'green');
     }
 }
 
@@ -575,7 +544,7 @@ form.addEventListener('submit', (e)=> {
     let message = e.target.message.value;
 	
     username = localStorage.getItem('username');
-    chatSocket.send(JSON.stringify({
+    window.chatSocket.send(JSON.stringify({
         'message': message,
         'username': username
     }));
@@ -584,12 +553,10 @@ form.addEventListener('submit', (e)=> {
 
 
 function showContextMenu(event, id, isblocked = false) {
-    // Ottieni il menu contestuale
     const contextMenu = document.getElementById("contextMenu");
     const addfriendcontext = document.getElementById("addfriendcontext");
     const viewpfoilecontext = document.getElementById("viewprofilecontext");
     const blockusercontext = document.getElementById("blockusercontext");
-    // Posiziona il menu contestuale in base alla posizione del clic
     let pathname = window.location.pathname;
     if (pathname.includes('lobby') === true) {
 	viewpfoilecontext.style.display = "none";
@@ -607,22 +574,18 @@ function showContextMenu(event, id, isblocked = false) {
     contextMenu.style.left = event.pageX + "px";
     contextMenu.style.top = event.pageY + "px";
 
-    // Mostra il menu
     contextMenu.style.display = "block";
     
-    // Nascondi il menu quando si clicca altrove
     window.onclick = function() {
         contextMenu.style.display = "none";
     };
 }
 
 function showFriendContextMenu(event, id, username) {
-    // Ottieni il menu contestuale
     const contextMenu = document.getElementById("friendContextMenu");
     const invitegamecontext = document.getElementById("invitegamecontext");
     const invitetournamentcontext = document.getElementById("invitetournamentcontext");
     const removefriendcontext = document.getElementById("removefriendcontext");
-    // Posiziona il menu contestuale in base alla posizione del clic
 	let pathname = window.location.pathname;
 	if (pathname.includes('lobby') === false && pathname.includes('tournament') === false)
 	{
@@ -649,21 +612,17 @@ function showFriendContextMenu(event, id, username) {
     contextMenu.style.left = event.pageX + "px";
     contextMenu.style.top = event.pageY + "px";
 
-    // Mostra il menu
     contextMenu.style.display = "block";
 
-    // Nascondi il menu quando si clicca altrove
     window.onclick = function() {
         contextMenu.style.display = "none";
     };
 }
 
 function showRequestContextMenu(event, id, requesting_user, target_user) {
-    // Ottieni il menu contestuale
     const contextMenu = document.getElementById("requestContextMenu");
     const acceptrequestcontext = document.getElementById("acceptrequestcontext");
     const declinerequestcontext = document.getElementById("declinerequestcontext");
-    // Posiziona il menu contestuale in base alla posizione del clic
 
     acceptrequestcontext.dataset.id = id;
 	acceptrequestcontext.dataset.requesting_user = requesting_user;
@@ -674,10 +633,8 @@ function showRequestContextMenu(event, id, requesting_user, target_user) {
     contextMenu.style.left = event.pageX + "px";
     contextMenu.style.top = event.pageY + "px";
 
-    // Mostra il menu
     contextMenu.style.display = "block";
 
-    // Nascondi il menu quando si clicca altrove
     window.onclick = function() {
         contextMenu.style.display = "none";
     };
@@ -700,10 +657,8 @@ async function recoverUser(id) {
             const data = await response.json();
 
             if (data.message === 'Token valido') {
-                // Il token è valido, procedi con la richiesta
                 return accessToken;
             } else if (data.message === 'Token non valido') {
-                // Il token non è valido, tentiamo di rinnovarlo
                 const newAccessToken = await refreshAccessToken();
                 if (newAccessToken) {
                     localStorage.setItem('accessToken', newAccessToken);
@@ -723,36 +678,31 @@ async function recoverUser(id) {
         }
     };
 
-    // Verifica la validità del token e procedi con la richiesta se tutto è in ordine
     accessToken = await checkAndRefreshToken();
     if (!accessToken) {
-        // Se non è possibile ottenere un token valido, esci
         return;
     }
     try {
-        // La funzione fetch ritorna una promessa, quindi puoi usare await qui
         const response = await fetch(`/api/request_user/${id}/`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }
         });
-        const text = await response.text();  // Otteniamo il testo grezzo della risposta
+        const text = await response.text();  
 
         if (!response.ok) {
             console.error(`Errore nella risposta della rete: ${response.status} ${response.statusText}`);
             throw new Error('Network response was not ok');
         }
 
-        const data = JSON.parse(text);  // Prova a fare il parse del messaggio
+        const data = JSON.parse(text);  
 
-        return data; // Modifica questo percorso in base alla struttura della tua risposta
+        return data; 
 
     } catch (error) {
 		console.log("DA ERRORE MA L'ID è: ",id);
-		//recoverUser(id);
-        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
-        //throw error;
+		
     }
 }
 
@@ -789,15 +739,12 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 		const data = await response.json();
     
 		if (data.message === 'Token valido') {
-		    // Token valido, procedi con la richiesta effettiva
 		    return;
 		} else if (data.message === 'Token non valido') {
-		    // Token non valido, prova a rinfrescare
 		    const newAccessToken = await refreshAccessToken();
 		    if (newAccessToken) {
-			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+			accessToken = newAccessToken;
 			localStorage.setItem("accessToken", newAccessToken);
-			// Richiesta effettiva con nuovo token
 		    } else {
 			loadPage("api/login/");
 		    }
@@ -828,13 +775,13 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 			alert(`Errore durante l'invio della richiesta: ${errorMessage.error}`);
 	    } else {
 			const responseData = await response.json();
-			if (responseData.already_exists) { // Conflict, richiesta già presente
+			if (responseData.already_exists) { 
 				alert('La richiesta è in attesa di essere accettata o rifutata');
 			} else if (responseData.already_friend) {
 				alert('The user is already a friend.')
 			} else {
 				alert('Friend request sent');
-				chatSocket.send(JSON.stringify({
+				window.chatSocket.send(JSON.stringify({
 					'pending_request': 'send',
 					'target_user': id,
 					'requesting_user': localStorage.getItem('userId'),
@@ -863,7 +810,6 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 		return;
 	}
 
-	// Funzione per verificare la validità del token
 	async function checkTokenValidity(url) {
 	    try {
 		const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
@@ -872,15 +818,12 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 		const data = await response.json();
     
 		if (data.message === 'Token valido') {
-		    // Token valido, procedi con la richiesta effettiva
 		    await performRequest(accessToken, url);
 		} else if (data.message === 'Token non valido') {
-		    // Token non valido, prova a rinfrescare
 		    const newAccessToken = await refreshAccessToken();
 		    if (newAccessToken) {
-			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+			accessToken = newAccessToken;
 			localStorage.setItem("accessToken", newAccessToken);
-			// Richiesta effettiva con nuovo token
 			await performRequest(newAccessToken, url);
 		    } else {
 			loadPage("api/login/");
@@ -892,8 +835,6 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 		console.error('Errore durante la verifica del token:', error);
 	    }
 	}
-    
-	// Funzione per eseguire la richiesta effettiva
 	const performRequest = async (token, url) => {
 	    try {
 		const response = await fetch(url, {
@@ -927,7 +868,7 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 
 
 document.getElementById("invitegamecontext").addEventListener('click', async function(e) {
-	let accessToken = localStorage.getItem("accessToken");  // Usa let al posto di const
+	let accessToken = localStorage.getItem("accessToken");
 	const id = e.target.dataset.id; 
 	const csrfToken = getCookie('csrftoken');
     let lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
@@ -939,7 +880,6 @@ document.getElementById("invitegamecontext").addEventListener('click', async fun
     
 	const requestType = 'game'; 
 	let url = `/api/request/${requestType}/${lobbyId}/`;
-	// Funzione per verificare la validità del token
 	async function checkTokenValidity(url, requestType) {
 	    try {
 		const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
@@ -948,15 +888,12 @@ document.getElementById("invitegamecontext").addEventListener('click', async fun
 		const data = await response.json();
     
 		if (data.message === 'Token valido') {
-		    // Token valido, procedi con la richiesta effettiva
 		    await performRequest(accessToken);
 		} else if (data.message === 'Token non valido') {
-		    // Token non valido, prova a rinfrescare
 		    const newAccessToken = await refreshAccessToken();
 		    if (newAccessToken) {
-			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+			accessToken = newAccessToken;
 			localStorage.setItem("accessToken", newAccessToken);
-			// Richiesta effettiva con nuovo token
 			console
 			await performRequest(newAccessToken, url, requestType);
 		    } else {
@@ -969,12 +906,10 @@ document.getElementById("invitegamecontext").addEventListener('click', async fun
 		console.error('Errore durante la verifica del token:', error);
 	    }
 	}
-    
-	// Funzione per eseguire la richiesta effettiva
 	const performRequest = async (token, url, requestType) => {
 	    try {
 		const response = await fetch(url, {
-		    method: 'POST',  // Usa POST se richiesto
+		    method: 'POST',
 		    headers: {
 			'Content-Type': 'application/json',
 			'Authorization': `Bearer ${token}`,
@@ -993,9 +928,8 @@ document.getElementById("invitegamecontext").addEventListener('click', async fun
 			if (requestType === undefined) {
 				requestType = 'game';
 			}
-		    // Invia il messaggio tramite WebSocket per aggiornare in tempo reale
 			lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
-		    chatSocket.send(JSON.stringify({
+		    window.chatSocket.send(JSON.stringify({
 			'pending_request': 'send',
 			'target_user': id,
 			'requesting_user': localStorage.getItem('userId'),
@@ -1016,7 +950,7 @@ document.getElementById("invitegamecontext").addEventListener('click', async fun
     
 
 document.getElementById("invitetournamentcontext").addEventListener('click', async function(e) {
-	let accessToken = localStorage.getItem("accessToken");  // Usa let al posto di const
+	let accessToken = localStorage.getItem("accessToken");
 	const id = e.target.dataset.id; 
 	const csrfToken = getCookie('csrftoken');
     let lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
@@ -1028,7 +962,6 @@ document.getElementById("invitetournamentcontext").addEventListener('click', asy
     
 	const requestType = 'tournament'; 
 	let url = `/api/request/${requestType}/${lobbyId}/`;
-	// Funzione per verificare la validità del token
 	async function checkTokenValidity(url, requestType) {
 	    try {
 		const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
@@ -1037,15 +970,12 @@ document.getElementById("invitetournamentcontext").addEventListener('click', asy
 		const data = await response.json();
     
 		if (data.message === 'Token valido') {
-		    // Token valido, procedi con la richiesta effettiva
 		    await performRequest(accessToken);
 		} else if (data.message === 'Token non valido') {
-		    // Token non valido, prova a rinfrescare
 		    const newAccessToken = await refreshAccessToken();
 		    if (newAccessToken) {
-			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+			accessToken = newAccessToken;
 			localStorage.setItem("accessToken", newAccessToken);
-			// Richiesta effettiva con nuovo token
 			console
 			await performRequest(newAccessToken, url, requestType);
 		    } else {
@@ -1059,11 +989,10 @@ document.getElementById("invitetournamentcontext").addEventListener('click', asy
 	    }
 	}
     
-	// Funzione per eseguire la richiesta effettiva
 	const performRequest = async (token, url, requestType) => {
 	    try {
 		const response = await fetch(url, {
-		    method: 'POST',  // Usa POST se richiesto
+		    method: 'POST',
 		    headers: {
 			'Content-Type': 'application/json',
 			'Authorization': `Bearer ${token}`,
@@ -1081,9 +1010,8 @@ document.getElementById("invitetournamentcontext").addEventListener('click', asy
 			if (requestType === undefined) {
 				requestType = 'tournament';
 			}
-		    // Invia il messaggio tramite WebSocket per aggiornare in tempo reale
 			lobbyId = window.location.pathname.split('/').filter(part => part !== '').pop();
-		    chatSocket.send(JSON.stringify({
+		    window.chatSocket.send(JSON.stringify({
 			'pending_request': 'send',
 			'target_user': id,
 			'requesting_user': localStorage.getItem('userId'),
@@ -1130,7 +1058,7 @@ document.getElementById("removefriendcontext").addEventListener('click', async f
     } else {
     }
 	document.getElementById("friend_" + e.target.dataset.id).remove();
-	chatSocket.send(JSON.stringify({
+	window.chatSocket.send(JSON.stringify({
 		'type': 'remove',
 		'pending_request': 'remove',
 		'target_user': e.target.dataset.id,
@@ -1171,33 +1099,14 @@ document.getElementById("acceptrequestcontext").addEventListener('click', async 
 	    console.error('Errore durante l\'accettazione della richiesta', response.status, response.statusText, errorMessage);
 	} else {
 		document.getElementById("pending-request_" + e.target.dataset.id).remove();
-		chatSocket.send(JSON.stringify({
+		window.chatSocket.send(JSON.stringify({
 			'type': 'accept',
 			'target_user': e.target.dataset.requesting_user,
 			'requesting_user': e.target.dataset.target_user,
 			'request_type': 'accept',
 			'pending_request': 'accept'
 		}));
-		
-		// let friendListElement = document.getElementById("dashboard-friendlist");
 
-		// if (friendListElement) {
-		// 	let itemElement = document.createElement('li');
-		// 	itemElement.id = `friend_${e.target.dataset.requesting_user}`;
-		// 	recoverUser(e.target.dataset.requesting_user).then(item => {
-		// 		itemElement.textContent = item.username;
-		// 		try {
-		// 		itemElement.dataset.id = e.target.dataset.requesting_user;
-		// 		itemElement.oncontextmenu = function(event) {
-		// 			event.preventDefault();
-		// 			showFriendContextMenu(event, e.target.dataset.requesting_user);
-		// 		};
-		// 		friendListElement.appendChild(itemElement);
-		// 		} catch (error) {
-		// 		console.error('Errore durante l\'impostazione dell\'ID:', error);
-		// 		}
-		// 	});
-		// }
 		actual_user = await recoverUser(user_id)
 		UpdateFriendList(actual_user)
 	}
