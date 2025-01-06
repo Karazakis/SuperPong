@@ -59,7 +59,14 @@ LobbySocket.onmessage = function(e) {
             if (readyButton) readyButton.disabled = true;
             break
         case 'join_game_notification':
-            showJoinGamePopup(data.game_link);
+            if (data.show_popup) {
+                showJoinGamePopup(data.game_link);
+            } else {
+                const readyButton = document.querySelector('.lobby-ready');
+                const leaveButton = document.querySelector('.lobby-leave');
+                if (readyButton) leaveButton.disabled = true;
+                if (leaveButton) leaveButton.disabled = false;
+            }
             break;
         case 'tournament_finished':
             setTimeout(() => {
