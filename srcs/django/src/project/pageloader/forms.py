@@ -13,29 +13,43 @@ class SignUpForm(forms.ModelForm):
         fields = ['username', 'email', 'password']
 
     def clean_username(self):
-        username = self.cleaned_data.get('username')
-        # Sanitizza l'input per prevenire XSS
-        username = re.sub(r'[<>]', '', username)
+        username = self.cleaned_data.get('username', '').strip()
+        if not username:
+            raise ValidationError("Username cannot be empty or contain only spaces.")
         if len(username) < 3:
-            raise ValidationError("Il nome utente deve essere lungo almeno 3 caratteri.")
+            raise ValidationError("Username must be at least 3 characters long.")
+        if len(username) > 20:
+            raise ValidationError("Username cannot be over 20 characters long.")
+        if not re.match(r'^[a-zA-Z0-9_]+$', username):
+            raise ValidationError("Username can contain only letters, numbers and underscore.")
+        if User.objects.filter(username=username).exists():
+            raise ValidationError("Username already taken.")
         return username
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
-        # Sanitizza l'input per prevenire XSS
-        email = re.sub(r'[<>]', '', email)
-        email_pattern = r'^[a-zA-Z0-9._%+]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_pattern, email):
-            raise ValidationError("Inserisci un indirizzo email valido (almeno 3 caratteri prima della @, almeno 3 caratteri dopo la @, un punto e almeno 2 caratteri dopo il punto).")
+        email = self.cleaned_data.get('email', '').strip()
+        if not email:
+            raise ValidationError("Email cannot be empty or contain only spaces.")
+        if len(email) > 40:
+            raise ValidationError("Email address cannot be over 40 characters long.")
+        if not re.match(r'^(?!.*\.\.)[a-zA-Z0-9._%+]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            raise ValidationError("Insert a valid email address.")
         if User.objects.filter(email=email).exists():
-            raise ValidationError("L'email è già in uso.")
+            raise ValidationError("Email address already taken.")
         return email
 
     def clean_password(self):
-        password = self.cleaned_data.get('password')
-        password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$'
-        if not re.match(password_pattern, password):
-            raise ValidationError("La password deve avere almeno 8 caratteri, con almeno una lettera maiuscola, una lettera minuscola e un carattere speciale.")
+        password = self.cleaned_data.get('password', '').strip()
+        if not password:
+            raise ValidationError("Password cannot be empty or contain only spaces.")
+        if len(password) < 8:
+            raise ValidationError("Password must have at least 8 characters.")
+        if not re.search(r'[A-Z]', password):
+            raise ValidationError("Password must have at least one uppercase character.")
+        if not re.search(r'[a-z]', password):
+            raise ValidationError("Password must have at least one lowercase character.")
+        if not re.search(r'\W', password):
+            raise ValidationError("Password must have at least one special character.")
         return password
 
     def save(self, commit=True):
@@ -44,8 +58,6 @@ class SignUpForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
-
 
 class UserSettingsForm(UserChangeForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False, min_length=8)
@@ -57,34 +69,45 @@ class UserSettingsForm(UserChangeForm):
         fields = ['username', 'email', 'password']
 
     def clean_username(self):
-        username = self.cleaned_data.get('username')
+        username = self.cleaned_data.get('username', '').strip()
         if username:
-            # Sanitizza l'input per prevenire XSS
-            username = re.sub(r'[<>]', '', username)
             if len(username) < 3:
-                raise ValidationError("Il nome utente deve essere lungo almeno 3 caratteri.")
+                raise ValidationError("Username must be at least 3 characters long.")
+            if len(username) > 20:
+                raise ValidationError("Username cannot be over 20 characters long.")
+            if not re.match(r'^[a-zA-Z0-9_]+$', username):
+                raise ValidationError("Username can contain only letters, numbers and underscore.")
             if User.objects.filter(username=username).exists():
-                raise ValidationError("Il nome utente è già in uso.")
+                raise ValidationError("Username already taken.")
+        elif not self.instance.username:
+            raise ValidationError("Username cannot be empty or contain only spaces.")
         return username
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get('email', '').strip()
         if email:
-            # Sanitizza l'input per prevenire XSS
-            email = re.sub(r'[<>]', '', email)
-            email_pattern = r'^[a-zA-Z0-9._%+]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$'
+            if len(email) > 40:
+                raise ValidationError("Email address cannot be over 40 characters long.")
+            email_pattern = r'^(?!.*\.\.)[a-zA-Z0-9._%+]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(email_pattern, email):
-                raise ValidationError("Inserisci un indirizzo email valido.")
+                raise ValidationError("Insert a valid email address.")
             if User.objects.filter(email=email).exists():
-                raise ValidationError("L'email è già in uso.")
+                raise ValidationError("Email address already taken.")
+        elif not self.instance.email:
+            raise ValidationError("Email cannot be empty or contain only spaces.")
         return email
 
     def clean_password(self):
-        password = self.cleaned_data.get('password')
+        password = self.cleaned_data.get('password', '').strip()
         if password:
-            password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$'
-            if not re.match(password_pattern, password):
-                raise ValidationError("La password deve avere almeno 8 caratteri, con almeno una lettera maiuscola, una lettera minuscola e un carattere speciale.")
+            if len(password) < 8:
+                raise ValidationError("Password must have at least 8 characters.")
+            if not re.search(r'[A-Z]', password):
+                raise ValidationError("Password must have at least one uppercase character.")
+            if not re.search(r'[a-z]', password):
+                raise ValidationError("Password must have at least one lowercase character.")
+            if not re.search(r'\W', password):
+                raise ValidationError("Password must have at least one special character.")
         return password
 
     def save(self, commit=True):

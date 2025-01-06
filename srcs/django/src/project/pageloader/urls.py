@@ -66,8 +66,7 @@ urlpatterns = [
     path('api/forbidden/', ForbiddenAPIView.as_view(), name='forbidden'),
     path('api/matchinfo/<int:game_id>/', StatsAPIView.as_view(), name='match_info'),
     path('api/tournamentinfo/<int:tournament_id>/', StatsAPIView.as_view(), name='tournament_info'),
-    # Altre configurazioni URL...
-    re_path(r'^.*$', index),  # Questo catturerà tutte le altre richieste
+    re_path(r'^.*$', index),
 ]
 
 

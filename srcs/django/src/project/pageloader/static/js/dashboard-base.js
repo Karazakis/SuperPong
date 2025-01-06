@@ -1,5 +1,5 @@
 document.getElementById('profile').addEventListener('click', function() {    
-    var userId = localStorage.getItem('userId'); // Assicurati che 'userId' sia la chiave corretta
+    var userId = localStorage.getItem('userId');
     if (userId) {
         loadPage("api/profile/" + userId + '/');
     } else {
@@ -10,8 +10,7 @@ document.getElementById('profile').addEventListener('click', function() {
 
 document.getElementById('settings').addEventListener('click', function() {
     loadPage("api/settings/");
-}
-);
+});
 
 document.getElementById('logout').addEventListener('click', function() {
     fetch("/api/logout/")
@@ -30,6 +29,7 @@ document.getElementById('logout').addEventListener('click', function() {
                 const container = document.getElementById('body');
                 const basescript = document.getElementById('dashboard-base');  
                 container.removeChild(basescript);
+				chatSocket.close();
                 loadPage("api/home/");
             }
         })
@@ -37,12 +37,9 @@ document.getElementById('logout').addEventListener('click', function() {
 }
 );
 
-//id = localStorage.getItem('userId');
-//url = `wss://${window.location.host}/wss/socket-server/?id=${id}`;
 var chatSocket;
 function initializeWebSocket() {
 	if (chatSocket) {
-        // Chiudi la connessione WebSocket esistente
         chatSocket.close();
     }
 	let id = localStorage.getItem('userId');
@@ -98,7 +95,9 @@ function initializeWebSocket() {
 	
 					if (!isBlocked) {
 						if (data.message.startsWith('@')) {
-							handlePrivateMessage(data, actualUser.username);
+							actualUser = await recoverUser(actualUserId)
+							console.log(actualUser.nickname)
+							handlePrivateMessage(data, actualUser.nickname, actualUser.username);
 						} else {
 							displayMessage(data, 'black');
 						}
@@ -113,7 +112,6 @@ function initializeWebSocket() {
 	    
 		    if (listElement) {
 			(async function() {
-			    //listElement.innerHTML = '';
 			    const itemList = data.list;
 			    const elementsToAdd = [];
 				const existingIds = new Set();
@@ -125,7 +123,6 @@ function initializeWebSocket() {
 			    for (const id of itemList) {
 					const itemElementId = listElementId.slice(0, -1) + '_' + id;
 			
-					// Controlla se l'elemento con l'ID specifico esiste già
 					if (!existingIds.has(itemElementId) && !document.getElementById(itemElementId)) {
 						let itemElement = document.createElement('li');
 						itemElement.id = itemElementId;
@@ -154,7 +151,6 @@ function initializeWebSocket() {
 			    }
 	    
 			    elementsToAdd.forEach(element => {
-					// Controlla se c'è già un figlio con lo stesso ID
 					if (!listElement.querySelector(`#${element.id}`)) {
 						listElement.appendChild(element);
 					} else {
@@ -164,16 +160,18 @@ function initializeWebSocket() {
 				
 			})();
 		    } else {
-			//console.error("L'elemento users non esiste");
+			console.error("L'elemento users non esiste");
 		    }
 		} else if (data.type === 'invite_game') {
 			handleGameInvite(data, accessToken, csrfToken);		    
 		} else if (data.type === 'friend_request') {
 			handleFriendRequest(data, accessToken, csrfToken);
 		} else if (data.type === 'accept') {
-			updateFriendshipStatus(data);
+			updateRequestStatus(data);
+		} else if (data.type === 'decline') {
+			updateRequestStatus(data);
 		} else if (data.type === 'remove') {
-			updateFriendshipStatus(data);
+			updateRequestStatus(data);
 		} else if (data.type === 'pending_request') {
 			if (data.request_type === 'game') {
 			    handleGameInvite(data);
@@ -188,7 +186,7 @@ function initializeWebSocket() {
 
 initializeWebSocket();
 
-function handleGameInvite(data, accessToken, csrfToken) {
+ async function handleGameInvite(data, accessToken, csrfToken) {
 
 	function joinGame(gameId) {
 		let accessToken = localStorage.getItem('accessToken');
@@ -210,19 +208,21 @@ function handleGameInvite(data, accessToken, csrfToken) {
 		})
 		.catch(error => console.error('Error joining game:', error));
 	}
-	
-    let invite = confirm(`${data.requesting_user} ti ha invitato a giocare`);
+
+    let actualRequestingUser = await recoverUser(data.requesting_user)
+    console.log(actualRequestingUser)    
+    let invite = window.confirm(`${actualRequestingUser.nickname} invited you to a game`);
     if (invite) {
 		let pathname = window.location.pathname;
-		if (pathname.includes('lobby') === true) {
+		if (pathname.includes('lobby') === true && pathname.includes('join') === false) {
 			alert("Sei già in una lobby");
 			return;
 		}
 		joinGame(data.target_lobby);
     } else {
 		chatSocket.send(JSON.stringify({
-			'type': 'remove',
-			'pending_request': 'remove',
+			'type': 'decline',
+			'pending_request': 'decline',
 			'target_user': data.requesting_user,
 			'requesting_user': data.target_user,
 			'lobby_id': data.target_lobby
@@ -231,7 +231,7 @@ function handleGameInvite(data, accessToken, csrfToken) {
 }
 
 
-function handleTournamentInvite(data, accessToken, csrfToken) {
+async function handleTournamentInvite(data, accessToken, csrfToken) {
 
 	function joinTournament(tournamentId) {
 		let accessToken = localStorage.getItem('accessToken');
@@ -254,7 +254,8 @@ function handleTournamentInvite(data, accessToken, csrfToken) {
 		.catch(error => console.error('Error joining tournament:', error));
 	}
 	
-    let invite = confirm(`${data.requesting_user} ti ha invitato ad un torneo`);
+    let actualRequestingUser = await recoverUser(data.requesting_user)        
+    let invite = window.confirm(`${actualRequestingUser.nickname} invited you to a tournament.`);
     if (invite) {
 		let pathname = window.location.pathname;
 		if (pathname.includes('lobby') === true) {
@@ -264,8 +265,8 @@ function handleTournamentInvite(data, accessToken, csrfToken) {
 		joinTournament(data.target_lobby);
     } else {
 		chatSocket.send(JSON.stringify({
-			'type': 'remove',
-			'pending_request': 'remove',
+			'type': 'decline',
+			'pending_request': 'decline',
 			'target_user': data.requesting_user,
 			'requesting_user': data.target_user,
 			'lobby_id': data.target_lobby
@@ -274,14 +275,15 @@ function handleTournamentInvite(data, accessToken, csrfToken) {
 }
 
 
-function updateGameInviteStatus(data) {
+async function updateGameInviteStatus(data) {
+    let actualTargetUser = await recoverUser(data.target_user)	
     let message;
     switch (data.type) {
         case 'accept':
-            message = `${data.target_user} ha accettato l'invito a giocare`;
+            message = `${actualTargetUser.nickname} ha accettato l'invito a giocare`;
             break;
         case 'decline':
-            message = `${data.target_user} ha rifiutato l'invito a giocare`;
+            message = `${actualTargetUser.nickname} ha rifiutato l'invito a giocare`;
             break;
         default:
             console.error('Unhandled game status update:', data.type);
@@ -290,13 +292,18 @@ function updateGameInviteStatus(data) {
     alert(message);
 }
 
-function handleFriendRequest(data, accessToken, csrfToken) {
-    let request = confirm(`${data.requesting_user} vuole aggiungerti come amico`);
+async function handleFriendRequest(data, accessToken, csrfToken) {
+    let actualRequestingUser = await recoverUser(data.requesting_user)
+	let user = await recoverUser(data.target_user)    
+    let request = window.confirm(`${actualRequestingUser.nickname} wants to add you as a friend`);
     if (request) {
         processFriendRequest('accept', data, accessToken, csrfToken);
 		updateFriendListFromServer();
     } else {
         processFriendRequest('decline', data, accessToken, csrfToken);
+		if (user.pending_requests !== undefined) {
+			UpdateRequestList(user);
+		}
     }
 }
 
@@ -308,6 +315,35 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
         request: action
     };
 	
+	async function checkTokenValidity() {
+	    try {
+		const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
+		    method: "GET"
+		});
+		const data = await response.json();
+    
+		if (data.message === 'Token valido') {
+		    // Token valido, procedi con la richiesta effettiva
+		    return;
+		} else if (data.message === 'Token non valido') {
+		    // Token non valido, prova a rinfrescare
+		    const newAccessToken = await refreshAccessToken();
+		    if (newAccessToken) {
+			accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+			localStorage.setItem("accessToken", newAccessToken);
+			// Richiesta effettiva con nuovo token
+		    } else {
+			loadPage("api/login/");
+		    }
+		} else {
+		    throw new Error('Network response was not ok');
+		}
+	    } catch (error) {
+		console.error('Errore durante la verifica del token:', error);
+	    }
+	}
+
+	await checkTokenValidity()
 	
 	try {
 	    const response = await fetch(`/api/request/friend/${data.requesting_user}/`, {
@@ -325,7 +361,6 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 			console.error('Errore durante l\'invio della risposta:', errorMessage);
 			alert(`Errore durante l'invio della risposta: ${errorMessage.error}`);
 	    } else {
-			alert('risposta inviata con successo');
 		
 			chatSocket.send(JSON.stringify({
 				'type': action,
@@ -371,18 +406,21 @@ async function processFriendRequest(action, data, accessToken, csrfToken) {
 	updateFriendListFromServer();
 }
 
-function updateFriendshipStatus(data) {
+async function updateRequestStatus(data) {
+    let actualRequestingUser = await recoverUser(data.requesting_user)
+    let actualTargetUser = await recoverUser(data.target_user)
     let message;
+    console.log(`${data.request_type}`)
     switch (data.type) {
         case 'accept':
-            message = `${data.target_user} ha accettato la tua richiesta`;
+            message = `${actualTargetUser.nickname} accepted your request`;
             break;
         case 'decline':
-            message = `${data.target_user} ha rifiutato la tua richiesta`;
+            message = `${actualTargetUser.nickname} declined your request`;
             break;
         case 'remove':
-            message = `${data.target_user} ha rimosso l'amicizia`;
-            break;
+		message = `${actualTargetUser.nickname} removed friendship`;
+		break;
         default:
             console.error('Unhandled status update:', data.type);
             return;
@@ -392,6 +430,31 @@ function updateFriendshipStatus(data) {
     // Aggiorna la lista degli amici dopo l'aggiornamento dello stato dell'amicizia
     updateFriendListFromServer();
 }
+
+
+async function updatePendingRequestsFromServer() {
+    const userId = localStorage.getItem('userId');
+    try {
+        const response = await fetch(`/api/pending-requests/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch pending requests');
+        const pendingRequests = await response.json();
+        const listElement = document.getElementById('pending-requests');
+        listElement.innerHTML = ''; // Clear existing list
+
+        pendingRequests.forEach(request => {
+            const item = document.createElement('li');
+            item.textContent = `Request from ${request.requesting_user.nickname}`;
+            listElement.appendChild(item);
+        });
+    } catch (error) {
+        console.error('Error updating pending requests:', error);
+    }
+}
+
 
 
 async function updateFriendListFromServer() {
@@ -433,26 +496,27 @@ async function updateFriendListFromServer() {
 
 
 
-function handlePrivateMessage(data, currentUsername) {
+function handlePrivateMessage(data, currentNickname, currenteUsername) {
     const endOfUsernameIndex = data.message.indexOf(' ');
-    const targetUsername = data.message.substring(1, endOfUsernameIndex);
+    const targetNickname = data.message.substring(1, endOfUsernameIndex);
     const messageContent = data.message.substring(endOfUsernameIndex + 1);
 
     // Se l'utente corrente è il destinatario, mostra il messaggio senza il nome del destinatario
-    if (currentUsername === targetUsername) {
-        displayMessage({ player: data.player, message: messageContent }, 'green');
+    if (currentNickname === targetNickname) {
+        displayMessage({ player: data.nickname, message: messageContent }, 'green');
     }
     // Se l'utente corrente è il mittente, mostra il messaggio con il nome del destinatario in parentesi
-    if (data.player === currentUsername) {
-        const formattedMessage = `(a ${targetUsername}) ${messageContent}`;
-        displayMessage({ player: data.player, message: formattedMessage }, 'green');
+    console.log(data.player)
+    if (data.player === currenteUsername) {
+        const formattedMessage = `(a ${targetNickname}) ${messageContent}`;
+        displayMessage({ player: currentNickname, message: formattedMessage }, 'green');
     }
 }
 
 function displayMessage(data, color) {
     let messages = document.getElementById('messages');
     if (messages) {
-        messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2vh;"><span style="color: ${color};"><strong>${data.player}:</strong> ${data.message}</span></div>`);
+        messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2vh;"><span style="color: ${color};"><strong>${data.nickname}:</strong> ${data.message}</span></div>`);
         messages.scrollTop = messages.scrollHeight;
     } else {
         console.error("L'elemento messages non esiste");
@@ -478,14 +542,17 @@ function UpdateFriendList(user) {
 	    }
 	}
 }
-    //asdasdasdasd
-function UpdateRequestList(user) {
+
+async function UpdateRequestList(user) {
 	let listElementId = 'pending-requests';
 	const listElement = document.getElementById(listElementId);
+	let reqUser;
 	for (let request of user.pending_requests) {
 		let itemElement = document.createElement('li');
 	    itemElement.id = listElementId.slice(0, -1) + '_' + request.id;
-	    itemElement.textContent = request.request_type + ' request from ' + request.requesting_user;
+		reqUser = await recoverUser(request.requesting_user_id);
+	    itemElement.textContent = request.request_type + ' request from ' + reqUser.nickname;
+		
 	    try {
 			itemElement.dataset.id = request.id;
 			itemElement.dataset.requesting_user = request.requesting_user_id;
@@ -523,6 +590,13 @@ function showContextMenu(event, id, isblocked = false) {
     const viewpfoilecontext = document.getElementById("viewprofilecontext");
     const blockusercontext = document.getElementById("blockusercontext");
     // Posiziona il menu contestuale in base alla posizione del clic
+    let pathname = window.location.pathname;
+    if (pathname.includes('lobby') === true) {
+	viewpfoilecontext.style.display = "none";
+    }
+    else {
+	viewpfoilecontext.style.display = "block";
+    }
 
     addfriendcontext.dataset.id = id;
     viewpfoilecontext.dataset.id = id;
@@ -687,11 +761,19 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 	const accessToken = localStorage.getItem("accessToken");
 	const id = e.target.dataset.id;
 	if (id === localStorage.getItem('userId')) {
-		alert('Non puoi aggiungere te stesso come amico');
+		alert('You cant add yourself as friend');
 		return;
 	}
 	const csrfToken = getCookie('csrftoken');
-	
+
+	const user = await recoverUser(localStorage.getItem('userId'));
+    const alreadyFriend = user.user_friend_list.some(friend => friend.id === id);
+
+    if (alreadyFriend) {
+        alert('Questo utente è già nella tua lista di amici');
+        return;
+    }
+
 	const requestData = {
 	    requesting_user: localStorage.getItem('username'),
 	    request: 'pending'
@@ -741,19 +823,25 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 	    });
 	
 	    if (!response.ok) {
-		const errorMessage = await response.json();
-		console.error('Errore durante l\'invio della richiesta:', errorMessage);
-		alert(`Errore durante l'invio della richiesta: ${errorMessage.error}`);
+			const errorMessage = await response.json();
+			console.error('Errore durante l\'invio della richiesta:', errorMessage);
+			alert(`Errore durante l'invio della richiesta: ${errorMessage.error}`);
 	    } else {
-		alert('Richiesta inviata con successo');
-	
-		chatSocket.send(JSON.stringify({
-		    'pending_request': 'send',
-		    'target_user': id,
-		    'requesting_user': localStorage.getItem('userId'),
-		    'type': 'friend'
-		}));
-	    }
+			const responseData = await response.json();
+			if (responseData.already_exists) { // Conflict, richiesta già presente
+				alert('La richiesta è in attesa di essere accettata o rifutata');
+			} else if (responseData.already_friend) {
+				alert('The user is already a friend.')
+			} else {
+				alert('Friend request sent');
+				chatSocket.send(JSON.stringify({
+					'pending_request': 'send',
+					'target_user': id,
+					'requesting_user': localStorage.getItem('userId'),
+					'type': 'friend'
+				}));
+			}	
+		}
 	} catch (error) {
 	    console.error('Errore durante la fetch:', error);
 	    alert('Errore durante la fetch: ' + error.message);
@@ -1057,6 +1145,7 @@ document.getElementById("acceptrequestcontext").addEventListener('click', async 
 	const csrfToken = getCookie('csrftoken');
 	const request_user = e.target.dataset.requesting_user;
 	const target_user = e.target.dataset.target_user;
+	let user_id = localStorage.getItem('userId')
 
 	const responseData = {
 		target_user: target_user,
@@ -1090,26 +1179,27 @@ document.getElementById("acceptrequestcontext").addEventListener('click', async 
 			'pending_request': 'accept'
 		}));
 		
-		let friendListElement = document.getElementById("dashboard-friendlist");
+		// let friendListElement = document.getElementById("dashboard-friendlist");
 
-		if (friendListElement) {
-			let itemElement = document.createElement('li');
-			itemElement.id = `friend_${e.target.dataset.requesting_user}`;
-			recoverUser(e.target.dataset.requesting_user).then(item => {
-				itemElement.textContent = item.username;
-				try {
-				itemElement.dataset.id = e.target.dataset.requesting_user;
-				itemElement.oncontextmenu = function(event) {
-					event.preventDefault();
-					showFriendContextMenu(event, e.target.dataset.requesting_user);
-				};
-				friendListElement.appendChild(itemElement);
-				} catch (error) {
-				console.error('Errore durante l\'impostazione dell\'ID:', error);
-				}
-			});
-		}
-		
+		// if (friendListElement) {
+		// 	let itemElement = document.createElement('li');
+		// 	itemElement.id = `friend_${e.target.dataset.requesting_user}`;
+		// 	recoverUser(e.target.dataset.requesting_user).then(item => {
+		// 		itemElement.textContent = item.username;
+		// 		try {
+		// 		itemElement.dataset.id = e.target.dataset.requesting_user;
+		// 		itemElement.oncontextmenu = function(event) {
+		// 			event.preventDefault();
+		// 			showFriendContextMenu(event, e.target.dataset.requesting_user);
+		// 		};
+		// 		friendListElement.appendChild(itemElement);
+		// 		} catch (error) {
+		// 		console.error('Errore durante l\'impostazione dell\'ID:', error);
+		// 		}
+		// 	});
+		// }
+		actual_user = await recoverUser(user_id)
+		UpdateFriendList(actual_user)
 	}
 
 });

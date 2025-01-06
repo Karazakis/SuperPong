@@ -58,11 +58,7 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	}
 
-	// MikkTSpace algorithm requires non-indexed input.
-
 	const _geometry = geometry.index ? geometry.toNonIndexed() : geometry;
-
-	// Compute vertex tangents.
 
 	const tangents = MikkTSpace.generateTangents(
 
@@ -71,9 +67,6 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 		getAttributeArray( _geometry.attributes.uv )
 
 	);
-
-	// Texture coordinate convention of glTF differs from the apparent
-	// default of the MikkTSpace library; .w component must be flipped.
 
 	if ( negateSign ) {
 
@@ -84,8 +77,6 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 		}
 
 	}
-
-	//
 
 	_geometry.setAttribute( 'tangent', new BufferAttribute( tangents, 4 ) );
 
@@ -125,16 +116,12 @@ function mergeGeometries( geometries, useGroups = false ) {
 		const geometry = geometries[ i ];
 		let attributesCount = 0;
 
-		// ensure that all geometries are indexed, or none
-
 		if ( isIndexed !== ( geometry.index !== null ) ) {
 
 			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. All geometries must have compatible attributes; make sure index attribute exists among all geometries, or in none of them.' );
 			return null;
 
 		}
-
-		// gather attributes, exit early if they're different
 
 		for ( const name in geometry.attributes ) {
 
@@ -153,16 +140,12 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 		}
 
-		// ensure geometries have the same number of attributes
-
 		if ( attributesCount !== attributesUsed.size ) {
 
 			console.error( 'THREE.BufferGeometryUtils: .mergeGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of attributes.' );
 			return null;
 
 		}
-
-		// gather morph attributes, exit early if they're different
 
 		if ( morphTargetsRelative !== geometry.morphTargetsRelative ) {
 
@@ -213,8 +196,6 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 	}
 
-	// merge indices
-
 	if ( isIndexed ) {
 
 		let indexOffset = 0;
@@ -238,8 +219,6 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 	}
 
-	// merge attributes
-
 	for ( const name in attributes ) {
 
 		const mergedAttribute = mergeAttributes( attributes[ name ] );
@@ -254,8 +233,6 @@ function mergeGeometries( geometries, useGroups = false ) {
 		mergedGeometry.setAttribute( name, mergedAttribute );
 
 	}
-
-	// merge morph attributes
 
 	for ( const name in morphAttributes ) {
 
@@ -416,13 +393,10 @@ export function deepCloneAttribute( attribute ) {
  */
 function interleaveAttributes( attributes ) {
 
-	// Interleaves the provided attributes into an InterleavedBuffer and returns
-	// a set of InterleavedBufferAttributes for each attribute
 	let TypedArray;
 	let arrayLength = 0;
 	let stride = 0;
 
-	// calculate the length and type of the interleavedBuffer
 	for ( let i = 0, l = attributes.length; i < l; ++ i ) {
 
 		const attribute = attributes[ i ];
@@ -440,7 +414,6 @@ function interleaveAttributes( attributes ) {
 
 	}
 
-	// Create the set of buffer attributes
 	const interleavedBuffer = new InterleavedBuffer( new TypedArray( arrayLength ), stride );
 	let offset = 0;
 	const res = [];
@@ -457,8 +430,6 @@ function interleaveAttributes( attributes ) {
 
 		offset += itemSize;
 
-		// Move the data for each attribute into the new interleavedBuffer
-		// at the appropriate offset
 		for ( let c = 0; c < count; c ++ ) {
 
 			for ( let k = 0; k < itemSize; k ++ ) {
@@ -475,7 +446,6 @@ function interleaveAttributes( attributes ) {
 
 }
 
-// returns a new, non-interleaved version of the provided attribute
 export function deinterleaveAttribute( attribute ) {
 
 	const cons = attribute.data.array.constructor;
@@ -523,7 +493,6 @@ export function deinterleaveAttribute( attribute ) {
 
 }
 
-// deinterleaves all attributes on the geometry
 export function deinterleaveGeometry( geometry ) {
 
 	const attributes = geometry.attributes;
@@ -572,9 +541,6 @@ export function deinterleaveGeometry( geometry ) {
  */
 function estimateBytesUsed( geometry ) {
 
-	// Return the estimated memory used by this geometry in bytes
-	// Calculate using itemSize, count, and BYTES_PER_ELEMENT to account
-	// for InterleavedBufferAttributes.
 	let mem = 0;
 	for ( const name in geometry.attributes ) {
 
@@ -598,17 +564,13 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	tolerance = Math.max( tolerance, Number.EPSILON );
 
-	// Generate an index buffer if the geometry doesn't have one, or optimize it
-	// if it's already available.
 	const hashToIndex = {};
 	const indices = geometry.getIndex();
 	const positions = geometry.getAttribute( 'position' );
 	const vertexCount = indices ? indices.count : positions.count;
 
-	// next value for triangle indices
 	let nextIndex = 0;
 
-	// attributes and new attribute arrays
 	const attributeNames = Object.keys( geometry.attributes );
 	const tmpAttributes = {};
 	const tmpMorphAttributes = {};
@@ -616,8 +578,6 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
 	const setters = [ 'setX', 'setY', 'setZ', 'setW' ];
 
-	// Initialize the arrays, allocating space conservatively. Extra
-	// space will be trimmed in the last step.
 	for ( let i = 0, l = attributeNames.length; i < l; i ++ ) {
 
 		const name = attributeNames[ i ];
@@ -644,7 +604,6 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	}
 
-	// convert the error tolerance to an amount of decimal places to truncate to
 	const halfTolerance = tolerance * 0.5;
 	const exponent = Math.log10( 1 / tolerance );
 	const hashMultiplier = Math.pow( 10, exponent );
@@ -653,7 +612,6 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 		const index = indices ? indices.getX( i ) : i;
 
-		// Generate a hash for the vertex attributes at the current index 'i'
 		let hash = '';
 		for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
 
@@ -663,22 +621,18 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 			for ( let k = 0; k < itemSize; k ++ ) {
 
-				// double tilde truncates the decimal value
 				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
 
 			}
 
 		}
 
-		// Add another reference to the vertex if it's already
-		// used by another index
 		if ( hash in hashToIndex ) {
 
 			newIndices.push( hashToIndex[ hash ] );
 
 		} else {
 
-			// copy data to the new index in the temporary attributes
 			for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
 
 				const name = attributeNames[ j ];
@@ -716,7 +670,6 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	}
 
-	// generate result BufferGeometry
 	const result = geometry.clone();
 	for ( const name in geometry.attributes ) {
 
@@ -744,8 +697,6 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 	}
 
-	// indices
-
 	result.setIndex( newIndices );
 
 	return result;
@@ -769,8 +720,6 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 	if ( drawMode === TriangleFanDrawMode || drawMode === TriangleStripDrawMode ) {
 
 		let index = geometry.getIndex();
-
-		// generate index if not present
 
 		if ( index === null ) {
 
@@ -805,8 +754,6 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 		if ( drawMode === TriangleFanDrawMode ) {
 
-			// gl.TRIANGLE_FAN
-
 			for ( let i = 1; i <= numberOfTriangles; i ++ ) {
 
 				newIndices.push( index.getX( 0 ) );
@@ -816,8 +763,6 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 			}
 
 		} else {
-
-			// gl.TRIANGLE_STRIP
 
 			for ( let i = 0; i < numberOfTriangles; i ++ ) {
 
@@ -844,8 +789,6 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 			console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
 
 		}
-
-		// build final geometry
 
 		const newGeometry = geometry.clone();
 		newGeometry.setIndex( newIndices );
@@ -980,8 +923,6 @@ function computeMorphedAttributes( object ) {
 
 	if ( index !== null ) {
 
-		// indexed buffer geometry
-
 		if ( Array.isArray( material ) ) {
 
 			for ( i = 0, il = groups.length; i < il; i ++ ) {
@@ -1053,8 +994,6 @@ function computeMorphedAttributes( object ) {
 		}
 
 	} else {
-
-		// non-indexed buffer geometry
 
 		if ( Array.isArray( material ) ) {
 
@@ -1153,8 +1092,6 @@ function mergeGroups( geometry ) {
 
 	let groups = geometry.groups;
 
-	// sort groups by material index
-
 	groups = groups.sort( ( a, b ) => {
 
 		if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
@@ -1162,8 +1099,6 @@ function mergeGroups( geometry ) {
 		return a.start - b.start;
 
 	} );
-
-	// create index for non-indexed geometries
 
 	if ( geometry.getIndex() === null ) {
 
@@ -1179,8 +1114,6 @@ function mergeGroups( geometry ) {
 		geometry.setIndex( indices );
 
 	}
-
-	// sort index
 
 	const index = geometry.getIndex();
 
@@ -1201,10 +1134,8 @@ function mergeGroups( geometry ) {
 
 	}
 
-	geometry.dispose(); // Required to force buffer recreation
+	geometry.dispose();
 	geometry.setIndex( newIndices );
-
-	// update groups indices
 
 	let start = 0;
 
@@ -1216,8 +1147,6 @@ function mergeGroups( geometry ) {
 		start += group.count;
 
 	}
-
-	// merge groups
 
 	let currentGroup = groups[ 0 ];
 
@@ -1259,14 +1188,12 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 	const creaseDot = Math.cos( creaseAngle );
 	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
 
-	// reusable vectors
 	const verts = [ new Vector3(), new Vector3(), new Vector3() ];
 	const tempVec1 = new Vector3();
 	const tempVec2 = new Vector3();
 	const tempNorm = new Vector3();
 	const tempNorm2 = new Vector3();
 
-	// hashes a vector
 	function hashVertex( v ) {
 
 		const x = ~ ~ ( v.x * hashMultiplier );
@@ -1276,13 +1203,10 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 	}
 
-	// BufferGeometry.toNonIndexed() warns if the geometry is non-indexed
-	// and returns the original geometry
 	const resultGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
 	const posAttr = resultGeometry.attributes.position;
 	const vertexMap = {};
 
-	// find all the normals shared by commonly located vertices
 	for ( let i = 0, l = posAttr.count / 3; i < l; i ++ ) {
 
 		const i3 = 3 * i;
@@ -1293,7 +1217,6 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 		tempVec1.subVectors( c, b );
 		tempVec2.subVectors( a, b );
 
-		// add the normal to the map for all vertices
 		const normal = new Vector3().crossVectors( tempVec1, tempVec2 ).normalize();
 		for ( let n = 0; n < 3; n ++ ) {
 
@@ -1311,13 +1234,10 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 	}
 
-	// average normals from all vertices that share a common location if they are within the
-	// provided crease threshold
 	const normalArray = new Float32Array( posAttr.count * 3 );
 	const normAttr = new BufferAttribute( normalArray, 3, false );
 	for ( let i = 0, l = posAttr.count / 3; i < l; i ++ ) {
 
-		// get the face normal for this vertex
 		const i3 = 3 * i;
 		const a = verts[ 0 ].fromBufferAttribute( posAttr, i3 + 0 );
 		const b = verts[ 1 ].fromBufferAttribute( posAttr, i3 + 1 );
@@ -1328,7 +1248,6 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 		tempNorm.crossVectors( tempVec1, tempVec2 ).normalize();
 
-		// average all normals that meet the threshold and set the normal value
 		for ( let n = 0; n < 3; n ++ ) {
 
 			const vert = verts[ n ];

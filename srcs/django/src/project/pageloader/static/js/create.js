@@ -43,6 +43,7 @@ document.getElementById('create').addEventListener('click', function(event) {
     } else if (actual_url.includes('single')) {
         Type = 'single-game';
     }
+    
     let limit;
     if (document.getElementById('rule').value === 'time') {
         limit = parseInt(document.getElementById('timelimit').value, 10);
@@ -60,14 +61,13 @@ document.getElementById('create').addEventListener('click', function(event) {
         boost: document.getElementById('boost').checked
     };
 
-    // Aggiungi il numero di giocatori solo se il campo esiste
     const nbPlayersElement = document.getElementById('nb_players');
     if (nbPlayersElement) {
         data.nb_players = parseInt(nbPlayersElement.value, 10) || 2;
     }
 
     const currentUrl = window.location.href;
-    const queryString = new URLSearchParams(data).toString(); // Crea la stringa di query
+    const queryString = new URLSearchParams(data).toString();
 
     let source = 'default';
     if (currentUrl.includes('create_remote')) {
@@ -84,7 +84,6 @@ document.getElementById('create').addEventListener('click', function(event) {
     if (source === 'remote' || source === 'tournament') {
         let accessToken = localStorage.getItem("accessToken");
     
-        // Funzione per verificare la validità del token e, se necessario, rinnovarlo
         const checkAndRefreshToken = async () => {
             try {
                 const response = await fetch(`/api/token/refresh/?token=${accessToken}`, {
@@ -94,10 +93,8 @@ document.getElementById('create').addEventListener('click', function(event) {
                 const data = await response.json();
     
                 if (data.message === 'Token valido') {
-                    // Il token è valido, procedi con la richiesta
                     return accessToken;
                 } else if (data.message === 'Token non valido') {
-                    // Il token non è valido, tentiamo di rinnovarlo
                     const newAccessToken = await refreshAccessToken();
                     if (newAccessToken) {
                         localStorage.setItem('accessToken', newAccessToken);
@@ -116,7 +113,6 @@ document.getElementById('create').addEventListener('click', function(event) {
             }
         };
     
-        // Funzione per il rinnovo del token
         async function refreshAccessToken() {
             const refreshToken = localStorage.getItem('refreshToken');
             if (!refreshToken) {
@@ -146,7 +142,6 @@ document.getElementById('create').addEventListener('click', function(event) {
             }
         }
     
-        // Funzione principale per eseguire la richiesta
         const executeRequest = async () => {
             accessToken = await checkAndRefreshToken();
             if (!accessToken) {
@@ -155,7 +150,6 @@ document.getElementById('create').addEventListener('click', function(event) {
                 return;
             }
     
-            // Effettua la richiesta POST
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -185,7 +179,6 @@ document.getElementById('create').addEventListener('click', function(event) {
             .catch(error => console.error('Errore durante la creazione:', error));
         };
     
-        // Esegui la richiesta con il controllo del token
         executeRequest();
     } else if (source === 'local' || source === 'single') {
 

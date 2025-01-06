@@ -1,122 +1,136 @@
-<div class="p-4" style="width: 70vh;">
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <h2>Lobby</h2>
-            <h1 id="game_name">{{ game.name }}</h1>
-        </div>
+<div class="container-fluid p-2" style="font-size: 0.85rem; width: 100%; max-width: 1000px; margin: 0 auto;">
+	<div class="row">
+	    <div class="col-md-12 text-center">
+		<h2 style="font-size: 1.3rem;">Lobby</h2>
+		<h1 id="game_name" style="font-size: 1.5rem;">{{ game.name }}</h1>
+	    </div>
+	    <h6 style="font-size: 0.9rem; margin-left: 20px;">Game Rules - 
+		<span id="info-icon" style="cursor: pointer; color: #007bff;" data-toggle="tooltip" 
+		    title="To start the game: Wait for a player to join the lobby or invite a friend from the online friends menu. The invited user must click the ready button to indicate they are ready to play. The game host must click start game to begin the countdown. Wait for the countdown, and you’ll enter the game!">
+		    Hold to info
+		</span>
+	    </h6>      
+	    <div id="chat_details" class="collapse">
+		<p>To start the game:</p>
+		<p>-Wait for a player to join the lobby or invite a friend from the online friends menu.</p>
+		<p>-The invited user must click the ready button to indicate they are ready to play.</p>
+		<p>-The game host must click start game to begin the countdown.</p>
+		<p>-Wait for the countdown, and you’ll enter the game!</p>
+	    </div>
+	</div>
+    
+	{% if game.mode == "1v1" %}
+	    <div class="row mt-3 text-center">
+		<div class="col-md-5">
+		    <h3 style="font-size: 1.1rem;">Player 1</h3>
+		    <span id="player1_label">Empty</span>
+		</div>
+		<div class="col-md-2 text-center">
+		    <h3 style="font-size: 1.2rem; color: #333; margin-bottom: 8px; margin-left: -15px;">Game Details</h3>
+		    <ul class="list-unstyled" style="padding-left: 0; list-style-type: none; font-size: 0.85rem;">
+			<li style="margin-bottom: 3px;">Mode: <span id="game_mode">{{ game.mode }}</span></li>
+			<li style="margin-bottom: 3px;">Rules: <span id="game_rules">{{ game.rules }}</span></li>
+			<li style="margin-bottom: 3px;">Time Limit: <span id="game_time_limit">{{ game.limit }}</span></li>
+			<li style="margin-bottom: 3px;">Balls: <span id="game_balls">{{ game.balls }}</span></li>
+			<li style="margin-bottom: 3px;">Boost: <span id="game_boost">{{ game.boost }}</span></li>
+		    </ul>
+		</div>
+		<div class="col-md-5">
+		    <h3 style="font-size: 1.1rem;">Player 2</h3>
+		    <span id="player2_label">Empty</span>
+		</div>
+	    </div>
+	{% elif game.mode == "2v2" %}
+	    <div class="row mt-3 lobby-team-box">
+		<div class="col-md-5 lobby-team-box-col text-center">
+		    <h3 style="font-size: 1.1rem;">Team 1</h3>
+		    <ul class="list-unstyled" style="font-size: 0.85rem;">
+			<li>Player 1: <span id="t1p1_lobby_label">Empty</span></li>
+			<li>Player 2: <span id="t1p2_lobby_label">Empty</span></li>
+		    </ul>
+		    <button class="btn btn-primary lobby-join-team" id="t1_button" data-team="team1">Join Team</button>
+		</div>
+		<div class="col-md-2 text-center">
+		    <h3 style="font-size: 1.2rem; color: #333; margin-bottom: 8px;">Game Details</h3>
+		    <ul class="list-unstyled" style="padding-left: 0; list-style-type: none; font-size: 0.85rem;">
+			<li style="margin-bottom: 3px;">Mode: <span id="game_mode">{{ game.mode }}</span></li>
+			<li style="margin-bottom: 3px;">Rules: <span id="game_rules">{{ game.rules }}</span></li>
+			<li style="margin-bottom: 3px;">Time Limit: <span id="game_time_limit">{{ game.limit }}</span></li>
+			<li style="margin-bottom: 3px;">Balls: <span id="game_balls">{{ game.balls }}</span></li>
+			<li style="margin-bottom: 3px;">Boost: <span id="game_boost">{{ game.boost }}</span></li>
+		    </ul>
+		</div>
+		<div class="col-md-5 lobby-team-box-col text-center">
+		    <h3 style="font-size: 1.1rem;">Team 2</h3>
+		    <ul class="list-unstyled" style="font-size: 0.85rem;">
+			<li>Player 1: <span id="t2p1_lobby_label">Empty</span></li>
+			<li>Player 2: <span id="t2p2_lobby_label">Empty</span></li>
+		    </ul>
+		    <button class="btn btn-primary lobby-join-team" id="t2_button" data-team="team2">Join Team</button>
+		</div>
+	    </div>
+	{% elif game.mode == "4dm" %}
+	    <div class="row mt-3 lobby-team-box text-center">
+		<div class="col-md-2">
+		    <h3 style="font-size: 1.1rem;">Player 1</h3>
+		    <span id="player1_label">Empty</span>
+		</div>
+		<div class="col-md-2">
+		    <h3 style="font-size: 1.1rem;">Player 2</h3>
+		    <span id="player2_label">Empty</span>
+		</div>
+		<div class="col-md-4 text-center">
+		    <h3 style="font-size: 1.1rem;">Game Details</h3>
+		    <ul class="list-unstyled" style="font-size: 0.85rem;">
+			<li>Mode: <span id="game_mode">{{ game.mode }}</span></li>
+			<li>Rules: <span id="game_rules">{{ game.rules }}</span></li>
+			<li>Time Limit: <span id="game_time_limit">{{ game.limit }}</span></li>
+			<li>Balls: <span id="game_balls">{{ game.balls }}</span></li>
+			<li>Boost: <span id="game_boost">{{ game.boost }}</span></li>
+		    </ul>
+		</div>
+		<div class="col-md-2">
+		    <h3 style="font-size: 1.1rem;">Player 3</h3>
+		    <span id="player3_label">Empty</span>
+		</div>
+		<div class="col-md-2">
+		    <h3 style="font-size: 1.1rem;">Player 4</h3>
+		    <span id="player4_label">Empty</span>
+		</div>
+	    </div>
+	{% endif %}
+	
+	<div class="row mt-3">
+	    <div class="col-md-8 text-center">
+		<h3 style="font-size: 1.1rem;">Chat</h3>
+		<div id="lobby_messages" class="chat-log overflow-auto" style="height: 130px; border: 1px solid #ccc; padding: 8px;"></div>
+		<form id="lobby_form" class="mt-2">
+		    <input type="text" name="message" class="form-control" placeholder="Type a message..." style="font-size: 0.85rem;"/>
+		</form>
+	    </div>
+	    <div class="col-md-4 text-center">
+		<h3 style="font-size: 1.1rem;">Users in Lobby</h3>
+		<ul id="users_in_lobby" class="list-unstyled" style="font-size: 0.85rem;">
+		    <li id="user1_lobby" data-status="{{ game.player1_status }}" style="color: rgb(66, 66, 161);">Empty</li>
+		    <li id="user2_lobby" data-status="{{ game.player2_status }}">Empty</li>
+		    {% if game.mode != "1v1" %}
+			<li id="user3_lobby" data-status="{{ game.player3_status }}">Empty</li>
+			<li id="user4_lobby" data-status="{{ game.player4_status }}">Empty</li>
+		    {% endif %}
+		</ul>
+	    </div>
+	</div>
+	
+	<div class="row mt-3">
+	    <div class="col-md-12 text-center">
+		{% if user.username == game.player1.username %}
+		    <button id="start" class="btn btn-success lobby-start" disabled="true">Start Game</button>
+		    <button id="delete" class="btn btn-danger lobby-delete">Delete Lobby</button>
+		{% else %}
+		    <button id="ready" class="btn btn-success lobby-ready">Ready</button>
+		    <button id="leave" class="btn btn-danger lobby-leave">Leave Game</button>
+		{% endif %}
+	    </div>
+	</div>
     </div>
-
-    {% if game.mode == "1v1" %}
-        <div class="row mt-4 text-center">
-            <div class="col-md-5">
-                <h3>Player 1</h3>
-                <span id="player1_label">Empty</span>
-            </div>
-            <div class="col-md-2 text-center">
-                <h3>Game Details</h3>
-                <ul class="list-unstyled">
-                    <li>Mode: <span id="game_mode">{{ game.mode }}</span></li>
-                    <li>Rules: <span id="game_rules">{{ game.rules }}</span></li>
-                    <li>Time Limit: <span id="game_time_limit">{{ game.limit }}</span></li>
-                    <li>Balls: <span id="game_balls">{{ game.balls }}</span></li>
-                    <li>Boost: <span id="game_boost">{{ game.boost }}</span></li>
-                </ul>
-            </div>
-            <div class="col-md-5">
-                <h3>Player 2</h3>
-                <span id="player2_label">Empty</span>
-            </div>
-        </div>
-    {% elif game.mode == "2v2" %}
-        <div class="row mt-4 lobby-team-box">
-            <div class="col-md-5 lobby-team-box-col text-center">
-                <h3>Team 1</h3>
-                <ul class="list-unstyled">
-                    <li>Player 1: <span id="t1p1_lobby_label">Empty</span></li>
-                    <li>Player 2: <span id="t1p2_lobby_label">Empty</span></li>
-                </ul>
-                <button class="btn btn-primary lobby-join-team" id="t1_button" data-team="team1">Join Team</button>
-            </div>
-            <div class="col-md-2 text-center">
-                <h3>Game Details</h3>
-                <ul class="list-unstyled">
-                    <li>Mode: <span id="game_mode">{{ game.mode }}</span></li>
-                    <li>Rules: <span id="game_rules">{{ game.rules }}</span></li>
-                    <li>Time Limit: <span id="game_time_limit">{{ game.limit }}</span></li>
-                    <li>Balls: <span id="game_balls">{{ game.balls }}</span></li>
-                    <li>Boost: <span id="game_boost">{{ game.boost }}</span></li>
-                </ul>
-            </div>
-            <div class="col-md-5 lobby-team-box-col text-center">
-                <h3>Team 2</h3>
-                <ul class="list-unstyled">
-                    <li>Player 1: <span id="t2p1_lobby_label">Empty</span></li>
-                    <li>Player 2: <span id="t2p2_lobby_label">Empty</span></li>
-                </ul>
-                <button class="btn btn-primary lobby-join-team" id="t2_button" data-team="team2">Join Team</button>
-            </div>
-        </div>
-    {% elif game.mode == "4dm" %}
-        <div class="row mt-4 lobby-team-box text-center">
-            <div class="col-md-2">
-                <h3>Player 1</h3>
-                <span id="player1_label">Empty</span>
-            </div>
-            <div class="col-md-2">
-                <h3>Player 2</h3>
-                <span id="player2_label">Empty</span>
-            </div>
-            <div class="col-md-4 text-center">
-                <h3>Game Details</h3>
-                <ul class="list-unstyled">
-                    <li>Mode: <span id="game_mode">{{ game.mode }}</span></li>
-                    <li>Rules: <span id="game_rules">{{ game.rules }}</span></li>
-                    <li>Time Limit: <span id="game_time_limit">{{ game.limit }}</span></li>
-                    <li>Balls: <span id="game_balls">{{ game.balls }}</span></li>
-                    <li>Boost: <span id="game_boost">{{ game.boost }}</span></li>
-                </ul>
-            </div>
-            <div class="col-md-2">
-                <h3>Player 3</h3>
-                <span id="player3_label">Empty</span>
-            </div>
-            <div class="col-md-2">
-                <h3>Player 4</h3>
-                <span id="player4_label">Empty</span>
-            </div>
-        </div>
-    {% endif %}
-
-    <div class="row mt-4">
-        <div class="col-md-8 text-center">
-            <h3>Chat</h3>
-            <div id="lobby_messages" class="chat-log overflow-auto" style="height: 150px; border: 1px solid #ccc; padding: 10px;"></div>
-            <form id="lobby_form" class="mt-2">
-                <input type="text" name="message" class="form-control" placeholder="Type a message..."/>
-            </form>
-        </div>
-        <div class="col-md-4 text-center">
-            <h3>Users in Lobby</h3>
-            <ul id="users_in_lobby" class="list-unstyled">
-                <li id="user1_lobby" data-status="{{ game.player1_status }}" style="color: rgb(66, 66, 161);">Empty</li>
-                <li id="user2_lobby" data-status="{{ game.player2_status }}">Empty</li>
-                {% if game.mode != "1v1" %}
-                    <li id="user3_lobby" data-status="{{ game.player3_status }}">Empty</li>
-                    <li id="user4_lobby" data-status="{{ game.player4_status }}">Empty</li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-md-12 text-center">
-            {% if user.username == game.player1.username %}
-                <button id="start" class="btn btn-success lobby-start" disabled="true">Start Game</button>
-                <button id="delete" class="btn btn-danger lobby-delete">Delete Lobby</button>
-            {% else %}
-                <button id="ready" class="btn btn-success lobby-ready">Ready</button>
-                <button id="leave" class="btn btn-danger lobby-leave">Leave Game</button>
-            {% endif %}
-        </div>
-    </div>
-</div>
+    

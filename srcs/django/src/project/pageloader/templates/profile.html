@@ -1,26 +1,23 @@
 <div class="row justify-content-center">
-    <!-- Profile Information and Friends Section -->
     <div class="col-md-3">
         
         <div class="card border rounded shadow my-3" style="min-width: 20vh !important;">
             <div class="card-body text-center">
                 <h2 class="card-title">Profile<br> Information</h2>
-                <!-- User Image -->
                 <div class="text-center mb-3">
                     <img src="/static/media/{{ userprofile.img_profile }}" class="rounded-circle profile-img" style="width: 150px; height: 150px;" alt="User Image">
                 </div>
-                <!-- User Nickname and Last Online -->
                 <h3 class="card-title text-nowrap">{{ userprofile.nickname }}</h3>
             </div>
         </div>
-        <div class="card border rounded shadow my-3" style="min-width: 20vh !important;">
+        <div class="card border rounded shadow my-3" style="min-width: 20vh !important; overflow-y: scroll; height: 20vh; ">
             <div class="card-body">
                 <h4 class="card-title text-center">Friends</h4>
                 <ul class="list-group list-group-flush">
                     {% if friends %}
                         {% for friend in friends %}
-                            <li class="list-group-item friend-item" data-id="{{ friend.user.id }}">
-                                {{ friend.nickname }}
+                            <li class="list-group-item" >
+                                <a class="friend-item" data-id="{{ friend.user.id }}">{{ friend.nickname }}</a>
                             </li>
                         {% endfor %}
                     {% else %}
@@ -31,7 +28,6 @@
         </div>
     </div>
 
-    <!-- User Stats Section -->
     <div class="col-md-8">
         <div class="card border rounded shadow my-3 ">
             <div class="card-body" style="max-height: 8vh;">
@@ -39,11 +35,9 @@
             </div>
             <div class="card-footer">
                 <div class="row">
-                    <!-- Chart Column -->
                     <div class="col-md-8">
                         <canvas id="user-stats-chart"></canvas>
                     </div>
-                    <!-- Stats List Column -->
                     <div class="col-md-4 d-flex flex-column justify-content-center ">
                         <ul class="list-group" id="stat-values">
                             <li class="list-group-item d-flex justify-content-between">
@@ -53,7 +47,7 @@
                                 <span>Reactivity</span><span id="reactivity">{{ relative_game_statistics.reactivity|floatformat:2 }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span>Patience</span><span id="patience">{{ relative_game_statistics.patience |floatformat:2}}</span>
+                                <span>Patience</span><span id="patience">{{ relative_game_statistics.patience|default:"2.50"  |floatformat:2}}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Madness</span><span id="madness">{{ relative_game_statistics.madness|floatformat:2 }}</span>
@@ -69,9 +63,7 @@
     </div>
 </div>
 
-<!-- Game History and Tournament History Section -->
 <div class="row justify-content-center">
-    <!-- Game History Section -->
     <div class="col-md-5">
         <div class="card border rounded shadow my-3">
             <div class="card-body" style="max-height: 30vh; overflow: scroll;">
@@ -122,23 +114,27 @@
                                         {% if game.player1 == game.player2 %}
                                             {% if game.rules == 'time' %}
                                                 {% if game.player1_score < game.player2_score %}
-                                                    <span class="text-danger">{{ game.winner.nickname }}</span>
+                                                    <span class="text-success">{{ game.winner.nickname }}</span>
                                                 {% elif game.player1_score > game.player2_score %}
                                                     <span class="text-danger">Local Player 2</span>
                                                 {% else %}
-                                                    <span class="text-success">Draw</span>
+                                                    <span>Draw</span>
                                                 {% endif %}
                                             {% else %}
                                                 {% if game.player1_score > game.player2_score %}
                                                     <span class="text-success">{{ game.player1 }}</span>
                                                 {% elif game.player1_score < game.player2_score %}
-                                                    <span class="text-success">Local Player 2</span>
+                                                    <span class="text-danger">Local Player 2</span>
                                                 {% else %}
-                                                    <span class="text-danger">Draw</span>
+                                                    <span">Draw</span>
                                                 {% endif %}
                                             {% endif %}
                                         {% else %}
-                                            {{ game.winner }}
+											{% if game.winner == userprofile.nickname %}
+												<span class="text-success">{{ game.winner }}</span>
+											{% else %}
+												<span class="text-danger">{{ game.winner }}</span>
+											{% endif %}
                                         {% endif %}
                                     </td>                                    
                                 </tr>
@@ -154,7 +150,6 @@
         </div>
     </div>
 
-    <!-- Tournament History Section -->
     <div class="col-md-6">
         <div class="card border rounded shadow my-3">
             <div class="card-body" style="max-height: 30vh; min-height: 30vh; overflow: scroll;">
@@ -167,14 +162,6 @@
                     <div class="col-3">
                         <strong>Losses</strong>
                         <p id="tournament-losses">{{ tournament_losses }}</p>
-                    </div>
-                    <div class="col-3">
-                        <strong>Draws</strong>
-                        <p id="tournament-draws">{{ tournament_draws }}</p>
-                    </div>
-                    <div class="col-3">
-                        <strong>Abandons</strong>
-                        <p id="tournament-abandons">{{ tournament_abandons }}</p>
                     </div>
                 </div>
                 <table class="table table-striped mt-3" id="tournament-history-table">
@@ -198,7 +185,18 @@
                                             {% endif %}
                                         </td>
                                         <td>{{ tournament.status }}</td>
-                                        <td>{{ tournament.winner|default:"No winner yet" }}</td>
+                                        <td>
+											{% if tournament.winner %}
+												{% if tournament.winner == userprofile.nickname %}
+													<span class="text-success">{{ tournament.winner }}</span>
+												{% else %}
+													<span class="text-danger">{{ tournament.winner }}</span>
+												{% endif %}
+											{% else %}
+												<span>No winner yet</span>
+											{% endif %}
+										</td>
+										
                                     </tr>
                                 {% endfor %}
                             {% else %}
@@ -215,7 +213,6 @@
     </div>
 </div>
 
-<!-- Go back button -->
 <div class="row justify-content-center my-3">
     <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
 </div>

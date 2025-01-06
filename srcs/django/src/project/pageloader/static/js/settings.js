@@ -1,10 +1,7 @@
 document.querySelectorAll('.key-capture').forEach(function(input) {
     input.addEventListener('keydown', function(event) {
-        event.preventDefault(); // Previene l'azione di default dei tasti speciali
-        
-        // Imposta il valore dell'input con il nome del tasto premuto
+        event.preventDefault();
         this.value = event.code;
-        // Usa event.key o event.code a seconda delle tue necessità
     });
 });
 
@@ -60,9 +57,8 @@ document.getElementById('game-settings-btn').addEventListener('click', function(
 });
 
 document.getElementById('profile-settings-btn').addEventListener('click', function(event) {
-    event.preventDefault(); // Previene il comportamento di submit predefinito del form
+    event.preventDefault();
 
-    // Pulire i messaggi di errore precedenti
     clearErrors();
 
     const username = document.getElementById('username').value;
@@ -71,24 +67,33 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     const nickname = document.getElementById('nickname').value;
 
     let hasError = false;
+    const usernameError = validateUsername(username);
+    const nicknameError = validateNickname(nickname);
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
 
-    if (!validateUsername(username)) {
-        displayError('username-error', "Il nome utente deve essere lungo almeno 3 caratteri.");
+    if (usernameError) {
+        displayError('username-error', usernameError);
         hasError = true;
     }
 
-    if (!validateEmail(email)) {
-        displayError('email-error', "Inserisci un indirizzo email valido.");
+    if (nicknameError) {
+        displayError('nickname-error', nicknameError);
         hasError = true;
     }
 
-    if (password && !validatePassword(password)) {
-        displayError('password-error', "La password deve avere almeno 8 caratteri, con almeno una lettera maiuscola, una lettera minuscola e un carattere speciale.");
+    if (emailError) {
+        displayError('email-error', emailError);
+        hasError = true;
+    }
+    
+    if (password && passwordError) {
+        displayError('password-error', passwordError);
         hasError = true;
     }
 
     if (hasError) {
-        return; // Esci dalla funzione se ci sono errori
+        return;
     }
 
     const formData = new FormData();
@@ -101,26 +106,23 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     if (imgProfileInput.files.length > 0) {
         const imgProfile = imgProfileInput.files[0];
 
-        // Controllo del tipo di file
         const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!allowedTypes.includes(imgProfile.type)) {
-            displayError('img-profile-error', "Il file deve essere un'immagine (JPEG, PNG, GIF).");
+            displayError('img-profile-error', "File must be one of these formats (JPEG, PNG, GIF).");
             hasError = true;
         }
 
-        // Controllo della dimensione in byte
         const maxImageSize = 2 * 1024 * 1024; // 2 MB
         if (imgProfile.size > maxImageSize) {
-            displayError('img-profile-error', `L'immagine non può superare i 2 MB. Dimensione attuale: ${(imgProfile.size / 1024 / 1024).toFixed(2)} MB`);
+            displayError('img-profile-error', `Image cannot be more than 2 MB. Actual dimension: ${(imgProfile.size / 1024 / 1024).toFixed(2)} MB`);
             hasError = true;
         }
 
-        // Controllo asincrono della dimensione in pixel
         if (!hasError) {
             formData.append('img_profile', imgProfile);
             }
     } else {
-        // tutto ok con l immagine
+        
     }
 
     formData.append('password', password);
@@ -149,18 +151,69 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
 
 function validateUsername(username) {
     username = username.replace(/[<>]/g, '');
-    return username.length >= 3;
+
+    if (/\s/.test(username)) {
+        return "Username cannot contain spaces.";
+    }
+    if (username.length < 3) {
+        return "Username must be at least 3 characters long.";
+    }
+    if (username.length > 20) {
+        return "Username cannot be over 20 characters long.";
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        return "Username can contain only letters, numbers and underscore.";
+    }
+    return "";
 }
+
+function validateNickname(nickname) {
+    nickname = nickname.replace(/[<>]/g, '');
+
+    if (/\s/.test(nickname)) {
+        return "Nickname cannot contain spaces.";
+    }
+    if (nickname.length < 3) {
+        return "Nickname must be at least 3 characters long.";
+    }
+    if (nickname.length > 20) {
+        return "Nickname cannot be over 20 characters long.";
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(nickname)) {
+        return "Nickname can contain only letters, numbers and underscore.";
+    }
+    return "";
+}
+
 
 function validateEmail(email) {
     email = email.replace(/[<>]/g, '');
-    const emailPattern = /^[a-zA-Z0-9._%+]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,}$/;
-    return email.match(emailPattern);
+
+    if (email.length > 40) {
+        return "Email address cannot be over 40 characters long.";
+    }
+    if (!/^(?!.*\.\.)[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        return "Insert a valid email address.";
+    }
+    return "";
 }
 
+
+
 function validatePassword(password) {
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
-    return password.match(passwordPattern);
+    if (password.length < 8) {
+        return "Password must have at least 8 characters.";
+    }
+    if (!/[A-Z]/.test(password)) {
+        return "Password must have at least one lowercase character.";
+    }
+    if (!/[a-z]/.test(password)) {
+        return "Password must have at least one uppercase character.";
+    }
+    if (!/\W/.test(password)) {
+        return "Password must have at least one special character.";
+    }
+    return "";
 }
 
 function displayError(elementId, message) {
@@ -184,7 +237,6 @@ function handleServerErrors(errors) {
     if (errors.password) {
         displayError('password-error', errors.password);
     }
-    // Aggiungi altri controlli degli errori come necessario
 }
 
 
@@ -194,11 +246,9 @@ async function updateUserProfile() {
     let accessToken = localStorage.getItem('accessToken');
 
     if (!userId || !accessToken) {
-        console.error('ID utente o token di accesso mancante');
         return;
     }
 
-    // Funzione per verificare la validità del token e, se necessario, rinnovarlo
     const checkAndRefreshToken = async () => {
         try {
             const response = await fetch(`/api/token/refresh/?token=${accessToken}`, {
@@ -208,36 +258,28 @@ async function updateUserProfile() {
             const data = await response.json();
 
             if (data.message === 'Token valido') {
-                // Il token è valido, procedi con la richiesta
                 return accessToken;
             } else if (data.message === 'Token non valido') {
-                // Il token non è valido, tentiamo di rinnovarlo
                 const newAccessToken = await refreshAccessToken();
                 if (newAccessToken) {
                     localStorage.setItem('accessToken', newAccessToken);
                     return newAccessToken;
                 } else {
-                    console.error('Impossibile rinnovare il token');
                     return null;
                 }
             } else {
-                console.error('Errore durante il controllo del token:', data.error);
                 return null;
             }
         } catch (error) {
-            console.error('Errore durante la verifica o il rinnovo del token:', error);
             return null;
         }
     };
 
-    // Verifica la validità del token e procedi con la richiesta se tutto è in ordine
     accessToken = await checkAndRefreshToken();
     if (!accessToken) {
-        // Se non è possibile ottenere un token valido, esci
         return;
     }
 
-    // Effettua la richiesta per aggiornare il profilo utente
     try {
         const response = await fetch(`/api/userinfo/${userId}/`, {
             method: 'GET',
@@ -247,7 +289,6 @@ async function updateUserProfile() {
         });
 
         if (!response.ok) {
-            console.error('Errore durante il recupero dei dati dell\'utente');
             return;
         }
 
@@ -260,16 +301,13 @@ async function updateUserProfile() {
             nicknameElement.innerHTML = `<h4>${user.nickname}</h4>`;
             profilePictureElement.src = "/static/" + user.img_profile;
         } else {
-            console.error('Elementi HTML non trovati');
         }
 
     } catch (error) {
 		recoverUser(id);
-        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
     }
 }
 
-// Funzione per il rinnovo del token
 async function refreshAccessToken() {
     const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) {
@@ -290,11 +328,9 @@ async function refreshAccessToken() {
             const data = await response.json();
             return data.access;
         } else {
-            console.error('Errore durante il rinnovo del token di accesso');
             return null;
         }
     } catch (error) {
-        console.error('Errore durante il rinnovo del token di accesso:', error);
         return null;
     }
 }

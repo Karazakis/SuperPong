@@ -34,8 +34,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['51.75.18.18']
 
 
-# Application definition
-
 INSTALLED_APPS = [
     'channels',
     'rest_framework',
@@ -88,9 +86,6 @@ CHANNEL_LAYERS = {
     }
 }
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -106,6 +101,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',  # Solo JSON
+    ],
 }
 
 SIMPLE_JWT = {
@@ -114,8 +112,6 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -132,8 +128,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -145,32 +139,24 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR / 'pageloader', 'static'),  # Aggiungi il percorso alla cartella static qui
+    os.path.join(BASE_DIR / 'pageloader', 'static'),
 ]
 
 MEDIA_URL = '/media/'
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'pageloader/static/media')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SESSION_COOKIE_AGE = 3600  # 1 ora, ad esempio
+SESSION_COOKIE_AGE = 3600
 
-# Utilizza X-Forwarded-Proto per riconoscere richieste sicure
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Imposta il reindirizzamento HTTP a HTTPS
 SECURE_SSL_REDIRECT = True
 
-# Cookie settings per sicurezza
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
@@ -192,9 +178,9 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'WARNING',  # Modifica il livello a 'WARNING'
+            'level': 'WARNING',
             'class': 'logging.StreamHandler',
-            'filters': ['ignore_static'],  # Applica il filtro personalizzato
+            'filters': ['ignore_static'],
         },
     },
     'loggers': {

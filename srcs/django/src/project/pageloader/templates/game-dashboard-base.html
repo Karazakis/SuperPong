@@ -2,7 +2,7 @@
 <div id="wait-modal" class="modal" style="display: none;">
     <div class="modal-content">
         <h2>Waiting for other players...</h2>
-        <p>countdown: <span id="countdown-conn">60</span></p>
+        <p>if nobody reconnects you will win in: <span id="countdown-conn">60</span></p>
     </div>
 </div>
 <div id="gameover-modal" class="modal" style="display: none;">
@@ -10,7 +10,6 @@
         <h2 id="modal-title"></h2>
         <p id="modal-message"></p>
         
-        <!-- Dettagli del Match -->
         <div id="match-details" style="display: none;">
             <h4>Match Details</h4>
             <p>Game: <strong id="detail-game-name"></strong></p>
@@ -23,7 +22,6 @@
             <p>Boost: <strong id="detail-game-boost"></strong></p>
         </div>
 
-        <!-- Punteggi finali -->
         <div id="final-scores" style="display: none;">
             <h4>Final Scores</h4>
             <ul id="score-list"></ul>
@@ -42,7 +40,12 @@
         <div id="game-timer" data-timer="{{game_info.time}}">
             <span id="countdown"></span>
         </div>
-        <h6>Players score:</h6>
+        <h6>Players score:
+		<span id="info-icon" style="cursor: pointer; color: #007bff;" data-toggle="tooltip" 
+				  title="The player that take the least amount of goals wins. -Time type games: ends when the timer goes to zero, the player with less points wins. -Score type games: ends when a player take the setted amount of goals, the player that reach zero loses.">
+				game rules
+			</span>
+	</h6>
         <div class="row justify-content-center">
                 {% if game_info.mode == '2v2' %}
                     <div class="col-4 text-center">

@@ -29,11 +29,11 @@ services:
     networks:
       - srcs_mynetwork
     environment:
-      DB_NAME: mydatabase
-      DB_USER: myuser
-      DB_PASSWORD: mypassword
-      DB_HOST: postgres
-      DB_PORT: 5432
+      DB_NAME: ${DJANGO_DB_NAME}
+      DB_USER: ${DJANGO_DB_USER}
+      DB_PASSWORD: ${DJANGO_DB_PASSWORD}
+      DB_HOST: ${DJANGO_DB_HOST}
+      DB_PORT: ${DJANGO_DB_PORT}
     depends_on:
       - postgres
     restart: always
@@ -42,9 +42,9 @@ services:
     image: postgres:13
     container_name: postgres_db
     environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5789:5789"
     volumes:

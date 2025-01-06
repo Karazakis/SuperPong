@@ -142,7 +142,7 @@ function getPlayerControl(key)
 const GEOMETRY = new THREE.SphereGeometry(3, 5, 20, 20);
 GEOMETRY.rotateZ(Math.PI / 2);
 
-const MATERIAL = new THREE.MeshNormalMaterial({transparent: true, opacity: 0.0}); // , transparent: true, opacity: 0.3});
+const MATERIAL = new THREE.MeshNormalMaterial({transparent: true, opacity: 0.0});
 const TURBO_MATERIAL = new THREE.MeshBasicMaterial({ color: 0x00ff0000, transparent: true, opacity: 0.3 });
 
 export class Pad { 
@@ -243,9 +243,6 @@ export class Pad {
 
             for (let j = 0; j < this.mesh.attachedBalls.length; j++) {
                 if (this.mesh.attachedBalls[j] != null) {
-                    // const originalVelocity = this.mesh.attachedBalls[j].mesh.velocity.clone();
-                    // const reducedVelocity = originalVelocity.multiplyScalar(0.5); // Riduce la velocità del 50%
-                    //this.mesh.attachedBalls[j].mesh.velocity.copy(reducedVelocity);
                     if (this.mesh.hasBall[0]) {
                         this.mesh.attachedBalls[j].mesh.velocity.set(-25, 15, 0);
                     } else if (this.mesh.hasBall[1]) {
@@ -258,14 +255,14 @@ export class Pad {
                     this.mesh.attachedBalls[j] = null;
                 }
             }
-            clearTimeout(this.releaseTimeout); // Cancella il timer
+            clearTimeout(this.releaseTimeout);
             this.releaseTimeout = null;
             this.mesh.previousMState = false;
         };
     
         for (let i = 0; i < balls.length; i++) {
             if (this.collision(balls[i], this)) {
-                if (keyboardState[this.mesh.shoot]) { // Il tasto 'm' è premuto
+                if (keyboardState[this.mesh.shoot]) {
                     if (!this.mesh.previousMState && !balls[i].mesh.isAttached) {
                         let closestSlot = -1;
                         let minDistance = Infinity;
@@ -381,15 +378,14 @@ endgameOnline(isLeft = false, isHostLeft = false) {
 			const data = await response.json();
 	
 			if (data.message === 'Token valido') {
-			// Token valido, procedi con la richiesta effettiva
 			await performRequest(accessToken, url);
 			} else if (data.message === 'Token non valido') {
-			// Token non valido, prova a rinfrescare
+			
 			const newAccessToken = await refreshAccessToken();
 			if (newAccessToken) {
-				accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+				accessToken = newAccessToken;
 				localStorage.setItem("accessToken", newAccessToken);
-				// Richiesta effettiva con nuovo token
+				
 				await performRequest(newAccessToken, url);
 			} else {
 				loadPage("api/login/");
@@ -447,8 +443,6 @@ endgameOnline(isLeft = false, isHostLeft = false) {
                     },
                     body: JSON.stringify(data)
                 });
-
-
             } catch (error) {
                 console.error('Errore durante la richiesta:', error);
             }
@@ -471,15 +465,12 @@ endgameLocal(abandon = false) {
 			const data = await response.json();
 	
 			if (data.message === 'Token valido') {
-			// Token valido, procedi con la richiesta effettiva
 			await performRequest(accessToken, url, abandon);
 			} else if (data.message === 'Token non valido') {
-			// Token non valido, prova a rinfrescare
 			const newAccessToken = await refreshAccessToken();
 			if (newAccessToken) {
-				accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+				accessToken = newAccessToken;
 				localStorage.setItem("accessToken", newAccessToken);
-				// Richiesta effettiva con nuovo token
 				await performRequest(newAccessToken, url);
 			} else {
 				loadPage("api/login/");
@@ -502,7 +493,6 @@ endgameLocal(abandon = false) {
                 let scorePlayer1 = document.getElementById('player0score').textContent;
                 let scorePlayer2 = document.getElementById('player1score').textContent;
                 
-                // Controllo su paddle1 e paddle2
                 let hitPlayer1 = paddle1 ? paddle1.hit : 0;
                 let hitPlayer2 = paddle2 ? paddle2.hit : 0;
                 let keyCountPlayer1 = paddle1 ? paddle1.keyPressCount : 0;
@@ -549,7 +539,6 @@ window.endgameOnline = endgameOnline;
 window.gameover = gameover;
 
 function startTimer() {
-    // Inizializza il timer del gioco
     if (gameEnded === true) {
         return;
     }
@@ -559,22 +548,19 @@ function startTimer() {
     if (!isNaN(timerValue) && timerValue > 0) {
         let timeRemaining = timerValue * 60;
 
-        // Aggiorna il countdown all'inizio
         countdownElement.textContent = timeRemaining;
 
-        // Imposta un intervallo per aggiornare il countdown ogni secondo
         const countdownInterval = setInterval(function() {
             timeRemaining--;
             countdownElement.textContent = timeRemaining;
             if (window.inGame === false) {
                 clearInterval(countdownInterval);
             }
-            // Quando il tempo scade, ferma il timer e chiama endgame()
             if (timeRemaining <= 0) {
                 clearInterval(countdownInterval);
                 gameover();
             }
-        }, 1000); // 1000 millisecondi = 1 secondo
+        }, 1000);
     } else {
         console.error("Valore del timer non valido:", timerValue);
     }
@@ -630,7 +616,7 @@ window.gameScene.add(ambientLight);
 let bot = null;
 let bot2 = null;
 let bot3 = null;
-const boundaries = new THREE.Vector2(20, 20); // limiti gioco
+const boundaries = new THREE.Vector2(20, 20);
 const clock = new THREE.Clock();
     
 function getPlayerControls(playerId) {
@@ -659,7 +645,7 @@ let paddle1 = new Pad(window.gameScene, boundaries, 0, -20, p1Controls.left, p1C
 let paddle2;
 let paddle3;
 let paddle4;
-let walls = [false, true, false, true]; // attiva i muri laterali
+let walls = [false, true, false, true];
 const cornerBotLeft = new Corner(window.gameScene, -21, -21, 0, 5);
 const cornerBotRight = new Corner(window.gameScene, 21, -21, 0, 5);
 const cornerTopRight = new Corner(window.gameScene, 21, 21, 0, 5);
@@ -723,7 +709,7 @@ gridHelper.rotateX(Math.PI / 2);
 gridHelper.position.z = -1;
 window.gameScene.add(gridHelper);
 
-const pointLight = new THREE.PointLight(0xffffff, 0.5); // Luce puntiforme
+const pointLight = new THREE.PointLight(0xffffff, 0.5);
 pointLight.position.set(20, -20, 40);
 window.gameScene.add(pointLight);
 
@@ -866,7 +852,19 @@ let scoreTeam = [20, 20]
 if (gameSettings.gameRules == "time") {
     scoreTeam = [0, 0];
 
-    score = [0, 0, 0, 0];
+    const player0Element = document.getElementById("player0score");
+    const player1Element = document.getElementById("player1score");
+
+    if (!player0Element || !player1Element) {
+        console.error("Gli elementi player0score o player1score non esistono nel DOM.");
+    }
+
+
+    score = [0, 0];
+    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament") {
+        score[0] = parseInt(document.getElementById("player0score").innerText);
+        score[1] = parseInt(document.getElementById("player1score").innerText);
+    }
 } else {
     let scorebase = 10;
     if (gameSettings.gameScoreLimit) {
@@ -875,7 +873,10 @@ if (gameSettings.gameRules == "time") {
     let scorebaseteam = scorebase * 2;
     score = [scorebase, scorebase, scorebase, scorebase];
     scoreTeam = [scorebaseteam, scorebaseteam];
-    
+    if (gameSettings.gameType === "remote-game" || gameSettings.gameType === "tournament") {
+        score[0] = parseInt(document.getElementById("player0score").innerText);
+        score[1] = parseInt(document.getElementById("player1score").innerText);
+    }
 }
 
 let isPaused = false;
@@ -902,7 +903,12 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
 
     if (gameSettings.gameType === "local-game")
     {
-        endgameLocal(abandon);
+        if (abandon === false) {
+            endgameLocal(abandon);
+        } else {
+            return;
+        }
+
     }
     
     if(gameSettings.gameRules == "time") {
@@ -913,19 +919,19 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
                 showModal("You Win!", "Congratulations");
             } else if (posit == "p1" || gameSettings.gameType === "local-game" || gameSettings.gameType === "single-game") {
                 if (score[0]  < score[1]) {
-                    showModal("You Win!", "Congratulations, Player 1!");
+                    showModal("You win!", "Congratulations, Player 1!");
                 } else if (score[0] == score[1]) {
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else {
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             } else if (posit == "p2"){
                 if (score[1] < score[0]) {
                     showModal("You Win!", "Congratulations, Player 2!");
                 } else if (score[0] == score[1]){
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else{
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             }
         } else if (gameSettings.gameMode == "2v2") {
@@ -958,7 +964,7 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
             } else if (score[0] > 0 && walls[0] === false) {
                 showModal("You Win!", "Congratulations, Player 1!");
             } else {
-                showModal("You lose!", "You suck! Go kill yourself!");
+                showModal("You lose!", "You'll have better luck next time!");
             }
         }
         else if (counter === 2 && document.getElementById("gamemode").textContent === "1v1") {
@@ -971,9 +977,9 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
                 } else if (score[0] > 0 && score[0] > score[1]) {
                     showModal("You Win!", "Congratulations, Player 1!");
                 }else if (score[0] == score[1]){
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else {
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             } else if (posit == "p2") {
                 if (isLeft === true){
@@ -981,9 +987,9 @@ export function gameover(p1 = -1, p2 = -1, isLeft = false, abandon = false) {
                 } else if (score[1] > 0 && score[1] > score[0]){
                     showModal("You Win!", "Congratulations, Player 1!");
                 }else if (score[0] == score[1]){
-                    showModal("You DRAW!", "You suck! Go suck dick!");
+                    showModal("You draw!", "Well, at least you didn't lose!");
                 } else {
-                    showModal("You lose!", "You suck! Go kill yourself!");
+                    showModal("You lose!", "You'll have better luck next time!");
                 }
             }
             walls[0] = true;
@@ -1067,7 +1073,7 @@ function populateFinalScores() {
         scoreList.appendChild(listItem);
     }
 
-    document.getElementById("final-scores").style.display = "block"; // Mostra la sezione dei punteggi finali
+    document.getElementById("final-scores").style.display = "block";
 }
 
 let oneTime = true
@@ -1077,7 +1083,6 @@ export let scoreP3 = document.getElementById("player2score");
 export let scoreP4 = document.getElementById("player3score");
 export let scoreTeam1 = document.getElementById("team1score");
 export let scoreTeam2 = document.getElementById("team2score");
-
 
 
 function checkScore(ball){
@@ -1090,14 +1095,14 @@ function checkScore(ball){
     if(scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null && scoreTeam1 === null && scoreTeam2 === null){
         return(0);
     }
-    if (scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null ) // se é a team
+    if (scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null )
     {
         scoreTeam1.innerHTML = scoreTeam[0];
         scoreTeam2.innerHTML = scoreTeam[1];
     } else {
         scoreP1.innerHTML = score[0];
         scoreP2.innerHTML = score[1];
-        if (scoreP3 !== null && scoreP4 !== null) // se é 4v4
+        if (scoreP3 !== null && scoreP4 !== null)
         {
             scoreP3.innerHTML = score[2];
             scoreP4.innerHTML = score[3];
@@ -1201,19 +1206,24 @@ function checkScoreHost(ball){
     if (gameEnded === true) {
         return 0;
     }
+    if (gamePaused == true)
+    {
+        return;
+    }
+    
     let scoreTeam1 = document.getElementById("team1score");
     let scoreTeam2 = document.getElementById("team2score");
     if(scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null && scoreTeam1 === null && scoreTeam2 === null){
         return(0);
     }
-    if (scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null ) // se é a team
+    if (scoreP1 === null && scoreP2 === null && scoreP3 === null && scoreP4 === null )
     {
         scoreTeam1.innerHTML = scoreTeam[0];
         scoreTeam2.innerHTML = scoreTeam[1];
     } else {
         scoreP1.innerHTML = score[0];
         scoreP2.innerHTML = score[1];
-        if (scoreP3 !== null && scoreP4 !== null) // se é 4v4
+        if (scoreP3 !== null && scoreP4 !== null)
         {
             scoreP3.innerHTML = score[2];
             scoreP4.innerHTML = score[3];
@@ -1231,8 +1241,10 @@ function checkScoreHost(ball){
             scoreTeam[0]--;
         }
 
-        if(score[1] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[1] == 0 && gameSettings.gameRules == "score" || goldenGoal === true) {
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            
+        }
         return(1);     
     }
     else if(ball.mesh.position.y < -21 && ballToRemoveHost.get(ball.ballId) != true){
@@ -1246,8 +1258,10 @@ function checkScoreHost(ball){
             scoreTeam[0]--;
         }
    
-        if(score[0] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[0] == 0 && gameSettings.gameRules == "score" || goldenGoal === true) {
+
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+        }
         return(1);
     }
     else if(ball.mesh.position.x > 21 && ((scoreP3 && scoreP4) || scoreTeam2)){
@@ -1259,8 +1273,9 @@ function checkScoreHost(ball){
             score[2]--;
             scoreTeam[1]--;
         }
-        if(score[2] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[2] == 0 && gameSettings.gameRules == "score" || goldenGoal === true){
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+        }
         return(1);
     }
     else if(ball.mesh.position.x < -21 && ((scoreP3 && scoreP4) || scoreTeam2)){
@@ -1272,8 +1287,9 @@ function checkScoreHost(ball){
             score[3]--;
             scoreTeam[1]--;
         }
-        if(score[3] == 0 && gameSettings.gameRules == "score" || goldenGoal === true)
+        if(score[3] == 0 && gameSettings.gameRules == "score" || goldenGoal === true){
             GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+        }
         return(1);
     }
 }
@@ -1440,7 +1456,6 @@ export class Ball2 {
                 }
             }
             catch (e) {
-                console.log(e);
             }
 
            
@@ -1485,12 +1500,10 @@ export function updateBall(ballId, position, velocity) {
 }
 
 export function addCollisionCorrection(ballId, ballId2 = -1, type, correction) {
-    // Se l'oggetto ballId non esiste ancora, crealo
     if (!collisionMap[ballId]) {
         collisionMap[ballId] = {};
     }
     
-    // Aggiungi o aggiorna la correzione per il tipo specifico
     collisionMap[ballId][type] = correction;
     if (ballId2 !== null && ballId2 !== -1) {
         collisionMap[ballId]["ballId2"] = ballId2;
@@ -1498,14 +1511,10 @@ export function addCollisionCorrection(ballId, ballId2 = -1, type, correction) {
 }
 
 export function removeCollisionCorrection(ballId, type) {
-    // Controlla se il ballId esiste nella mappa
     if (collisionMap[ballId]) {
-        // Controlla se esiste una correzione per il tipo specificato
         if (collisionMap[ballId][type]) {
-            // Rimuovi la correzione per quel tipo
             delete collisionMap[ballId][type];
 
-            // Se non ci sono più correzioni per questo ballId, rimuovi anche il ballId
             if (Object.keys(collisionMap[ballId]).length === 0) {
                 delete collisionMap[ballId];
             }
@@ -1563,7 +1572,6 @@ export function setCollisionReady(ready) {
 }
 
 
-// ti metti in attesa che tutto (modelli e altro) sia caricato e a vista, parte un count down di 3 secondi e poi o start timer o start score sistem//
 let flagTimer = true;
 
 
@@ -1622,6 +1630,8 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         } else if (data.action === "game_over") {
             if (isHost === true) {
                 endgameOnline();
+            } else {
+                document.getElementById('game-details').dataset.gameStatus = "finished";
             }
             gameEnded = true;
             gameover(data.p1, data.p2);
@@ -1651,10 +1661,15 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         {
             gamePaused = true;
             gameIsStarting = true;
-            BALLS.forEach(ball => { ball.destroy(); });
+            BALLS.forEach(ball => { ball.destroy(); ball = null; });
+            BALLS =  [];
             ballToRemove.clear();
             ballToRemoveHost.clear();
             maxBalls = gameSettings.gameBalls;
+            paddle1.mesh.spawn = new THREE.Vector2(0, -20);
+            paddle1.mesh.position.set(paddle1.mesh.spawn.x, paddle1.mesh.spawn.y);
+            paddle2.mesh.spawn = new THREE.Vector2(0, 20);
+            paddle2.mesh.position.set(paddle2.mesh.spawn.x, paddle2.mesh.spawn.y);
             ballCounter = 0;
             ball_is_ready = false;
             collision_is_ready = false;
@@ -1663,15 +1678,15 @@ if(gametype == 'remote-game' || gametype == 'tournament')
             if (gameEnded !== true) {
                 document.getElementById('leavegame').disabled = true;
                 startConnectionCountdown();
+                if (intervalCountdown !== null) {
+                    clearInterval(intervalCountdown);
+                }
             }
             document.getElementById("wait-modal").style.display = "block";
         }
         else if (data.action === 'player_rejoin')
         {
-            /* gamePaused = false;
-            gameIsStarting = true;
-            firstTimer = true; */
-            //document.getElementById("wait-modal").style.display = "none";
+
         }
         else if (data.action === 'join')
         {
@@ -1717,11 +1732,15 @@ if(gametype == 'remote-game' || gametype == 'tournament')
     window.addEventListener('keyup', window.handleKeyUp);
 }
 
+let intervalCountdown = null;
 function startCountdown() {
     let countdown = -10;
     let countdownElement = document.getElementById('countdown');
     window.timer = document.getElementById('countdown').textContent;
-    let intervalCountdown = setInterval(() => {
+    if (intervalCountdown !== null) {
+        clearInterval(intervalCountdown);
+    }
+    intervalCountdown = setInterval(() => {
         countdownElement.innerText = countdown;
         countdown++;
         GameSocket.send(JSON.stringify({ action: "time_update", time: countdown }));
@@ -1830,7 +1849,7 @@ function animateonline(){
             GameSocket.send(JSON.stringify({ action: "ball_launch", position: Math.floor(Math.random() * 4), ballId: "ball_" + ballCounter }));          
         }, 500);
         ballCounter++;
-        timer = 0; // Reseta il timer
+        timer = 0;
     }
 
     if (paddle1 && walls[0] == false) {
@@ -1896,7 +1915,7 @@ function animateonline(){
     if (isHost === true) {
 
         for (let i = 0; i < BALLS.length; i++) {
-            if (BALLS[i]) {
+            if (BALLS[i] && gamePaused === false) {
                
                 if (checkScoreHost(BALLS[i]) == 1) {
 
@@ -1906,7 +1925,7 @@ function animateonline(){
             }
         }
     
-        for(let i = 0; i < BALLS.length; i++){ // collisione balls pad
+        for(let i = 0; i < BALLS.length; i++){
             if(ballCollision(BALLS[i], paddle1) && walls[0] == false) {
                 penetrationDepthCorner2(BALLS[i], paddle1, isOnlineGame, isHost);
                 ballPadCollisionResponse(BALLS[i], paddle1, isOnlineGame, isHost);            
@@ -1929,7 +1948,7 @@ function animateonline(){
             }
         }
         
-        for (let i = 0; i < BALLS.length; i++) { // collisione balls
+        for (let i = 0; i < BALLS.length; i++) {
             for (let j = 0; j < BALLS.length; j++) {
                 if (ballCollision(BALLS[i], BALLS[j])) {
                     penetrationDepth(BALLS[i], BALLS[j], isOnlineGame, isHost);
@@ -1938,7 +1957,7 @@ function animateonline(){
             }
         }
     
-        for (let i = 0; i < corners.length; i++) { // collisione corner
+        for (let i = 0; i < corners.length; i++) {
             for (let j = 0; j < BALLS.length; j++) {
                 if (cornerCollision(BALLS[j], corners[i])) {
                     penetrationDepthCorner2(BALLS[j], corners[i], isOnlineGame, isHost);
@@ -1964,19 +1983,19 @@ function animate() {
         flagTimer = false;
         setTimeout(() => {            
             startTimer();
-        } , 7000);        
+        } , 3000);        
     }
 
     if (isPaused) {
-        requestAnimationFrame(animate); // Se è in pausa, richiama se stesso e attende la ripresa
+        requestAnimationFrame(animate);
         return;
     }
     const deltaTime = clock.getDelta();
     timer += deltaTime;
     timer2 += deltaTime;
-    if (timer >= interval && 0 < maxBalls) { // BALLS.length con 0
+    if (timer >= interval && 0 < maxBalls) {
         launchBall();
-        timer = 0; // Reseta il timerw
+        timer = 0;
     } 
 
     if (bot && timer2 >= interval) {
@@ -2034,7 +2053,7 @@ function animate() {
         }
     }
 
-    for(let i = 0; i < BALLS.length; i++){ // collisione balls pad
+    for(let i = 0; i < BALLS.length; i++){
         if(ballCollision(BALLS[i], paddle1) && walls[0] == false) {
             penetrationDepthCorner2(BALLS[i], paddle1);
             ballPadCollisionResponse(BALLS[i], paddle1);            
@@ -2075,7 +2094,7 @@ function animate() {
         }
     }
     
-    for (let i = 0; i < BALLS.length; i++) { // collisione balls
+    for (let i = 0; i < BALLS.length; i++) {
         for (let j = 0; j < BALLS.length; j++) {
             if (ballCollision(BALLS[i], BALLS[j])) {
                 penetrationDepth(BALLS[i], BALLS[j]);
@@ -2084,7 +2103,7 @@ function animate() {
         }
     }
 
-    for (let i = 0; i < corners.length; i++) { // collisione corner
+    for (let i = 0; i < corners.length; i++) {
         for (let j = 0; j < BALLS.length; j++) {
             if (cornerCollision(BALLS[j], corners[i])) {
                 penetrationDepthCorner2(BALLS[j], corners[i]);
@@ -2116,7 +2135,7 @@ function animate() {
     window.renderer.render(window.gameScene, camera);
     window.animationFrameId = requestAnimationFrame(animate);
 }
-//animate();
+
 function start() {
     Promise.all([
         model3D.loadModel1v1(window.gameScene, ufo),

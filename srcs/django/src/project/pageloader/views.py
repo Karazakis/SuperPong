@@ -259,8 +259,6 @@ class DashboardAPIView(APIView):
             }
             return Response(data)
 
-
-
 def normalize_statistics(individual_stats, global_stats):
     """
     Normalizes individual statistics compared to global statistics.
@@ -354,13 +352,13 @@ def calculate_global_game_statistics():
     if total_games == 0:
         logger.warning("No games found. Returning 'None' for all statistics.")
         return {
-            'precision_time': None,
-            'precision_score': None,
-            'reactivity': None,
-            'madness': None,
-            'leadership': None,
-            'patience': None,
-            'intensity': None,
+            'precision_time': 1,
+            'precision_score': 1,
+            'reactivity': 1,
+            'madness': 1,
+            'leadership': 1,
+            'patience': 1,
+            'intensity': 1,
         }
 
     # Calcolo precisione con distinzione per tipo di gioco
@@ -454,7 +452,7 @@ def calculate_global_game_statistics():
 
 
 def calculate_individual_game_statistics(user_profile):
-    # Partite giocate dal giocatore
+    
     match_history = user_profile.game_played.all()
     total_games = match_history.count()
     logger.debug(f"Total games played by {user_profile.user}: {total_games}")
@@ -462,12 +460,12 @@ def calculate_individual_game_statistics(user_profile):
     if total_games == 0:
         logger.warning(f"No games found for user {user_profile.user}. Returning 'None' for all statistics.")
         return {
-            'precision_time': None,
-            'precision_score': None,
-            'reactivity': None,
-            'madness': None,
-            'leadership': None,
-            'intensity': None,
+            'precision_time': 1,
+            'precision_score': 1,
+            'reactivity': 1,
+            'madness': 1,
+            'leadership': 1,
+            'intensity': 1,
         }
 
     total_time_scores = 0
@@ -508,7 +506,6 @@ def calculate_individual_game_statistics(user_profile):
         if match.winner == user_profile.user:
             total_wins += 1
 
-    # Calcolo delle statistiche
     precision_time_value = total_time_scores / total_time_games if total_time_games > 0 else None
     precision_score_value = total_score_precision / total_score_games if total_score_games > 0 else None
     reactivity_value = total_hits / total_games if total_games > 0 else None
@@ -516,7 +513,6 @@ def calculate_individual_game_statistics(user_profile):
     intensity_value = total_key_presses / total_games if total_games > 0 else None
     patience_value = (total_time_games / total_games) * 5 if total_games > 0 else None
 
-    # Risultati finali
     individual_stats = {
         'precision_time': round(precision_time_value, 2) if precision_time_value is not None else None,
         'precision_score': round(precision_score_value, 2) if precision_score_value is not None else None,
@@ -607,7 +603,7 @@ class ProfileAPIView(APIView):
                 'tournament_losses': tournament_losses,
                 'tournament_draws': tournament_draws,
                 'tournament_abandons': tournament_abandons,
-                'relative_game_statistics': normalized_game_statistics,  # Normalizzate
+                'relative_game_statistics': normalized_game_statistics,
             }
             
             html = render_to_string('profile.html', context)
@@ -832,7 +828,7 @@ class JoinAPIView(APIView):
                 games = Game.objects.filter(status='not_started', tournament__isnull=True)
             elif 'join_tournament' in current_url:
                 tournaments = Tournament.objects.filter(status='not_started')
-                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'preparing_next_round', 'waiting_for_round'], players__in=[user])
+                active_tournaments = Tournament.objects.filter(status__in=['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','countdown_started','notifying_players'], players__in=[user])
 
             context = {
                 'user': user,
@@ -910,7 +906,7 @@ class JoinAPIView(APIView):
 
                         return Response({'success': True}, status=status.HTTP_200_OK)
 
-                    elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','finished']:
+                    elif tournament.status in ['waiting_for_matches', 'preparing_next_round', 'waiting_for_round','finished','countdown_started','notifying_players']:
                         # Tornei in corso: logica di re-join
                         if user in tournament.players.all():
                             # L'utente è già nel torneo, esegui il re-join
@@ -1047,8 +1043,13 @@ class CreateAPIView(APIView):
             else:
                 if request.data.get('rules', '') == 'time':
                     timelimit = int(request.data.get('limit', 0)) * 60
+                    player1_score = 0
+                    player2_score = 0
                 else:
                     timelimit = 0
+                    player1_score = request.data.get('limit', 0)
+                    player2_score = request.data.get('limit', 0)
+                
                 game = Game.objects.create(
                     name=request.data.get('name', ''),
                     mode=request.data.get('mode', ''),
@@ -1057,6 +1058,8 @@ class CreateAPIView(APIView):
                     balls=int(request.data.get('balls', 1)),
                     boost=request.data.get('boost', False),
                     time_left=timelimit,
+                    player1_score=player1_score,
+                    player2_score=player2_score,
                 )
                 if request.data.get('mode', '') == '1v1':
                     game.player_limit = 2
@@ -1395,9 +1398,10 @@ class UserRequestAPIView(APIView):
 
             if request_type == 'friend':
                 # Controlla se l'utente è già un amico
-                user_profile = UserProfile.objects.get(user=user)
-                if user in user_profile.user_friend_list.all():
-                    return Response({'error': 'L\'utente è già un amico.'}, status=status.HTTP_400_BAD_REQUEST)
+                usertocheck = UserProfile.objects.get(user=user)
+                user_profile = UserProfile.objects.get(user=requesting_user)
+                if usertocheck in user_profile.user_friend_list.all():
+                    return Response({'message': 'Utente gia amico.', 'already_friend': True}, status=status.HTTP_200_OK)
                 logger.debug(f"Request  nel requesttipe : {request_data}")
                 if request_data.get('request') == 'accept':
                     return self.accept_request(request, target_user, requesting_user)
@@ -1412,7 +1416,7 @@ class UserRequestAPIView(APIView):
                     requesting_user=requesting_user,
                     request_type=request_type,
                 ).exists():
-                    return Response({'error': 'La richiesta è già presente.'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'message': 'La richiesta è già presente.', 'already_exists': True}, status=status.HTTP_200_OK)
 
                 # Creazione di una nuova richiesta
                 new_request = PendingRequest.objects.create(
@@ -1706,11 +1710,9 @@ class UserRequestAPIView(APIView):
                 request_type='friend'
             )
 
-            if not pending_requests.exists():
-                return Response({'error': 'Richiesta non trovata.'}, status=status.HTTP_404_NOT_FOUND)
-
             # Elimina tutte le richieste pendenti trovate
-            pending_requests.delete()
+            if pending_requests.exists():
+                pending_requests.delete()
             requesting_user_profile = UserProfile.objects.get(user=requesting_user)
 
             logger.info(f"Richiesta di amicizia rifiutata {requesting_user_profile.user.username} e {target_user.user.username}")
@@ -2169,8 +2171,8 @@ class GameAPIView(APIView):
                 user = get_object_or_404(User, pk=request.user.id)
                 user_profile = get_object_or_404(UserProfile, user=user)
                 boosts = data.get('boosts', 0)
-                player1_score = data.get('scorePlayer1', '0')
-                player2_score = data.get('scorePlayer2', '0')
+                player1_score = data.get('scorePlayer1', 0)
+                player2_score = data.get('scorePlayer2', 0)
                 if boosts == "true":
                     boosts = True
                 else:
@@ -2257,10 +2259,12 @@ class GameAPIView(APIView):
                         player1.game_win += 1
                         player2.game_lose += 1
                         game.winner = game.player1
+                        logger.debug(f"NEL GAME WINNER DIO CAN SCORE 1 {game.player1_score}  SCORE 2 {game.player2_score} e winner fa: {game.winner}")
                     elif game.player2_score < game.player1_score and game.rules == 'time':
                         player2.game_win += 1
                         player1.game_lose += 1
                         game.winner = game.player2
+                        logger.debug(f"NEL GAME WINNER DIO SPORCO SCORE 1 {game.player1_score}  SCORE 2 {game.player2_score} e winner fa: {game.winner}")
                     elif game.player1_score > game.player2_score and game.rules == 'score':
                         player1.game_win += 1
                         player2.game_lose += 1

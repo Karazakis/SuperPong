@@ -19,13 +19,10 @@
     </ul>
 </div>
 <div id="rejoin-lobby" class="rejoin-section">
-    <h2>Rejoin Lobby</h2>
+    <h4>You are in a Lobby<br> leave the lobby to start <br> another game</h4>
     <div style="display:flex;">
         <div style="margin-right: 1vh;">
             <button id="rejoin-lobby-btn-join" class="btn btn-primary">Rejoin Lobby</button>
-        </div>
-        <div>
-            <button id="rejoin-lobby-btn-leave" class="btn btn-danger">Leave Lobby</button>
         </div>
     </div>
 </div>
@@ -37,7 +34,16 @@
         <button id="logout" class="btn btn-danger btn-sm mb-1">Log Out</button>
     </div>
     <div class="col-6">
-        <h6>General Channel</h6>
+		<h6>General Channel - 
+			<span id="info-icon" style="cursor: pointer; color: #007bff;" data-toggle="tooltip" 
+				  title="To send a global message, type in the text box. For private messages, use @username message. For various actions (block user, send friend request, view profile, send invites), right-click on a user in the Players Online list.">
+				Need Help?
+			</span>
+		</h6>		
+		<div id="chat_details" class="collapse">
+			<p>Per mandare un messaggio globale scrivere nel box di testo, per i messaggi privati usare @nomeutente messaggio.</p>
+			<p>Per le varie azioni (blocco utente, amicizia, profilo, inviti) cliccare col tasto destro del mouse sull'utente in Players Online</p>
+		</div>
         <div id="messages" class="chat-log overflow-auto" style="height: 13vh; padding: 10px; border: 3px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1); border-radius: 4px;"></div>
         <form id="dashboard_chat_form" class="mt-2">
             <input type="text" name="message" class="form-control" style="height: 4vh;" placeholder="Type a message..."/>
@@ -49,11 +55,11 @@
     </div>
     <div class="col-2">
         <div class="mb-2">
-            <h6>Online Friends</h6>
+            <h6>Friends</h6>
             <div id="dashboard-friendlist" class="overflow-auto" style="height: 7.5vh; background-color: white; padding: 1vh 3vh; border: 1px solid #ccc; border: 3px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1); border-radius: 4px;"></div>
         </div>
         <div>
-            <h6>Pending Requests</h6>
+            <h6>Friends Requests</h6>
             <div id="pending-requests" class="overflow-auto" style="height: 7vh; background-color: white; padding: 1vh 3vh; border: 1px solid #ccc; border: 3px ridge rgb(107, 107, 168); box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1), inset 0px 4px 8px rgba(0, 0, 0, 0.1); border-radius: 4px;"></div>
         
         </div>
