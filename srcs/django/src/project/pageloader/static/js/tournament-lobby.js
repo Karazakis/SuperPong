@@ -6,24 +6,48 @@ var slotSelectionLocked = false;
 var lobby = `wss://${window.location.host}/wss/tournament/${round_id_lobby}/?id=${userId_lobby}`;
 var LobbySocket = new WebSocket(lobby);
 
+var userIdToUserMap = {};
+
 var usernameToNicknameMap = {};
 var countdownActive = false;
 var countdownInterval = null;
 
 function initializeNicknameMapFromTemplate() {
     const nicknameElement = document.getElementById('user-nicknames');
+
     if (nicknameElement) {
         try {
             const nicknamesArray = JSON.parse(nicknameElement.dataset.nicknames);
-
             nicknamesArray.forEach(entry => {
-                usernameToNicknameMap[entry.username] = entry.nickname;
-            });
+                const userId = entry.userId;
+                const username = entry.username;
+                const nickname = entry.nickname;
 
+                if (
+                    !userIdToUserMap[userId] ||
+                    userIdToUserMap[userId].username !== username ||
+                    userIdToUserMap[userId].nickname !== nickname
+                ) {
+                    userIdToUserMap[userId] = { username, nickname };
+                }
+            });
         } catch (error) {
-            console.error("Error parsing nickname data:", error);
+            console.error("Errore nel parsing dei dati dal template:", error);
+        }
+    } else {
+        console.warn("Elemento nickname non trovato nel DOM.");
+    }
+}
+
+
+function getNickname(username) {
+    for (const userId in userIdToUserMap) {
+        const user = userIdToUserMap[userId];
+        if (user.username === username) {
+            return user.nickname || username;
         }
     }
+    return username;
 }
 
 onPageLoad();
@@ -34,16 +58,23 @@ LobbySocket.onopen = function(e) {
 
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-
     switch (data.type) {
         case 'chat_message':
             let messages = document.getElementById('lobby_messages');
-            messages.insertAdjacentHTML('afterbegin', `<div class="d-flex justify-content-start"><strong>${data.username}:</strong><p>${data.message}</p></div>`);
-            break;
+            const nickname = getNickname(data.username);
+			messages.insertAdjacentHTML('afterbegin', `<div class="d-flex justify-content-start"><strong>${nickname}:</strong><p>${data.message}</p></div>`);
+			break;
         case 'update_all_slots':
-            updateAllSlots(data.slots);
+            const updatedSlots = updateSlotsWithUsernames(data.slots);
+            updateAllSlots(updatedSlots);
+            const currentUserElement = document.getElementById('current-user');
+            const currentUser = currentUserElement.dataset.username;
+            setupSlotSelection(currentUser);
             break;
         case 'update_ready_status':
+            console.log('Action: update_ready_status');
+            console.log('Slots:', data.slots);
+            console.log('Ready Status:', data.ready_status);
             updateReadyStatusInUserList(data.slots, data.ready_status);
             break;
         case 'update_lobby':
@@ -123,9 +154,35 @@ function onPageLoad() {
     disableDashboard();
 
     generateBracket(tournament);
-    setupSlotSelection(tournament, currentUser);
-
 }
+
+function updateSlotsWithUsernames(slots) {
+    const updatedSlots = {};
+
+    Object.keys(slots).forEach(roundKey => {
+        const roundSlots = slots[roundKey];
+        const updatedRoundSlots = {};
+
+        Object.keys(roundSlots).forEach(slotKey => {
+            const slot = roundSlots[slotKey];
+            const playerId = slot.player_id;
+
+            const updatedUsername = playerId && userIdToUserMap[playerId]
+                ? userIdToUserMap[playerId].username
+                : slot.username;
+
+            updatedRoundSlots[slotKey] = {
+                ...slot,
+                username: updatedUsername
+            };
+        });
+        updatedSlots[roundKey] = updatedRoundSlots;
+    });
+
+    return updatedSlots;
+}
+
+
 
 function disableDashboard() {
     const profileButton = document.getElementById('profile');
@@ -168,7 +225,7 @@ function checkUserSlotAndReadyState(roundsSlots) {
     let allSlotsValid = true;
 
     if (!roundsSlots || Object.keys(roundsSlots).length === 0) {
-        if(readyButton) readyButton.disabled = true;
+        if (readyButton) readyButton.disabled = true;
         return;
     }
 
@@ -179,45 +236,47 @@ function checkUserSlotAndReadyState(roundsSlots) {
     }, null);
 
     if (!maxRoundKey) {
-        if(readyButton) readyButton.disabled = true;
+        if (readyButton) readyButton.disabled = true;
         return;
     }
 
-
     const maxRoundSlots = roundsSlots[maxRoundKey];
     if (!maxRoundSlots || Object.keys(maxRoundSlots).length === 0) {
-        if(readyButton) readyButton.disabled = true;
+        if (readyButton) readyButton.disabled = true;
         return;
     }
 
     Object.values(maxRoundSlots).forEach(slot => {
-        if (!slot || slot.username === 'empty' || slot.player_id === null) {
+        if (!slot || slot.player_id === null) {
             allSlotsValid = false;
         }
-        if (slot && slot.username === username_lobby) {
+        const userId = localStorage.getItem('userId');
+        if (slot && slot.player_id === parseInt(userId, 10)) {
             userSlotAssigned = true;
         }
     });
 
     if (!allSlotsValid) {
-        if(readyButton) readyButton.disabled = true;
+        if (readyButton) readyButton.disabled = true;
         return;
     }
 
     const userItems = userList ? userList.getElementsByTagName('li') : [];
     Array.from(userItems).forEach(item => {
-        const username = item.id.replace('user_', '').trim();
-        if (username === username_lobby && item.innerHTML.includes('✔️')) {
+        const userId = parseInt(item.id.replace('user_', '').trim(), 10);
+        const currentUserId = parseInt(localStorage.getItem('userId'), 10);
+        if (userId === currentUserId && item.innerHTML.includes('✔️')) {
             userIsReady = true;
         }
     });
 
     if (userSlotAssigned && allSlotsValid && !userIsReady) {
-        if(readyButton) readyButton.disabled = false;
+        if (readyButton) readyButton.disabled = false;
     } else {
-        if(readyButton) readyButton.disabled = true;
+        if (readyButton) readyButton.disabled = true;
     }
 }
+
 
 
 function generateBracket(tournament) {
@@ -227,20 +286,8 @@ function generateBracket(tournament) {
     const numPlayers = tournament.nb_players;
     const mode = tournament.mode;
 
-    let numMatches;
-    let totalRounds;
-
-    if (mode === '1v1') {
-        numMatches = Math.ceil(numPlayers / 2);
-        totalRounds = Math.ceil(Math.log2(numPlayers));
-    } else if (mode === '2v2') {
-        numMatches = Math.ceil(numPlayers / 4);
-        totalRounds = Math.ceil(Math.log2(numMatches * 2));
-    } else if (mode === '4dm') {
-        numMatches = 4;
-        totalRounds = 2;
-    }
-
+    let numMatches = Math.ceil(numPlayers / 2);
+    let totalRounds = Math.ceil(Math.log2(numPlayers));
     let round = 1;
     let matchIndex = 1;
     let winnerIndex = 1;
@@ -289,50 +336,7 @@ function generateBracket(tournament) {
                         <div class="player-slot" data-slot="${i * 2 + 2}" data-match="${matchIndex}">Winner SF 2</div>
                     `;
                 }
-            } else if (mode === '2v2') {
-                if (round === 1) {
-                    slotHTML = `
-                        <div class="team-slot" data-slot="${i * 4 + 1}" data-match="${matchIndex}">Team ${teamIndex} - Player 1</div>
-                        <div class="team-slot" data-slot="${i * 4 + 2}" data-match="${matchIndex}">Team ${teamIndex} - Player 2</div>
-                        <div class="team-slot" data-slot="${i * 4 + 3}" data-match="${matchIndex}">Team ${teamIndex + 1} - Player 1</div>
-                        <div class="team-slot" data-slot="${i * 4 + 4}" data-match="${matchIndex}">Team ${teamIndex + 1} - Player 2</div>
-                    `;
-                    teamIndex += 2;
-                } else if (round === totalRounds - 1) {
-                    slotHTML = `
-                        <div class="team-slot" data-slot="${i * 2 + 1}" data-match="${matchIndex}">Winner Match ${winnerIndex} P.1</div>
-                        <div class="team-slot" data-slot="${i * 2 + 1}" data-match="${matchIndex}">Winner Match ${winnerIndex} P.2</div>
-                        <div class="team-slot" data-slot="${i * 2 + 2}" data-match="${matchIndex}">Winner Match ${winnerIndex + 1} P.1</div>
-                        <div class="team-slot" data-slot="${i * 2 + 2}" data-match="${matchIndex}">Winner Match ${winnerIndex + 1} P.2</div>
-                    `;
-                    winnerIndex += 2;
-                } else if (round === totalRounds) {
-                    slotHTML = `
-                        <div class="team-slot" data-slot="1" data-match="${matchIndex}">Winner SF 1 - P.1</div>
-                        <div class="team-slot" data-slot="2" data-match="${matchIndex}">Winner SF 1 - P.2</div>
-                        <div class="team-slot" data-slot="3" data-match="${matchIndex}">Winner SF 2 - P.1</div>
-                        <div class="team-slot" data-slot="4" data-match="${matchIndex}">Winner SF 2 - P.2</div>
-                    `;
-                }
-            } else if (mode === '4dm') {
-                if (round === 1) {
-                    slotHTML = `
-                        <div class="player-slot first-round" data-slot="${i * 4 + 1}" data-match="${matchIndex}">Player ${i * 4 + 1}</div>
-                        <div class="player-slot first-round" data-slot="${i * 4 + 2}" data-match="${matchIndex}">Player ${i * 4 + 2}</div>
-                        <div class="player-slot first-round" data-slot="${i * 4 + 3}" data-match="${matchIndex}">Player ${i * 4 + 3}</div>
-                        <div class="player-slot first-round" data-slot="${i * 4 + 4}" data-match="${matchIndex}">Player ${i * 4 + 4}</div>
-                    `;
-                } else if (round === totalRounds) {
-                    slotHTML = `
-                        <div class="player-slot" data-slot="1" data-match="${matchIndex}">Winner Match 1</div>
-                        <div class="player-slot" data-slot="2" data-match="${matchIndex}">Winner Match 2</div>
-                        <div class="player-slot" data-slot="3" data-match="${matchIndex}">Winner Match 3</div>
-                        <div class="player-slot" data-slot="4" data-match="${matchIndex}">Winner Match 4</div>
-                    `;
-                    numMatches = 0; 
-                }
             }
-
             matchElement.innerHTML += slotHTML;
             roundElement.appendChild(matchElement);
             matchIndex++;
@@ -364,14 +368,19 @@ function getRoundName(totalRounds, currentRound, mode) {
 }
 
 function updateAllSlots(roundsSlots) {
-
     Object.keys(roundsSlots).forEach(roundKey => {
         const slots = roundsSlots[roundKey];
         const roundNumber = roundKey.split('_')[1];
 
-
         Object.keys(slots).forEach(slotKey => {
-            updateSlot(roundNumber, slotKey, slots[slotKey]);
+            const slot = slots[slotKey];
+
+            const playerId = slot.player_id;
+            const nickname = playerId && userIdToUserMap[playerId]
+                ? userIdToUserMap[playerId].nickname
+                : 'empty';
+
+            updateSlot(roundNumber, slotKey, { ...slot, nickname });
         });
     });
 
@@ -383,7 +392,7 @@ function updateSlot(roundNumber, slotKey, slotData) {
     const slotElement = document.querySelector(`.round[data-round="${roundNumber}"] .player-slot[data-slot="${slotKey}"]`);
     if (slotElement) {
         const username = (slotData && typeof slotData.username === 'string') ? slotData.username : null;
-        const nickname = usernameToNicknameMap[username] || username;
+        const nickname = getNickname(username);
 
         if (username && username !== 'empty' && !username.toLowerCase().includes('winner')) {
             slotElement.classList.add('occupied', 'locked');
@@ -400,29 +409,49 @@ function updateSlot(roundNumber, slotKey, slotData) {
 }
 
 
-function setupSlotSelection(tournament, currentUser) {
+function setupSlotSelection(currentUser) {
     const playerSlots = document.querySelectorAll('.player-slot.first-round');
     const readyButton = document.getElementById('ready');
+    const currentUserNickname = Object.values(userIdToUserMap).find(user => user.username === currentUser)?.nickname || currentUser;
 
     playerSlots.forEach(slot => {
+        const oldSlotClickHandler = slot.dataset.listenerAdded;
+        if (oldSlotClickHandler === 'true') {
+            return;
+        }
+        slot.dataset.listenerAdded = 'true';
         slot.addEventListener('click', function () {
+            const alreadyOccupiedSlot = Array.from(playerSlots).find(
+                s => s.textContent.trim() === currentUserNickname && s !== this
+            );
+            if (alreadyOccupiedSlot) {
+                alert('You already occupy a slot. You cannot select another one.');
+                return;
+            }
             if (slotSelectionLocked) {
                 return;
             }
-            if (this.classList.contains('occupied') && this.textContent !== currentUser || this.classList.contains('locked')) {
+            if (this.classList.contains('occupied') && this.textContent !== currentUserNickname || this.classList.contains('locked')) {
                 return;
             }
 
-            if (confirm('Vuoi davvero occupare questo slot? Una volta confermato non potrai più cambiarlo.')) {
-                updateSlotOnServer('assign_slot', this.dataset.slot, currentUser);
-
-                lockAllSlots(playerSlots);
-                if(readyButton) readyButton.disabled = false;
-                slotSelectionLocked = true;
+            if (confirm('Are you sure you want this slot? Once confirmed, you cannot change it.')) {
+                setTimeout(() => {
+                    if (this.classList.contains('occupied') && this.textContent !== currentUser) {
+                        return;
+                    }
+                    updateSlotOnServer('assign_slot', this.dataset.slot, currentUser);
+                    lockAllSlots(playerSlots);
+                    if (readyButton) readyButton.disabled = false;
+                    slotSelectionLocked = true;
+                }, 100);
             }
         });
     });
 }
+
+
+
 
 function lockAllSlots(slots) {
     slots.forEach(slot => {
@@ -458,7 +487,7 @@ function updateUserList(users, slots, readyStatus) {
             }
         }
 
-        const nickname = usernameToNicknameMap[user.username] || user.username;
+        const nickname = getNickname(user.username);
 
         let isReady = false;
         if (userSlot && readyStatus[userSlot]) {
@@ -499,7 +528,7 @@ if (readyButton !== null) {
         let userSlot = null;
         let maxRoundNumber = -1;
 
-        const userNickname = usernameToNicknameMap[username_lobby];
+        const userNickname = getNickname(username_lobby);
         const rounds = document.querySelectorAll('.round[data-round]');
         if (!rounds.length) {
             return;
@@ -516,23 +545,26 @@ if (readyButton !== null) {
                 }
             });
         });
-
+        console.log("ready")
         if (!userSlot) {
             return;
         }
 
-        if (confirm('Vuoi confermare di essere pronto? Una volta confermato, non potrai più cambiare lo stato.')) {
+        if (confirm('Do you wanna confirm that you are ready? You will not be able to change this.')) {
             const message = {
                 action: 'player_ready',
                 slot: userSlot,
                 username: username_lobby,
-                status: readyButton.textContent === 'Ready' ? 'ready' : 'not_ready'
+                userId: userId_lobby,
+                status: true
             };
             LobbySocket.send(JSON.stringify(message));
             readyButton.disabled = true;
         }
     });
 }
+
+
 
 
 var leaveButton = document.getElementById('leave');
@@ -632,17 +664,32 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     const currentUser = username_lobby;
 
 
+	console.log("Current slots:", slots);
+    console.log("Current readyStatus:", readyStatus);
+
     Array.from(userItems).forEach(item => {
         const username = item.id.replace('user_', '');
-        const nickname = usernameToNicknameMap[username] || username;
-        const slotKey = Object.keys(slots).find(key => slots[key].username === username);
+        const nickname = getNickname(username);
+        console.log(`Processing user: ${username}, Nickname: ${nickname}`);
 
-        if (slotKey && readyStatus[slotKey] !== undefined) {
-            item.innerHTML = `${nickname} ${readyStatus[slotKey] ? '✔️' : ''}`;
+        const slotKey = Object.keys(slots).find(key => {
+            const slot = slots[key];
+            const user = userIdToUserMap[slot.player_id];
+            console.log(`Checking slot ${key}: slotUsername=${user?.username}, username=${username}`);
+            return user && user.username === username;
+        });
+
+        if (slotKey) {
+            console.log(`Found slotKey: ${slotKey} for user: ${username}`);
+            const isReady = readyStatus[slotKey];
+            console.log(`Ready status for slotKey ${slotKey}: ${isReady}`);
+            item.innerHTML = `${nickname} ${isReady ? '✔️' : ''}`;
         } else {
+            console.warn(`No slot found for user: ${username}`);
             item.innerHTML = nickname;
         }
     });
+
 
     const readyButton = document.getElementById('ready');
     if (readyButton) {
@@ -802,7 +849,7 @@ function showWinnerPopup(winner) {
         return;
     }
 
-    const winnerNickname = usernameToNicknameMap[winner.username] || winner.username;
+    const winnerNickname = getNickname(winner.username);
 
     const popup = document.createElement('div');
     popup.classList.add('popup');

@@ -140,6 +140,7 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     .then(data => {
         if (data.success) {
             updateUserProfile();
+            localStorage.setItem('username', username);
             loadPage("api/settings/");
         } else {
             handleServerErrors(data.errors);

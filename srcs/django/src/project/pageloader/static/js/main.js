@@ -256,6 +256,11 @@ function refreshAccessToken() {
     .then(data => {
         if (data.access) {
             localStorage.setItem("accessToken", data.access);
+            if (data.refresh){
+                localStorage.setItem("refreshToken", data.refresh)
+            } else {
+                throw new Error("Impossibile rinnovare il token di accesso");
+            }
             return data.access;
         } else {
             throw new Error("Impossibile rinnovare il token di accesso");
@@ -289,8 +294,8 @@ function loadPage(url) {
             window.animateStarSky();
         }
     } else {
-        if (window.chatSocket !== null) {
-            
+        if (window.chatSocket !== null && typeof window.chatSocket !== "undefined") {
+            console.log(window.chatSocket);
             window.chatSocket.close();
         }
     }
@@ -368,6 +373,9 @@ function loadPage(url) {
                     } else {
                         loadPage("api/home/");
                     }
+                }).catch(error => {
+                    console.log("mattia ", error);
+                    loadPage("api/home/");
                 });
             } else {
                 throw new Error('Network response was not ok');

@@ -27,6 +27,9 @@ function cleanupGame() {
         cancelAnimationFrame(window.animationFrameId);
         window.animationFrameId = null;
     }
+    clearTimeout(window.TurboCountDown);
+    clearTimeout(window.speedTurbo);
+    clearTimeout(window.ballLaunch);
     BALLS.forEach(ball => ball.destroy());
     BALLS = [];
     ufo = [];
@@ -351,10 +354,10 @@ export class Pad {
             this.mesh.speed = this.turboSpeed;
             this.mesh.countdownTurbo = 1;
             this.mesh.material = this.turboMaterial;
-            setTimeout(() => { 
+            window.TurboCountDown = setTimeout(() => { 
                 this.mesh.countdownTurbo = 0;
             }, this.turboCD);
-            setTimeout(() => {
+            window.speedTurbo = setTimeout(() => {
                 this.mesh.speed = 20;
                 this.mesh.material = this.material;
             }, this.turboDuration);
@@ -1845,7 +1848,7 @@ function animateonline(){
         launchBall(ballPosition, ballId);
         ball_is_ready = false;
     } else if (isHost && !ball_is_ready && timer >= interval && 0 < maxBalls && gameEnded === false) {
-        setTimeout(() => {
+        window.ballLaunch = setTimeout(() => {
             GameSocket.send(JSON.stringify({ action: "ball_launch", position: Math.floor(Math.random() * 4), ballId: "ball_" + ballCounter }));          
         }, 500);
         ballCounter++;

@@ -79,7 +79,7 @@ LobbySocket.onmessage = function(e) {
         for (let i = 1; i <= 2; i++) {
             let playerLabel = document.getElementById('player' + i + '_label');
             let userLobby = document.getElementById('user' + i + '_lobby');
-    
+            
             playerLabel.classList.remove('ready', 'not_ready');
             if (playerLabel?.textContent.includes(userList[data.username])) {
                 
@@ -108,6 +108,7 @@ LobbySocket.onmessage = function(e) {
         if (document.getElementById('start') === null) {
             document.getElementById('ready').textContent = 'Ready';
             document.getElementById('ready').style.backgroundColor = 'green';
+            document.getElementById('ready').disabled = true;
         } else {
             document.getElementById('start').disabled = true;
         }
@@ -125,6 +126,10 @@ LobbySocket.onmessage = function(e) {
             if (userLobby?.textContent.includes(userList[data.username])) {
                 userLobby.classList.remove('disconnect');
             }
+        }
+        if(document.getElementById('ready') !== null)
+        {
+            document.getElementById('ready').disabled = false;
         }
     } else if (data.action === 'delete') {
         LobbySocket.close();

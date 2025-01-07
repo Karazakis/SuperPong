@@ -131,14 +131,21 @@ function initializeWebSocket() {
 				
 							if (isblocked) {
 								itemElement.classList.add('user-blocked');
-							}
-							itemElement.textContent = item.nickname;
-							itemElement.dataset.id = id;
-							itemElement.oncontextmenu = function(event) {
-								event.preventDefault();
-								showContextMenu(event, id, isblocked);
+								itemElement.textContent = item.nickname;
+								itemElement.dataset.id = id;
+								itemElement.oncontextmenu = function(event) {
+									event.preventDefault();
+									showBlockedContextMenu(event, id, isblocked);
 							};
-							
+							} else {
+
+								itemElement.textContent = item.nickname;
+								itemElement.dataset.id = id;
+								itemElement.oncontextmenu = function(event) {
+									event.preventDefault();
+									showContextMenu(event, id, isblocked);
+							};
+							}
 							elementsToAdd.push(itemElement);
 							existingIds.add(itemElementId);
 						} catch (error) {
@@ -210,7 +217,7 @@ initializeWebSocket();
     if (invite) {
 		let pathname = window.location.pathname;
 		if (pathname.includes('lobby') === true && pathname.includes('join') === false) {
-			alert("Sei già in una lobby");
+			alert("You are already in a lobby");
 			return;
 		}
 		joinGame(data.target_lobby);
@@ -551,35 +558,81 @@ form.addEventListener('submit', (e)=> {
     form.reset();
 });
 
+function showBlockedContextMenu(event, id) {
+	const contextMenu = document.getElementById("contextMenuBlocked");
+	const addfriendcontext = document.getElementById("addfriendcontext");
+	const viewprofilecontext = document.getElementById("viewprofilecontext");
+	const blockusercontext = document.getElementById("unlockusercontext");
 
-function showContextMenu(event, id, isblocked = false) {
-    const contextMenu = document.getElementById("contextMenu");
-    const addfriendcontext = document.getElementById("addfriendcontext");
-    const viewpfoilecontext = document.getElementById("viewprofilecontext");
-    const blockusercontext = document.getElementById("blockusercontext");
-    let pathname = window.location.pathname;
-    if (pathname.includes('lobby') === true) {
-	viewpfoilecontext.style.display = "none";
+	let pathname = window.location.pathname;
+    
+    // Mostra o nascondi l'opzione di visualizzazione profilo in base al percorso
+    if (pathname.includes('lobby')) {
+        viewprofilecontext.style.display = "none";
+    } else {
+        viewprofilecontext.style.display = "block";
     }
-    else {
-	viewpfoilecontext.style.display = "block";
-    }
-
+    
+    // Imposta gli ID dataset per gli elementi del contesto
     addfriendcontext.dataset.id = id;
-    viewpfoilecontext.dataset.id = id;
+    viewprofilecontext.dataset.id = id;
     blockusercontext.dataset.id = id;
-    if (isblocked) {
-	blockusercontext.textContent = "Unlock User";
-}
+    
+    // Imposta sempre il testo del contesto per bloccare l'utente
+    blockusercontext.textContent = "Unlock User";
+    
+    // Posiziona il menu contestuale vicino al clic dell'utente
     contextMenu.style.left = event.pageX + "px";
     contextMenu.style.top = event.pageY + "px";
-
+    
+    // Mostra il menu contestuale
     contextMenu.style.display = "block";
     
+    // Nasconde il menu contestuale quando si clicca altrove
+    window.onclick = function() {
+        contextMenu.style.display = "none";
+    };
+
+}
+
+
+
+function showContextMenu(event, id) {
+    const contextMenu = document.getElementById("contextMenu");
+    const addfriendcontext = document.getElementById("addfriendcontext");
+    const viewprofilecontext = document.getElementById("viewprofilecontext");
+    const blockusercontext = document.getElementById("blockusercontext");
+    
+    let pathname = window.location.pathname;
+    
+    // Mostra o nascondi l'opzione di visualizzazione profilo in base al percorso
+    if (pathname.includes('lobby')) {
+        viewprofilecontext.style.display = "none";
+    } else {
+        viewprofilecontext.style.display = "block";
+    }
+    
+    // Imposta gli ID dataset per gli elementi del contesto
+    addfriendcontext.dataset.id = id;
+    viewprofilecontext.dataset.id = id;
+    blockusercontext.dataset.id = id;
+    
+    // Imposta sempre il testo del contesto per bloccare l'utente
+    blockusercontext.textContent = "Block User";
+    
+    // Posiziona il menu contestuale vicino al clic dell'utente
+    contextMenu.style.left = event.pageX + "px";
+    contextMenu.style.top = event.pageY + "px";
+    
+    // Mostra il menu contestuale
+    contextMenu.style.display = "block";
+    
+    // Nasconde il menu contestuale quando si clicca altrove
     window.onclick = function() {
         contextMenu.style.display = "none";
     };
 }
+    
 
 function showFriendContextMenu(event, id, username) {
     const contextMenu = document.getElementById("friendContextMenu");
@@ -802,68 +855,143 @@ document.getElementById("viewprofilecontext").addEventListener('click', async fu
 });
 
 
-document.getElementById("blockusercontext").addEventListener('click', async function(e) {
-	let accessToken = localStorage.getItem("accessToken");
-	const id = e.target.dataset.id;
-	if (id === localStorage.getItem('userId')) {
-		alert('Non puoi bloccare te stesso');
-		return;
-	}
+document.getElementById("unlockusercontext").addEventListener('click', async function(e) {
+    let accessToken = localStorage.getItem("accessToken");
+    const id = e.target.dataset.id;
 
-	async function checkTokenValidity(url) {
-	    try {
-		const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
-		    method: "GET"
-		});
-		const data = await response.json();
-    
-		if (data.message === 'Token valido') {
-		    await performRequest(accessToken, url);
-		} else if (data.message === 'Token non valido') {
-		    const newAccessToken = await refreshAccessToken();
-		    if (newAccessToken) {
-			accessToken = newAccessToken;
-			localStorage.setItem("accessToken", newAccessToken);
-			await performRequest(newAccessToken, url);
-		    } else {
-			loadPage("api/login/");
-		    }
-		} else {
-		    throw new Error('Network response was not ok');
-		}
-	    } catch (error) {
-		console.error('Errore durante la verifica del token:', error);
-	    }
-	}
-	const performRequest = async (token, url) => {
-	    try {
-		const response = await fetch(url, {
-		    method: 'POST',
-		    headers: {
-			'Content-Type': 'application/json',
-			"Authorization": `Bearer ${token}`
-		    }
-		});
-    
-		if (!response.ok) {
-		    throw new Error('Errore durante il blocco dell\'utente');
-		}
-	    } catch (error) {
-		console.error('Errore durante la richiesta:', error);
-	    }
-	    const userElement = document.getElementById('user_' + id);
-	    if (userElement) {
-			userElement.classList.toggle('user-blocked');
-			if (userElement.classList.contains('user-blocked')) {
-				document.getElementById('blockusercontext').textContent = 'Unlock User';
-			} else {
-				document.getElementById('blockusercontext').textContent = 'Block';
-			}
-	    }
-	};
-    
-	await checkTokenValidity(`/api/block_user/${id}/`);
-    });
+    if (id === localStorage.getItem('userId')) {
+        alert('Non puoi bloccare te stesso');
+        return;
+    }
+
+    async function checkTokenValidity() {
+        try {
+            const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
+                method: "GET"
+            });
+            const data = await response.json();
+
+            if (data.message === 'Token valido') {
+                return;
+            } else if (data.message === 'Token non valido') {
+                const newAccessToken = await refreshAccessToken();
+                if (newAccessToken) {
+                    accessToken = newAccessToken;
+                    localStorage.setItem("accessToken", newAccessToken);
+                } else {
+                    loadPage("api/login/");
+                }
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Errore durante la verifica del token:', error);
+        }
+    }
+
+    const performRequest = async (url) => {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Errore durante il blocco/sblocco dell\'utente');
+            }
+
+            // Aggiorna il menu contestuale senza ricaricare la pagina
+            const userElement = document.getElementById('user_' + id);
+            if (userElement) {
+				userElement.classList.remove('user-blocked');
+                userElement.oncontextmenu = function(event) {
+                    event.preventDefault();
+                    showContextMenu(event, id);
+                };
+            }
+        } catch (error) {
+            console.error('Errore durante la richiesta:', error);
+        }
+    };
+
+    await checkTokenValidity();
+
+    const url = `/api/block_user/${id}/`;
+    await performRequest(url);
+});
+
+
+document.getElementById("blockusercontext").addEventListener('click', async function(e) {
+    let accessToken = localStorage.getItem("accessToken");
+    const id = e.target.dataset.id;
+
+    if (id === localStorage.getItem('userId')) {
+        alert('Non puoi bloccare te stesso');
+        return;
+    }
+
+    async function checkTokenValidity() {
+        try {
+            const response = await fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
+                method: "GET"
+            });
+            const data = await response.json();
+
+            if (data.message === 'Token valido') {
+                return;
+            } else if (data.message === 'Token non valido') {
+                const newAccessToken = await refreshAccessToken();
+                if (newAccessToken) {
+                    accessToken = newAccessToken;
+                    localStorage.setItem("accessToken", newAccessToken);
+                } else {
+                    loadPage("api/login/");
+                }
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Errore durante la verifica del token:', error);
+        }
+    }
+
+    const performRequest = async (url) => {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Errore durante il blocco/sblocco dell\'utente');
+            }
+
+            // Aggiorna il menu contestuale senza ricaricare la pagina
+            const userElement = document.getElementById('user_' + id);
+            if (userElement) {
+				userElement.classList.add('user-blocked');
+                userElement.oncontextmenu = function(event) {
+                    event.preventDefault();
+                    showBlockedContextMenu(event, id);
+                };
+            }
+        } catch (error) {
+            console.error('Errore durante la richiesta:', error);
+        }
+    };
+
+    await checkTokenValidity();
+
+    const url = `/api/block_user/${id}/`;
+    await performRequest(url);
+});
+
     
 
 

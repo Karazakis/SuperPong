@@ -208,6 +208,7 @@ class RefreshTokenAPIView(APIView):
         try:
             refresh = RefreshToken(request.data['refresh'])
             return Response({
+                'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }, status=status.HTTP_200_OK)
         except Exception as e:
@@ -500,10 +501,11 @@ class ProfileAPIView(APIView):
 
     def get(self, request, pk):
         try:
+            logger.debug(f"+++++profile pk {pk}")
             user = User.objects.get(pk=pk)
             user_profile = UserProfile.objects.get(user=user)
             friends = user_profile.user_friend_list.all()
-
+            logger.debug(f"friends {friends}")
             match_history = [
                 {
                     'created': game.created,
@@ -516,14 +518,15 @@ class ProfileAPIView(APIView):
                     'boost': game.boost,
                     'status': game.status,
                     'winner': UserProfile.objects.get(user=game.winner).nickname if game.winner else None,
-                    'player1': UserProfile.objects.get(user=game.player1).nickname,
-                    'player2': UserProfile.objects.get(user=game.player2).nickname,
+                    'player1': UserProfile.objects.filter(user=game.player1).first().nickname if UserProfile.objects.filter(user=game.player1).exists() else None,
+                    'player2': UserProfile.objects.filter(user=game.player2).first().nickname if UserProfile.objects.filter(user=game.player2).exists() else None,
                     'tournament': game.tournament,
                     'player1_score': game.player1_score,
                     'player2_score': game.player2_score,
                 }
                 for game in user_profile.game_played.all()
             ]
+            logger.debug(f"match_history {match_history}")
             tournamnt_history = [
                 {
                     'id': tournament.id,
@@ -538,7 +541,7 @@ class ProfileAPIView(APIView):
                 }
                 for tournament in user_profile.tournament_played.all()
             ]
-
+            logger.debug(f"tournamnt_history {tournamnt_history}")
             game_wins = user_profile.game_win
             game_losses = user_profile.game_lose
             game_draws = user_profile.game_draw
@@ -1075,7 +1078,7 @@ class LobbyAPIView(APIView):
                 tournament = Tournament.objects.get(pk=pk)
 
                 user_nicknames = [
-                    {'username': player.username, 'nickname': player.userprofile.nickname}
+                    {'userId': player.id, 'username': player.username, 'nickname': player.userprofile.nickname}
                     for player in User.objects.all()
                 ]
                 user_nicknames_json = json.dumps(user_nicknames)

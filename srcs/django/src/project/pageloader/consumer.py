@@ -1218,30 +1218,62 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send_slot_status_update_to_group()
 
 
+    # async def manage_ready_status(self, data):
+    #     slot = data.get('slot')
+    #     username = data.get('username')
+    #     ready_status = data.get('status', False)
+
+    #     logger.info(f"Ready status received: Slot {slot}, Username: {username}, Ready Status: {ready_status}")
+
+    #     current_round = await self.get_current_round()
+    #     if not current_round:
+    #         logger.error("Current round not found.")
+    #         return
+
+    #     current_slot_user = current_round.slots.get(str(slot), {}).get('username')
+
+    #     if current_slot_user == username:
+    #         current_status = self.current_round.ready_status.get(str(slot), False)
+    #         if current_status == (ready_status == 'ready'):
+    #             logger.warning(f"User {username} is already marked as ready: {current_status}. Status change denied.")
+    #             return
+
+    #         await self.update_ready_status_in_round(slot, ready_status == 'ready')
+    #         await self.send_ready_status_update_to_group()
+    #     else:
+    #         logger.warning(f"User {username} is not authorized to change the ready status for slot {slot}")
+
     async def manage_ready_status(self, data):
         slot = data.get('slot')
-        username = data.get('username')
+        user_id = data.get('userId')  # Recupera il userId dal messaggio
         ready_status = data.get('status', False)
 
-        logger.info(f"Ready status received: Slot {slot}, Username: {username}, Ready Status: {ready_status}")
+        logger.info(f"Ready status received: Slot {slot}, UserID: {user_id}, Ready Status: {ready_status}")
 
+        # Recupera il round corrente
         current_round = await self.get_current_round()
         if not current_round:
             logger.error("Current round not found.")
             return
 
-        current_slot_user = current_round.slots.get(str(slot), {}).get('username')
+        # Verifica il player_id associato allo slot
+        current_slot_user_id = current_round.slots.get(str(slot), {}).get('player_id')
+        logger.info(f"Current player ID in slot {slot}: {current_slot_user_id}, USERID: {user_id}")
 
-        if current_slot_user == username:
+        if int(current_slot_user_id) == int(user_id):
+            logger.info(f"DIOCANISSIMO")
             current_status = self.current_round.ready_status.get(str(slot), False)
-            if current_status == (ready_status == 'ready'):
-                logger.warning(f"User {username} is already marked as ready: {current_status}. Status change denied.")
+            if current_status == ready_status:
+                logger.warning(f"UserID {user_id} is already marked as ready: {current_status}. Status change denied.")
                 return
-
-            await self.update_ready_status_in_round(slot, ready_status == 'ready')
+            logger.info(f"DIOCANISSIMO2222")
+            # Aggiorna lo stato "ready" per il round
+            await self.update_ready_status_in_round(slot, ready_status)
+            logger.info(f"Ready status updated for UserID {user_id} in Slot {slot}.")
             await self.send_ready_status_update_to_group()
         else:
-            logger.warning(f"User {username} is not authorized to change the ready status for slot {slot}")
+            logger.warning(f"UserID {user_id} is not authorized to change the ready status for Slot {slot}")
+
 
 
 
