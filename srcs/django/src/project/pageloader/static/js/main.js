@@ -12,10 +12,8 @@ async function recoverUser(id) {
             const data = await response.json();
 
             if (data.message === 'Token valido') {
-                // Il token è valido, procedi con la richiesta
                 return accessToken;
             } else if (data.message === 'Token non valido') {
-                // Il token non è valido, tentiamo di rinnovarlo
                 const newAccessToken = await refreshAccessToken();
                 if (newAccessToken) {
                     localStorage.setItem('accessToken', newAccessToken);
@@ -34,14 +32,11 @@ async function recoverUser(id) {
         }
     };
 
-    // Verifica la validità del token e procedi con la richiesta se tutto è in ordine
     accessToken = await checkAndRefreshToken();
     if (!accessToken) {
-        // Se non è possibile ottenere un token valido, esci
         return;
     }
     try {
-        // La funzione fetch ritorna una promessa, quindi puoi usare await qui
         const response = await fetch(`/api/request_user/${id}/`, {
             method: "GET",
             headers: {
@@ -49,21 +44,19 @@ async function recoverUser(id) {
             }
         });
 
-        const text = await response.text();  // Otteniamo il testo grezzo della risposta
+        const text = await response.text();
 
         if (!response.ok) {
             console.error(`Errore nella risposta della rete: ${response.status} ${response.statusText}`);
             throw new Error('Network response was not ok');
         }
 
-        const data = JSON.parse(text);  // Prova a fare il parse del messaggio
+        const data = JSON.parse(text); 
 
-        return data; // Modifica questo percorso in base alla struttura della tua risposta
+        return data;
 
     } catch (error) {
 		recoverUser(id);
-        //console.error('Errore durante il recupero dei dati dell\'utente:', error);
-        //throw error;
     }
 }
 
@@ -81,7 +74,7 @@ function checkCurrentLobbyandDisable(){
     let baseUrl = window.location.origin;
     let url = baseUrl + "/api/request_status/" + userId + "/";
 
-    fetch(url).catch(error => console.log('Errore durante il recupero della pagina:', error))
+    fetch(url).catch(error => console.error('Errore durante il recupero della pagina:', error))
     .then(response => response.json())
     .then(data => {
         if(data.game !== null)
@@ -108,12 +101,10 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
     const container_main = document.getElementById('main-container');
     const container_app = document.getElementById('app');
 
-    // Condizione specifica per l'URL contenente "game"
     if (url.includes('game') && !url.includes('forbidden')) {
         if (container_main !== null) {
             container_main.remove();
         }
-        // Aggiunta del contenuto della dashboard base se non esiste già e se la modalità è corretta
         if (document.getElementById('dashboard-base-content') !== null) {
             const dashboardBase = document.getElementById('dashboard-base-content');
             dashboardBase.remove();
@@ -132,7 +123,6 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
         let genDash = document.getElementById('dashboard-base-content');
         if(gameDash !== null)
         {
-            //TODO chiudere il socket se esiste e togliere i listener
             if(window.GameSocket !== undefined && window.GameSocket !== null)
             {
                 window.GameSocket.close();
@@ -145,7 +135,7 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
             }
         }
         if (genDash !== null) {
-            genDash.style.display = 'block'; // Mostra la dashboard quando si esce dal gioco
+            genDash.style.display = 'block';
         }
 
         if (container_main !== null) {
@@ -158,7 +148,6 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
             container_app.appendChild(maincontainerBase);
         }
 
-        // Aggiunta del contenuto della dashboard base se non esiste già e se la modalità è corretta
         if (genDash === null && (mode === 'logged_nav' || mode === 'dashboard')) {
             const dashboardBase = document.createElement('div');
             dashboardBase.id = 'dashboard-base-content';
@@ -166,7 +155,7 @@ function renderHtml(url, html, dash_base, callback, mode = 'not_logged') {
             container_app.appendChild(dashboardBase);
         }
 
-        callback();  // Chiama la callback dopo aver impostato innerHTML
+        callback();
     }
 }
 
@@ -180,7 +169,6 @@ function clearScripts(url) {
     scriptArray.forEach(script => {
         if ((url.includes('login') || url.includes('signup') || url.includes('home') || url.includes('game')) || script.id !== 'dashboard-base') {
             try {
-                // Controlla se lo script ha ancora un parent node prima di tentare la rimozione
                 if (script.parentNode === container) {
                     container.removeChild(script);
                 }
@@ -195,7 +183,7 @@ function clearScripts(url) {
 
 
 function insertScript(url, src, mode = 'not_logged') {
-    clearScripts(url); // Pulisci gli script precedenti
+    clearScripts(url);
     if(mode === 'logged_nav' || mode === 'dashboard')
     {
         if (url.includes('game') && !url.includes('forbidden'))
@@ -255,7 +243,7 @@ function insertScript(url, src, mode = 'not_logged') {
 }
 
 function refreshAccessToken() {
-    const refreshToken = localStorage.getItem("refreshToken"); // Assumi di avere salvato il refreshToken in localStorage
+    const refreshToken = localStorage.getItem("refreshToken");
 
     return fetch("/api/token/refresh/", {
         method: "POST",
@@ -268,6 +256,11 @@ function refreshAccessToken() {
     .then(data => {
         if (data.access) {
             localStorage.setItem("accessToken", data.access);
+            if (data.refresh){
+                localStorage.setItem("refreshToken", data.refresh)
+            } else {
+                throw new Error("Impossibile rinnovare il token di accesso");
+            }
             return data.access;
         } else {
             throw new Error("Impossibile rinnovare il token di accesso");
@@ -278,8 +271,7 @@ function refreshAccessToken() {
 function loadPage(url) {
     let accessToken = localStorage.getItem("accessToken");
     const baseUrl = window.location.origin + (url.startsWith("/") ? url : "/" + url);
-    const refreshUrl = `${window.location.origin}/api/token/refresh/`; // URL per verificare e refreshare il token
-    // Funzione per eseguire la richiesta effettiva di caricamento della pagina
+    const refreshUrl = `${window.location.origin}/api/token/refresh/`;
     window.previousUrl = url;
     if(window.LobbySocket !== undefined)
     {
@@ -301,6 +293,11 @@ function loadPage(url) {
             window.initStarSky();
             window.animateStarSky();
         }
+    } else {
+        if (window.chatSocket !== null && typeof window.chatSocket !== "undefined") {
+            console.log(window.chatSocket);
+            window.chatSocket.close();
+        }
     }
     const performRequest = (token, url) => {
         
@@ -314,8 +311,7 @@ function loadPage(url) {
             })
             .then(data => {
                 renderHtml(url, data.html, data.nav_stat, function() {
-                    // Questa callback viene eseguita dopo che l'HTML è stato inserito
-                    insertScript(url, data.scripts, data.nav_stat);  // Ora puoi inserire gli script
+                    insertScript(url, data.scripts, data.nav_stat);
                 }, data.nav_stat);
                 newUrl = data.url.startsWith("/") ? data.url : "/" + data.url;
                 if (newUrl !== window.location.pathname) {
@@ -356,7 +352,6 @@ function loadPage(url) {
             })
             .catch(error => {
                 loadPage("api/dashboard/");
-                console.warn('Errore durante il recupero della pagina:', error);
             });
         }
     };
@@ -378,6 +373,9 @@ function loadPage(url) {
                     } else {
                         loadPage("api/home/");
                     }
+                }).catch(error => {
+                    console.log("mattia ", error);
+                    loadPage("api/home/");
                 });
             } else {
                 throw new Error('Network response was not ok');
@@ -397,7 +395,7 @@ function loadPage(url) {
 }
 
 function refreshAccessToken() {
-    const refreshToken = localStorage.getItem("refreshToken"); // Supponendo che tu abbia memorizzato il refresh token
+    const refreshToken = localStorage.getItem("refreshToken");
     return fetch(`${window.location.origin}/api/token/refresh/`, {
         method: "POST",
         headers: {
@@ -411,7 +409,7 @@ function refreshAccessToken() {
             localStorage.setItem("accessToken", data.access);
             return data.access;
         } else {
-            return null; // Token non valido
+            return null;
         }
     })
     .catch(error => {
@@ -429,7 +427,6 @@ async function checkUserPermission(page) {
     } else {
         if (url.includes("lobby")) {
             if (url.includes("tournament")) {
-                //qui andrebbe fatto: recuperato l'id dek torneo attuale, recuperata la lista dei tornei giocati e vedere se l'id e negli id della lista
                 return true;
             } else {
                 let sanitizedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
@@ -499,14 +496,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     window.onpopstate = function(event) {
-        console.log('popstate', event, window.previousUrl);
         event.preventDefault();
         
         if (window.previousUrl.includes("game") && !window.previousUrl.includes("forbidden")) {
             
             let confirmLeave = confirm("Are you sure you want to leave the game?");
             if (confirmLeave) {
-                console.log('leavegame'); 
                 gameEnded = true;
                 new Promise(resolve => {
                     setTimeout(resolve, 20);
@@ -517,7 +512,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         endgameOnline(true, true);
                     }
                     window.GameSocket.send(JSON.stringify({ action: "leave" }));
-                    console.log('leave');
                 }
                 history.pushState({ page: window.previousUrl }, window.previousUrl, window.previousUrl);
                 const event = new Event('cleanupGameEvent');
@@ -535,7 +529,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             } else {
                 let cleanUrl = window.previousUrl.replace("api", "");
-                console.log('il previous', cleanUrl);
                 window.previousUrl = event.state.page;
                 history.pushState({ page: cleanUrl }, cleanUrl, cleanUrl);
                 return;

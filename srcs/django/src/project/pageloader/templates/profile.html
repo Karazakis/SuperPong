@@ -1,26 +1,23 @@
 <div class="row justify-content-center">
-    <!-- Profile Information and Friends Section -->
     <div class="col-md-3">
         
         <div class="card border rounded shadow my-3" style="min-width: 20vh !important;">
             <div class="card-body text-center">
                 <h2 class="card-title">Profile<br> Information</h2>
-                <!-- User Image -->
                 <div class="text-center mb-3">
                     <img src="/static/media/{{ userprofile.img_profile }}" class="rounded-circle profile-img" style="width: 150px; height: 150px;" alt="User Image">
                 </div>
-                <!-- User Nickname and Last Online -->
                 <h3 class="card-title text-nowrap">{{ userprofile.nickname }}</h3>
             </div>
         </div>
-        <div class="card border rounded shadow my-3" style="min-width: 20vh !important;">
+        <div class="card border rounded shadow my-3" style="min-width: 20vh !important; overflow-y: scroll; height: 20vh; ">
             <div class="card-body">
                 <h4 class="card-title text-center">Friends</h4>
                 <ul class="list-group list-group-flush">
                     {% if friends %}
                         {% for friend in friends %}
-                            <li class="list-group-item friend-item" data-id="{{ friend.user.id }}">
-                                {{ friend.nickname }}
+                            <li class="list-group-item" >
+                                <a class="friend-item" data-id="{{ friend.user.id }}">{{ friend.nickname }}</a>
                             </li>
                         {% endfor %}
                     {% else %}
@@ -31,7 +28,6 @@
         </div>
     </div>
 
-    <!-- User Stats Section -->
     <div class="col-md-8">
         <div class="card border rounded shadow my-3 ">
             <div class="card-body" style="max-height: 8vh;">
@@ -39,11 +35,9 @@
             </div>
             <div class="card-footer">
                 <div class="row">
-                    <!-- Chart Column -->
                     <div class="col-md-8">
                         <canvas id="user-stats-chart"></canvas>
                     </div>
-                    <!-- Stats List Column -->
                     <div class="col-md-4 d-flex flex-column justify-content-center ">
                         <ul class="list-group" id="stat-values">
                             <li class="list-group-item d-flex justify-content-between">
@@ -69,9 +63,7 @@
     </div>
 </div>
 
-<!-- Game History and Tournament History Section -->
 <div class="row justify-content-center">
-    <!-- Game History Section -->
     <div class="col-md-5">
         <div class="card border rounded shadow my-3">
             <div class="card-body" style="max-height: 30vh; overflow: scroll;">
@@ -158,7 +150,6 @@
         </div>
     </div>
 
-    <!-- Tournament History Section -->
     <div class="col-md-6">
         <div class="card border rounded shadow my-3">
             <div class="card-body" style="max-height: 30vh; min-height: 30vh; overflow: scroll;">
@@ -171,14 +162,6 @@
                     <div class="col-3">
                         <strong>Losses</strong>
                         <p id="tournament-losses">{{ tournament_losses }}</p>
-                    </div>
-                    <div class="col-3">
-                        <strong>Draws</strong>
-                        <p id="tournament-draws">{{ tournament_draws }}</p>
-                    </div>
-                    <div class="col-3">
-                        <strong>Abandons</strong>
-                        <p id="tournament-abandons">{{ tournament_abandons }}</p>
                     </div>
                 </div>
                 <table class="table table-striped mt-3" id="tournament-history-table">
@@ -230,7 +213,6 @@
     </div>
 </div>
 
-<!-- Go back button -->
 <div class="row justify-content-center my-3">
     <button type="button" id="go-back-btn" class="btn btn-warning">Back</button>
 </div>

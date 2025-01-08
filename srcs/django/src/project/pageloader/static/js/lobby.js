@@ -1,7 +1,7 @@
 var urlPathLobby = window.location.pathname;
 var game_id_lobby = urlPathLobby.split('/').filter(part => part !== '').pop();
-var userId_lobby = localStorage.getItem('userId'); // Assicurati che l'ID utente sia memorizzato in localStorage
-var username_lobby = localStorage.getItem('username'); // Assicurati che il nome utente sia memorizzato in localStorage
+var userId_lobby = localStorage.getItem('userId');
+var username_lobby = localStorage.getItem('username');
 
 if (typeof lobby === 'undefined') {
   let lobby = null;
@@ -28,19 +28,13 @@ LobbySocket.onopen = function(e) {
     LobbySocket.send(JSON.stringify({ action: "join", game_id_lobby: game_id_lobby, username: username_lobby }));
 } 
 } catch (error) {
-    console.log('Errore durante la creazione:', error);
+    console.error('Errore durante la creazione:', error);
 }
 
-if (typeof intervalCountdown === 'undefined') {
-    let intervalCountdown = null;
-} else if (intervalCountdown !== null) {
-    clearInterval(intervalCountdown);
-    intervalCountdown = null;
-}
+var intervalCountdown = null;
 
 LobbySocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    console.log("on message ",data);
     if (data.action === 'message') {
         let messages = document.getElementById('lobby_messages');
         messages.insertAdjacentHTML('beforeend', `<div class="d-flex justify-content-start" style="height: 2.2vh;"><strong>${userList[data.player]}:</strong><p>${data.message}</p></div>`);
@@ -85,7 +79,7 @@ LobbySocket.onmessage = function(e) {
         for (let i = 1; i <= 2; i++) {
             let playerLabel = document.getElementById('player' + i + '_label');
             let userLobby = document.getElementById('user' + i + '_lobby');
-    
+            
             playerLabel.classList.remove('ready', 'not_ready');
             if (playerLabel?.textContent.includes(userList[data.username])) {
                 
@@ -114,6 +108,7 @@ LobbySocket.onmessage = function(e) {
         if (document.getElementById('start') === null) {
             document.getElementById('ready').textContent = 'Ready';
             document.getElementById('ready').style.backgroundColor = 'green';
+            document.getElementById('ready').disabled = true;
         } else {
             document.getElementById('start').disabled = true;
         }
@@ -131,6 +126,10 @@ LobbySocket.onmessage = function(e) {
             if (userLobby?.textContent.includes(userList[data.username])) {
                 userLobby.classList.remove('disconnect');
             }
+        }
+        if(document.getElementById('ready') !== null)
+        {
+            document.getElementById('ready').disabled = false;
         }
     } else if (data.action === 'delete') {
         LobbySocket.close();
@@ -191,7 +190,6 @@ function updateUserList(users) {
         }
     });
 
-    // Controlla se i team sono pieni e aggiorna i pulsanti
     if (team1Count >= 2 && document.getElementById('t1p1_lobby_label').textContent !== username_lobby && document.getElementById('t1p2_lobby_label').textContent !== username_lobby) {
         document.getElementById('t1_button').textContent = 'Team Full';
         document.getElementById('t1_button').disabled = true;
@@ -209,7 +207,7 @@ buttons.forEach(button => {
         const isJoin = this.textContent === 'Join Team';
 
 
-        let message; // Definisci la variabile message qui
+        let message;
 
         if (isJoin) {
             message = {
@@ -218,8 +216,8 @@ buttons.forEach(button => {
                 username: username_lobby
             };
             LobbySocket.send(JSON.stringify(message));
-            this.textContent = 'Leave Team'; // Aggiorna il pulsante per indicare che l'utente è nel team
-            disableOtherTeamButton(teamSelected); // Disabilita l'altro pulsante
+            this.textContent = 'Leave Team';
+            disableOtherTeamButton(teamSelected);
         } else {
             message = {
                 action: 'leave_team',
@@ -227,8 +225,8 @@ buttons.forEach(button => {
                 username: username_lobby
             };
             LobbySocket.send(JSON.stringify(message));
-            this.textContent = 'Join Team'; // Aggiorna il pulsante per indicare che l'utente ha lasciato il team
-            enableOtherTeamButton(); // Riabilita l'altro pulsante
+            this.textContent = 'Join Team';
+            enableOtherTeamButton();
         }
 
     });
@@ -361,7 +359,6 @@ form_lobby.addEventListener('submit', (e) => {
     e.preventDefault();
     const message = {
         action: 'message',
-        // username_lobby: username_lobby, # cambiato per fare comparire il nome di chi manda il messaggio
         username: username_lobby,
         message: e.target.message.value
     };
@@ -411,22 +408,18 @@ if (deleteButton) {
         let accessToken = localStorage.getItem("accessToken");
         
         function checkTokenValidity(url) {
-            // Rimuovi l'intestazione Authorization per la richiesta GET di verifica del token
             fetch(`${window.location.origin}/api/token/refresh/?token=${accessToken}`, {
                 method: "GET"
             })
             .then(response => response.json())
             .then(data => {
                 if (data.message === 'Token valido') {
-                    // Token valido, procedi con la richiesta effettiva
                     performRequest(accessToken, url);
                 } else if (data.message === 'Token non valido') {
-                    // Token non valido, prova a rinfrescare
                     return refreshAccessToken().then(newAccessToken => {
                         if (newAccessToken) {
-                            accessToken = newAccessToken;  // Aggiorna il token di accesso per le richieste future
+                            accessToken = newAccessToken;
                             localStorage.setItem("accessToken", newAccessToken);
-                            // Richiesta effettiva con nuovo token
                             performRequest(newAccessToken, url);
                         } else {
                             loadPage("api/login/");
@@ -452,7 +445,6 @@ if (deleteButton) {
             })
             .then(response => {
                 if (response.ok) {
-                    console.log('Lobby eliminata con successo');
                     LobbySocket.send(JSON.stringify({ action: 'delete', username: username_lobby }));
                     LobbySocket.close();
                     loadPage('/api/remote/');

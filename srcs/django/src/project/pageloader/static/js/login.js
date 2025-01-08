@@ -6,7 +6,6 @@ document.getElementById("login-form").addEventListener("submit", function(event)
     const usernameErrorDiv = document.getElementById("username-error");
     const passwordErrorDiv = document.getElementById("password-error");
 
-    // Resetta i messaggi di errore
     usernameErrorDiv.textContent = "";
     passwordErrorDiv.textContent = "";
 
@@ -67,7 +66,6 @@ if (goBackBtn) {
     });
 }
 
-// Funzione per ottenere il token CSRF dai cookie
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {

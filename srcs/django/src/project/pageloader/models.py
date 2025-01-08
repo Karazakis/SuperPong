@@ -9,53 +9,51 @@ import math
 class Tournament(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    mode = models.CharField(max_length=100)  # Es. '1v1', '2v2', '4dm'
+    mode = models.CharField(max_length=100)
     rules = models.CharField(max_length=100, default='Time')
     limit = models.IntegerField(default=0, null=True, blank=True)
     balls = models.IntegerField(default=1, null=True, blank=True)
     boost = models.BooleanField(default=True)
-    nb_players = models.IntegerField(default=0, null=True, blank=True)  # Numero totale di giocatori
-    players_in_lobby = models.IntegerField(default=0, null=True, blank=True)  # Giocatori nella lobby
-    players = models.ManyToManyField(User, related_name='tournament_players')  # Giocatori che partecipano al torneo
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_tournaments', default=None, null=True, blank=True)  # Proprietario del torneo
-    winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tournament_winner', default=None, null=True, blank=True)  # Vincitore del torneo
-    status = models.CharField(max_length=100, default='not_started')  # Stato del torneo: 'not_started', 'in_progress', 'finished'
-    rounds = models.IntegerField(default=0)  # Numero totale di round
+    nb_players = models.IntegerField(default=0, null=True, blank=True)
+    players_in_lobby = models.IntegerField(default=0, null=True, blank=True)
+    players = models.ManyToManyField(User, related_name='tournament_players')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_tournaments', default=None, null=True, blank=True)
+    winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tournament_winner', default=None, null=True, blank=True)
+    status = models.CharField(max_length=100, default='not_started')
+    rounds = models.IntegerField(default=0)
 
     def calculate_rounds(self):
         """Calcola il numero di round in base al numero di giocatori."""
         if self.mode == '1v1':
             return math.ceil(math.log2(self.nb_players))
         elif self.mode == '2v2':
-            return math.ceil(math.log2(self.nb_players // 2))  # Ogni partita ha 4 giocatori
+            return math.ceil(math.log2(self.nb_players // 2))
         elif self.mode == '4dm':
-            return math.ceil(math.log2(self.nb_players // 4))  # Supponendo riduzione fino a 4 giocatori
+            return math.ceil(math.log2(self.nb_players // 4))
         else:
-            return 1  # Default per modalità sconosciute
+            return 1
 
     def calculate_games_per_round(self):
         """Calcola il numero di game per round in base alla modalità."""
         if self.mode == '1v1':
-            return self.nb_players // 2  # Ogni partita ha 2 giocatori
+            return self.nb_players // 2
         elif self.mode == '2v2':
-            return self.nb_players // 4  # Ogni partita ha 4 giocatori
+            return self.nb_players // 4
         elif self.mode == '4dm':
-            return self.nb_players // 4  # Per esempio, nel deathmatch con 4 giocatori
+            return self.nb_players // 4
         else:
-            return 1  # Default per altre modalità
+            return 1
 
     def generate_initial_rounds(self):
         """Genera solo il primo round e i relativi game."""
         games_per_round = self.calculate_games_per_round()
-
-        # Genera solo il primo round
         round_instance = Round.objects.create(
             tournament=self,
             round_number=1,
             status='not_started'
         )
         round_instance.generate_initial_slot_status(self)
-        round_instance.generate_games(games_per_round, self.mode, self.rules, self.limit, self.balls, self.boost)  # Genera i game all'interno del round
+        round_instance.generate_games(games_per_round, self.mode, self.rules, self.limit, self.balls, self.boost)
         
         self.rounds = self.calculate_rounds()
         self.save()
@@ -83,17 +81,12 @@ class Tournament(models.Model):
         players_remaining = self.calculate_remaining_players(current_round_number)
         games_per_round = players_remaining // (2 if self.mode == '1v1' else 4)
 
-        # Genera il prossimo round
         next_round = Round.objects.create(
             tournament=self,
             round_number=next_round_number,
             status='not_started'
         )
-
-        # Inizializza gli slot solo per i giocatori rimanenti
         next_round.generate_slot_status_for_remaining_players(players_remaining)
-
-        # Genera i giochi per il round
         next_round.generate_games(games_per_round, self.mode, self.rules, self.limit, self.balls, self.boost)
 
         self.save()
@@ -106,23 +99,23 @@ class Tournament(models.Model):
         Calcola il numero di giocatori rimanenti in base al round attuale e alla modalità.
         """
         if self.mode == '1v1':
-            return self.nb_players // (2 ** current_round_number)  # Dimezza ogni round
+            return self.nb_players // (2 ** current_round_number)
         elif self.mode == '2v2':
-            return self.nb_players // (4 ** current_round_number)  # Dimezza ogni due round
+            return self.nb_players // (4 ** current_round_number)
         elif self.mode == '4dm':
-            return max(4, self.nb_players // (4 ** current_round_number))  # Mantiene almeno 4 giocatori
+            return max(4, self.nb_players // (4 ** current_round_number))
         return 1
 
 
 class Round(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='tournament_rounds')
-    round_number = models.IntegerField(default=1)  # Numero del round nel torneo
-    games = models.ManyToManyField('Game', related_name='round_games')  # Game che si svolgono in questo round
-    status = models.CharField(max_length=100, default='not_started')  # Stato del round: 'not_started', 'in_progress', 'finished'
-    start_time = models.DateTimeField(null=True, blank=True)  # Orario di inizio del round (opzionale)
-    end_time = models.DateTimeField(null=True, blank=True)  # Orario di fine del round (opzionale)
-    slots = models.JSONField(default=dict)  # Stato degli slot per i giocatori in questo round
-    ready_status = models.JSONField(default=dict)  # Stato di ready dei giocatori
+    round_number = models.IntegerField(default=1)
+    games = models.ManyToManyField('Game', related_name='round_games')
+    status = models.CharField(max_length=100, default='not_started')
+    start_time = models.DateTimeField(null=True, blank=True) 
+    end_time = models.DateTimeField(null=True, blank=True) 
+    slots = models.JSONField(default=dict)
+    ready_status = models.JSONField(default=dict)
 
     def generate_games(self, num_games, mode, rules, limit, balls, boost):
         """Genera i game per il round in base al numero di game e le regole del torneo."""
@@ -151,12 +144,12 @@ class Round(models.Model):
 
     def generate_initial_slot_status(self, tournament):
         """Inizializza gli slot e lo stato 'ready' del round basandosi sul numero di giocatori nel torneo."""
-        if not self.slots:  # Assicurati di non sovrascrivere se gli slot sono già presenti
+        if not self.slots:
             self.slots = {
                 i: {'player_id': None, 'username': 'empty'}
                 for i in range(1, tournament.nb_players + 1)
             }
-        if not self.ready_status:  # Assicurati di non sovrascrivere se lo stato 'ready' è già presente
+        if not self.ready_status:
             self.ready_status = {i: False for i in range(1, tournament.nb_players + 1)}
         
         self.save()
@@ -214,7 +207,6 @@ class Game(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
 def user_directory_path(instance, filename):
-    # Il file verrà caricato in MEDIA_ROOT / profiles / user_<id> / <filename>
     return f'profiles/{instance.user.id}/{filename}'
 
 

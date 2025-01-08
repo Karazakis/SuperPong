@@ -1,10 +1,9 @@
-//import * as THREE from "/static/js/game/module/three.module.js";
 import {Mesh} from "/static/js/game/module/three.module.js";
 
 const GEOMETRY = new THREE.SphereGeometry(3, 5, 20, 20);
 GEOMETRY.rotateZ(Math.PI / 2);
 
-const MATERIAL = new THREE.MeshNormalMaterial({transparent: true, opacity: 0.0}); // , transparent: true, opacity: 0.3});
+const MATERIAL = new THREE.MeshNormalMaterial({transparent: true, opacity: 0.3});
 const RED_MATERIAL = new THREE.MeshBasicMaterial({ color: 0xffff0000 });
 let count = 0;
 export class BotSide { 
@@ -42,23 +41,16 @@ export class BotSide {
 
     destroy(){
         this.scene.remove(this.mesh);
-        // Rimuovi l'oggetto dall'array delle collisioni
-        // const index = window.collisionObjects.indexOf(this.mesh);
-        // if (index > -1) {
-        //     window.collisionObjects.splice(index, 1);
-        // }
-        // Libera la memoria associata alla geometria e al materiale
         this.mesh.geometry.dispose();
         this.mesh.material.dispose();
         this.mesh = null;
     }
 
     update(dt, balls, closestBall) {
-        //console.log("bot side update");        
         this.mesh.balls = balls;
         this.mesh.closestBall = closestBall;
                 
-        if(this.mesh.position.y >= this.boundaries.y - 6.8) { // controllo sui bordi
+        if(this.mesh.position.y >= this.boundaries.y - 6.8) {
             this.mesh.position.y = this.boundaries.y - 6.8;
         }
         else if(this.mesh.position.y <= -this.boundaries.y + 6.8) {
@@ -82,35 +74,29 @@ export class BotSide {
 
     AI(balls, closestBall, gameBoosts) {
         count++;
-        //console.log("AI lanciata" + count);
-        let newClosestBall = closestBall; // controllo la palla piú vicina
+        let newClosestBall = closestBall;
         let oldClosestBall;
         for (let i = 0; i < balls.length; i++) { 
-            if(this.mesh.balls[i] && balls.length > 1) { // esistono almeno 2 palle
-                if(balls[i] != null && balls[this.mesh.closestBall] != null ) { // non sono una palla vuota
+            if(this.mesh.balls[i] && balls.length > 1) {
+                if(balls[i] != null && balls[this.mesh.closestBall] != null ) {
                 if (this.mesh.position.distanceTo(balls[i].mesh.position) < this.mesh.position.distanceTo(balls[this.mesh.closestBall].mesh.position)) {
                     oldClosestBall = newClosestBall;
                     newClosestBall = i;
-                    //balls[this.mesh.closestBall].mesh.material = MATERIAL;
                     this.mesh.closestBall = i;
                 }
                 }
             }            
         }
         if (balls[newClosestBall] != null) {
-            // Calcolo della destinazione come il punto di intersezione della pallina col paddle
             const ball = balls[newClosestBall];
-            const paddleY = this.mesh.position.x; // La x del paddle (presumibilmente costante)
+            const paddleY = this.mesh.position.x;
             const ballPosition = ball.mesh.position;
             const ballVelocity = ball.mesh.velocity;
 
-            // Calcolo del tempo di arrivo alla posizione y del paddle
             const timeToIntersect = (paddleY - ballPosition.x) / ballVelocity.x;
 
-            // Calcolo della posizione x dell'intersezione
             const intersectX = ballPosition.y + ballVelocity.y * timeToIntersect;
 
-            // Imposta la destinazione come l'intersezione calcolata
             this.destinationX = intersectX;
             if(timeToIntersect == Infinity || this.destinationX == null ) {
                 this.destinationX = 0;
@@ -134,10 +120,8 @@ export class BotSide {
 
         for (let i = 0; i < balls.length; i++) {
             if (this.collision(balls[i], this)) {
-                if (keyboardState['m']) { // Il tasto 'm' è premuto
-                    console.log("hasBall = " + this.mesh.hasBall, "stato m = " + this.mesh.previousMState);
+                if (keyboardState['m']) {
                     if (!this.mesh.previousMState && balls[i].mesh.isAttached == false ) {
-                        console.log("il tasto 'm' è premuto");
                         let closestSlot = -1;
                         let minDistance = Infinity;
                         for (let j = 0; j < this.ballSlots.length; j++) {
@@ -159,12 +143,10 @@ export class BotSide {
                             this.mesh.hasBall[closestSlot] = true;
                             this.mesh.attachedBalls[closestSlot] = balls[i];
                             balls[i].mesh.isAttached = true;
-                            console.log(`Attacco la palla ${balls[i].mesh.id} allo slot ${closestSlot}`);
                             balls[i].mesh.velocity.set(0, 0, 0);
                         }
                     }
                     else if (this.mesh.previousMState && balls[i].mesh.isAttached == false ) {
-                        //console.log("attacco un altra pallina " + balls[i].mesh.id);
                         let closestSlot = -1;
                         let minDistance = Infinity;
                         for (let j = 0; j < this.ballSlots.length; j++) {
@@ -186,13 +168,11 @@ export class BotSide {
                             this.mesh.hasBall[closestSlot] = true;
                             this.mesh.attachedBalls[closestSlot] = balls[i];
                             balls[i].mesh.isAttached = true;
-                            console.log(`Attacco un altra palla ${balls[i].mesh.id} allo slot ${closestSlot}`);
                             balls[i].mesh.velocity.set(0, 0, 0);
                         }
                     }
                 } else {
                     if (this.mesh.previousMState) {
-                        console.log("il tasto 'm' è rilasciato e le balls sono: " + this.mesh.hasBall.length);
                         for (let j = 0; j < this.mesh.attachedBalls.length; j++) {
                             if (this.mesh.attachedBalls[j] != null) {
                                 if(this.mesh.hasBall[0] == true) {
@@ -205,21 +185,19 @@ export class BotSide {
                                     this.mesh.attachedBalls[j].mesh.velocity.set(25, 50, 0);
                                 }
                                 this.mesh.hasBall[j] = false;
-                                console.log(`Rilasciata la palla ${this.mesh.attachedBalls[j].mesh.id} dallo slot ${j}`);
                                 this.mesh.attachedBalls[j] = null;
                                 balls[i].mesh.isAttached = false;
                             }
                         }
                     }
                 }
-                this.mesh.previousMState = keyboardState['m']; //
+                this.mesh.previousMState = keyboardState['m'];
             }
         }
     }
 
     turbo(){
-        if(this.mesh.countdownTurbo == 0 && keyboardState['n']){ // da impostare
-            console.log("turbo");
+        if(this.mesh.countdownTurbo == 0 && keyboardState['n']){
             this.mesh.speed = 60;
             this.mesh.countdownTurbo = 1;
             this.mesh.material = this.turboMaterial;

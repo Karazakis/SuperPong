@@ -15,8 +15,8 @@ joinButtons.forEach(button => {
 
 var refreshButton = document.getElementById('refresh-btn');
 refreshButton.addEventListener('click', function() {
-    var currentUrl = window.location.pathname; // Ottiene l'URL corrente
-    loadPage("api"+currentUrl); // Usa l'URL corrente per caricare la pagina
+    var currentUrl = window.location.pathname;
+    loadPage("api"+currentUrl);
 });
 
 
@@ -110,10 +110,8 @@ function deleteTournament(tournamentId) {
     .then(data => {
         if (data.success) {
             alert('Tournament deleted successfully.');
-            let currentUrl = window.location.pathname; // Ottiene l'URL corrente
+            let currentUrl = window.location.pathname;
             loadPage("api"+currentUrl);
-            //refreshTournamentList();
-            //location.reload();
         } else {
             console.error('Failed to delete tournament:', data.error);
             alert('Failed to delete tournament: ' + data.error);
@@ -123,7 +121,6 @@ function deleteTournament(tournamentId) {
 }
 
 
-// Funzione per ottenere il CSRF token dai cookie
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -148,7 +145,7 @@ function refreshTournamentList() {
             'Authorization': `Bearer ${accessToken}`
         }
     })
-    .then(response => response.text())  // Cambiato da response.json() a response.text()
+    .then(response => response.text())
     .then(html => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
@@ -164,7 +161,6 @@ function refreshTournamentList() {
     .catch(error => console.error('Error refreshing tournament list:', error));
 }
 
-// Configura gli event listeners sui pulsanti
 function setupEventListeners() {
     var joinButtons = document.querySelectorAll('.join-btn');
     joinButtons.forEach(button => {
@@ -188,7 +184,6 @@ function setupEventListeners() {
     });
 }
 
-// Inizializza gli event listeners all'avvio della pagina
 document.addEventListener('DOMContentLoaded', setupEventListeners);
 
 function updateLobbyPlayersCount(tournamentId) {
@@ -210,7 +205,6 @@ function updateLobbyPlayersCount(tournamentId) {
     .catch(error => console.error('Error updating lobby players count:', error));
 }
 
-// Aggiorniamo il numero di giocatori nella lobby ogni volta che viene caricata la pagina
 document.addEventListener('DOMContentLoaded', function() {
     const tournamentElements = document.querySelectorAll('[data-tournament-id]');
     tournamentElements.forEach(element => {

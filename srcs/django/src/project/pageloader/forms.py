@@ -70,7 +70,7 @@ class UserSettingsForm(UserChangeForm):
 
     def clean_username(self):
         username = self.cleaned_data.get('username', '').strip()
-        if username:  # Controlla se il campo non è vuoto
+        if username:
             if len(username) < 3:
                 raise ValidationError("Username must be at least 3 characters long.")
             if len(username) > 20:
@@ -79,13 +79,13 @@ class UserSettingsForm(UserChangeForm):
                 raise ValidationError("Username can contain only letters, numbers and underscore.")
             if User.objects.filter(username=username).exists():
                 raise ValidationError("Username already taken.")
-        elif not self.instance.username:  # Se l'utente non ha già un username, richiedi il campo
+        elif not self.instance.username:
             raise ValidationError("Username cannot be empty or contain only spaces.")
         return username
 
     def clean_email(self):
         email = self.cleaned_data.get('email', '').strip()
-        if email:  # Controlla se il campo non è vuoto
+        if email:
             if len(email) > 40:
                 raise ValidationError("Email address cannot be over 40 characters long.")
             email_pattern = r'^(?!.*\.\.)[a-zA-Z0-9._%+]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -93,13 +93,13 @@ class UserSettingsForm(UserChangeForm):
                 raise ValidationError("Insert a valid email address.")
             if User.objects.filter(email=email).exists():
                 raise ValidationError("Email address already taken.")
-        elif not self.instance.email:  # Se l'utente non ha già un'email, richiedi il campo
+        elif not self.instance.email:
             raise ValidationError("Email cannot be empty or contain only spaces.")
         return email
 
     def clean_password(self):
         password = self.cleaned_data.get('password', '').strip()
-        if password:  # Controlla solo se è stato fornito un nuovo valore
+        if password:
             if len(password) < 8:
                 raise ValidationError("Password must have at least 8 characters.")
             if not re.search(r'[A-Z]', password):

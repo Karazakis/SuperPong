@@ -5,17 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Pong</title>
-    <!-- Includi il CSS di Bootstrap -->
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
-    <!-- Includi jQuery, Popper.js, e il JavaScript di Bootstrap -->
     <script src="/static/js/lib/jquery.min.js"></script>
     <script src="/static/js/lib/popper.min.js"></script>
-    <script src="/static/js/lib/bootstrap.min.js"></script>
-   
-    <!-- Includi Three.js -->
+    <script src="/static/js/lib/bootstrap.min.js"></script>   
     <script src="/static/js/game/module/three.min.js"></script>    
 
     <style>
@@ -48,7 +44,6 @@
     <div id="app">
     </div>
     <script defer>
-        // import { THREE } from '/static/js/game/module/three.module.js';
         window.previousUrl = null;
         window.initStarSky = function () {
             window.starScene = new THREE.Scene();
@@ -73,36 +68,31 @@
             window.renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(window.renderer.domElement);
     
-            // Crea le particelle del cielo stellato
             window.particles.position.set(0, 100, -100);
             window.starScene.add(particles);
     
-            // Aggiungi luce alla scena
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             window.starScene.add(ambientLight);
             const pointLight = new THREE.PointLight(0xffffff, 1);
             pointLight.position.set(10, 10, 10);
             window.starScene.add(pointLight);
     
-            // Imposta la posizione della camera
-            //camera.position.z = 100;
             window.camera.position.set(0, -40, 25);
             window.camera.rotation.set(0.75, 0, 0);
         }
 
-        // Funzione di animazione
         window.animateStarSky = function ( ) {
             if (window.starScene == null || window.camera == null || window.particles == null || window.renderer == null) {
                 return;
             }
             requestAnimationFrame(animateStarSky);
             window.particles.rotation.x = 0.75;
-            window.particles.rotation.y += 0.001; // Aggiunge una rotazione lenta alle stelle
+            window.particles.rotation.y += 0.001; 
             window.renderer.render(starScene, camera);
         }
         window.singleSkyScene = function () {
             window.particles.rotation.x = 0.75;
-            window.particles.rotation.y += 0.001; // Aggiunge una rotazione lenta alle stelle
+            window.particles.rotation.y += 0.001;
             window.renderer.render(starScene, camera);
         }
         window.initStarSky(window.renderer, window.starScene, window.camera, window.particles, window.starScene);
@@ -127,7 +117,6 @@
             window.gameScene = null;
         }
 
-        // Gestisci la ridimensionamento della finestra
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();

@@ -112,7 +112,7 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
             hasError = true;
         }
 
-        const maxImageSize = 2 * 1024 * 1024; // 2 MB
+        const maxImageSize = 2 * 1024 * 1024;
         if (imgProfile.size > maxImageSize) {
             displayError('img-profile-error', `Image cannot be more than 2 MB. Actual dimension: ${(imgProfile.size / 1024 / 1024).toFixed(2)} MB`);
             hasError = true;
@@ -140,6 +140,7 @@ document.getElementById('profile-settings-btn').addEventListener('click', functi
     .then(data => {
         if (data.success) {
             updateUserProfile();
+            localStorage.setItem('username', username);
             loadPage("api/settings/");
         } else {
             handleServerErrors(data.errors);

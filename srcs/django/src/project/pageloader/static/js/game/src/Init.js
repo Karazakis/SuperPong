@@ -20,7 +20,6 @@ export function init(){
     const gameScoreLimit = document.getElementById("gamescore");
     const gameBalls = document.getElementById("gameballs");
     const gameBoosts = document.getElementById("gameboost");
-    //const gameRandomCorners = Array.from({ length: 50 }, () => Math.floor(Math.random() * 4)); // chioccia
     if (gameRules === 'time')
     {
         const gameSettings = {
@@ -30,7 +29,6 @@ export function init(){
         gameTimeLimit: gameTimeLimit.innerHTML,
         gameBalls: gameBalls.innerHTML,
         gameBoosts: gameBoosts.innerHTML
-        //gameRandomCorners: gameRandomCorners // chioccia
         };
         return gameSettings;
     }
@@ -41,7 +39,6 @@ export function init(){
         gameScoreLimit: gameScoreLimit.innerHTML,
         gameBalls: gameBalls.innerHTML,
         gameBoosts: gameBoosts.innerHTML
-        //gameRandomCorners: gameRandomCorners // chioccia
         };
     return gameSettings;
 }

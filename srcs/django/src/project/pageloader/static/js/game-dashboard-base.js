@@ -21,8 +21,6 @@ function joinTournament(tournamentId) {
 }
 
 document.getElementById('leavegame').addEventListener('click', function() {
-    // Emissione dell'evento custom
-    console.log('leavegame'); 
     gameEnded = true;
     new Promise(resolve => {
         setTimeout(resolve, 20);
@@ -33,7 +31,6 @@ document.getElementById('leavegame').addEventListener('click', function() {
             endgameOnline(true, true);
         }
         window.GameSocket.send(JSON.stringify({ action: "leave" }));
-        console.log('leave');
     }
 
     const event = new Event('cleanupGameEvent');
@@ -53,8 +50,8 @@ document.getElementById('leavegame').addEventListener('click', function() {
 
 var urlPathGame = window.location.pathname;
 var game_id_game = urlPathGame.split('/').filter(part => part !== '').pop();
-var userId_game = localStorage.getItem('userId'); // Assicurati che l'ID utente sia memorizzato in localStorage
-var username_game = localStorage.getItem('username'); // Assicurati che il nome utente sia memorizzato in localStorage
+var userId_game = localStorage.getItem('userId');
+var username_game = localStorage.getItem('username');
 
 if (game_id_game !== 'single' && game_id_game !== 'local') {
     let game = `wss://${window.location.host}/wss/game/${game_id_game}/?id=${userId_game}`;

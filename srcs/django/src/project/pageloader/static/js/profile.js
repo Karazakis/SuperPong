@@ -1,10 +1,8 @@
-// Funzione per ottenere l'ID utente dall'URL
 function getUserIdFromUrl() {
     const urlParts = window.location.pathname.split('/');
     return urlParts[urlParts.length - 2];
 }
 
-// Recupera l'ID utente dall'URL
 try {
     var userId = getUserIdFromUrl();
     if (userId === undefined || userId === null) {
@@ -15,7 +13,6 @@ catch (error) {
     console.error('Errore durante il recupero dell\'ID utente:', error);
     const userId = getUserIdFromUrl();
 }
-// Pulsante per tornare indietro
 var goBackBtn = document.getElementById('go-back-btn');
 if (goBackBtn) {
     goBackBtn.addEventListener('click', function() {
@@ -23,7 +20,6 @@ if (goBackBtn) {
     });
 }
 
-// Evento per ciascun elemento della lista amici
 document.querySelectorAll('.friend-item').forEach(function(item) {
     item.addEventListener('click', function() {
         var friendId = this.getAttribute('data-id');
@@ -35,7 +31,6 @@ document.querySelectorAll('.friend-item').forEach(function(item) {
     });
 });
 
-// Evento per ciascun link delle partite
 document.querySelectorAll(".game-link").forEach(link => {
     link.addEventListener("click", function (event) {
         event.preventDefault();
@@ -48,7 +43,6 @@ document.querySelectorAll(".game-link").forEach(link => {
     });
 });
 
-// Evento per ciascun link dei tornei
 document.querySelectorAll(".tournament-link").forEach(link => {
     link.addEventListener("click", function (event) {
         event.preventDefault();
@@ -63,8 +57,8 @@ document.querySelectorAll(".tournament-link").forEach(link => {
 
 
 function saveProfileIdFromUrl() {
-    const path = window.location.pathname; // Ottiene il percorso dell'URL
-    const regex = /\/profile\/(\d+)\//; // RegEx per estrarre l'ID dal percorso (es. /profile/9/)
+    const path = window.location.pathname;
+    const regex = /\/profile\/(\d+)\//;
     const match = path.match(regex);
     if (match && match[1]) {
         const profileId = match[1];
@@ -78,16 +72,14 @@ saveProfileIdFromUrl();
 
 function initializeChart() {
     const canvas = document.getElementById("user-stats-chart");
-    if (!canvas) return; // Evita errori se il canvas non è ancora presente
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
 
-    // Imposta le dimensioni del canvas dinamicamente
     const containerWidth = canvas.parentElement.offsetWidth;
-    canvas.width = 500; // Usa il 90% dello spazio disponibile
-    canvas.height = 500; // Mantieni il canvas quadrato
+    canvas.width = 600;
+    canvas.height = 600;
 
-    // Dati delle statistiche
     let precision = document.getElementById("precision").textContent;
     let reactivity = document.getElementById("reactivity").textContent;
     let patience = document.getElementById("patience").textContent;
@@ -102,21 +94,17 @@ function initializeChart() {
         "Leadership": leadership
     };
 
-    // Configurazione
-    const maxStatValue = 5; // Valore massimo per ogni statistica
+    const maxStatValue = 5;
     const statNames = Object.keys(stats);
     const statValues = Object.values(stats);
-    const padding = Math.min(canvas.width, canvas.height) * 0.1; // Calcola il padding dinamicamente
+    const padding = Math.min(canvas.width, canvas.height) * 0.1;
     const radius = Math.min(canvas.width, canvas.height) / 2 - padding;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
-    // Funzione per disegnare il grafico
     function drawChart() {
-        // Cancella il canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Disegna i raggi
         ctx.beginPath();
         ctx.strokeStyle = "#ddd";
         ctx.lineWidth = 1;
@@ -131,7 +119,6 @@ function initializeChart() {
         ctx.stroke();
         ctx.closePath();
 
-        // Disegna il poligono delle statistiche
         ctx.beginPath();
         ctx.fillStyle = "rgba(0, 123, 255, 0.5)";
         ctx.strokeStyle = "blue";
@@ -152,9 +139,8 @@ function initializeChart() {
         ctx.fill();
         ctx.stroke();
 
-        // Disegna le etichette
         ctx.fillStyle = "#000";
-        ctx.textAlign = "center";
+        ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         ctx.font = "bold 18px Arial";
 
@@ -169,5 +155,4 @@ function initializeChart() {
     drawChart();
 }
 
-// Chiamata manuale quando la SPA carica questa sezione
 initializeChart();
