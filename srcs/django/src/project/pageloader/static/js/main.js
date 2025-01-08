@@ -295,7 +295,6 @@ function loadPage(url) {
         }
     } else {
         if (window.chatSocket !== null && typeof window.chatSocket !== "undefined") {
-            console.log(window.chatSocket);
             window.chatSocket.close();
         }
     }

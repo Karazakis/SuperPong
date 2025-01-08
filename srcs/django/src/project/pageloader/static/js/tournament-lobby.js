@@ -47,6 +47,8 @@ function getNickname(username) {
             return user.nickname || username;
         }
     }
+    var currentUrl = window.location.pathname;
+    loadPage("api"+currentUrl);
     return username;
 }
 
@@ -72,9 +74,6 @@ LobbySocket.onmessage = function(e) {
             setupSlotSelection(currentUser);
             break;
         case 'update_ready_status':
-            console.log('Action: update_ready_status');
-            console.log('Slots:', data.slots);
-            console.log('Ready Status:', data.ready_status);
             updateReadyStatusInUserList(data.slots, data.ready_status);
             break;
         case 'update_lobby':
@@ -106,7 +105,7 @@ LobbySocket.onmessage = function(e) {
             }, 500);
             break;
         case 'start_countdown':
-            if (data.authorized_client === username_lobby) {
+            if (data.authorized_client == userId_lobby) {
                 startTournamentCountdown();
             }
             break;
@@ -545,7 +544,6 @@ if (readyButton !== null) {
                 }
             });
         });
-        console.log("ready")
         if (!userSlot) {
             return;
         }
@@ -663,38 +661,38 @@ function updateReadyStatusInUserList(slots, readyStatus) {
     const userItems = userList.getElementsByTagName('li');
     const currentUser = username_lobby;
 
-
-	console.log("Current slots:", slots);
-    console.log("Current readyStatus:", readyStatus);
-
     Array.from(userItems).forEach(item => {
         const username = item.id.replace('user_', '');
         const nickname = getNickname(username);
-        console.log(`Processing user: ${username}, Nickname: ${nickname}`);
 
         const slotKey = Object.keys(slots).find(key => {
             const slot = slots[key];
             const user = userIdToUserMap[slot.player_id];
-            console.log(`Checking slot ${key}: slotUsername=${user?.username}, username=${username}`);
             return user && user.username === username;
         });
 
         if (slotKey) {
-            console.log(`Found slotKey: ${slotKey} for user: ${username}`);
             const isReady = readyStatus[slotKey];
-            console.log(`Ready status for slotKey ${slotKey}: ${isReady}`);
             item.innerHTML = `${nickname} ${isReady ? '✔️' : ''}`;
         } else {
-            console.warn(`No slot found for user: ${username}`);
             item.innerHTML = nickname;
         }
     });
 
-
     const readyButton = document.getElementById('ready');
     if (readyButton) {
-        const currentUserSlot = Object.keys(slots).find(slotKey => slots[slotKey].username === currentUser);
-        readyButton.disabled = currentUserSlot ? readyStatus[currentUserSlot] || false : true;
+        const currentUserSlot = Object.keys(slots).find(slotKey => {
+            const slot = slots[slotKey];
+            const currentUserId = Object.keys(userIdToUserMap).find(id => userIdToUserMap[id].username === currentUser);
+            return slot.player_id === parseInt(currentUserId);
+        });
+
+        if (currentUserSlot) {
+            const isReady = readyStatus[currentUserSlot] || false;
+            readyButton.disabled = isReady;
+        } else {
+            readyButton.disabled = true;
+        }
     }
 
     const allSlotsHavePlayer = Object.keys(slots).every(slotKey => slots[slotKey].player_id);
@@ -707,12 +705,12 @@ function updateReadyStatusInUserList(slots, readyStatus) {
 
     const tournamentOwner = document.getElementById('tournament-data').dataset.owner;
     const startButton = document.getElementById('start');
-    const activeUsernames = Object.values(slots)
-        .map(slot => slot.username)
-        .filter(username => username !== "empty");
+    const activeUserIds = Object.values(slots)
+        .map(slot => slot.player_id)
+        .filter(playerId => playerId !== null);
 
     if (startButton) {
-        const ownerInGame = activeUsernames.includes(tournamentOwner);
+        const ownerInGame = activeUserIds.includes(parseInt(tournamentOwner));
         if (ownerInGame) {
             startTournamentLogic();
         } else {
@@ -834,7 +832,7 @@ function showJoinGamePopup(gameLink) {
 
         LobbySocket.send(JSON.stringify({
             action: 'player_joined_game',
-            username: username_lobby
+            userId: userId_lobby
         }));
 
         container.removeChild(popup);

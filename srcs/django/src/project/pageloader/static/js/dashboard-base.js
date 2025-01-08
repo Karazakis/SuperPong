@@ -135,6 +135,17 @@ function initializeWebSocket() {
 								itemElement.dataset.id = id;
 								itemElement.oncontextmenu = function(event) {
 									event.preventDefault();
+									if (document.getElementById("friendContextMenu").style.display === "block") {
+										document.getElementById("friendContextMenu").style.display = "none";
+									}
+									
+									if (document.getElementById("contextMenu").style.display === "block") {
+										document.getElementById("contextMenu").style.display = "none";
+									}
+									
+									if (document.getElementById("contextMenuBlocked").style.display === "block") {
+										document.getElementById("contextMenuBlocked").style.display = "none";
+									}
 									showBlockedContextMenu(event, id, isblocked);
 							};
 							} else {
@@ -143,6 +154,17 @@ function initializeWebSocket() {
 								itemElement.dataset.id = id;
 								itemElement.oncontextmenu = function(event) {
 									event.preventDefault();
+									if (document.getElementById("friendContextMenu").style.display === "block") {
+										document.getElementById("friendContextMenu").style.display = "none";
+									}
+									
+									if (document.getElementById("contextMenu").style.display === "block") {
+										document.getElementById("contextMenu").style.display = "none";
+									}
+									
+									if (document.getElementById("contextMenuBlocked").style.display === "block") {
+										document.getElementById("contextMenuBlocked").style.display = "none";
+									}
 									showContextMenu(event, id, isblocked);
 							};
 							}
@@ -459,6 +481,17 @@ async function updateFriendListFromServer() {
                 itemElement.dataset.id = friend.id;
                 itemElement.oncontextmenu = function(event) {
                     event.preventDefault();
+					if (document.getElementById("friendContextMenu").style.display === "block") {
+						document.getElementById("friendContextMenu").style.display = "none";
+					}
+					
+					if (document.getElementById("contextMenu").style.display === "block") {
+						document.getElementById("contextMenu").style.display = "none";
+					}
+					
+					if (document.getElementById("contextMenuBlocked").style.display === "block") {
+						document.getElementById("contextMenuBlocked").style.display = "none";
+					}
                     showFriendContextMenu(event, friend.id, friend.username);
                 };
                 friendListElement.appendChild(itemElement);
@@ -510,6 +543,17 @@ function UpdateFriendList(user) {
 		itemElement.dataset.id = friend.id;
 		itemElement.oncontextmenu = function(event) {
 		    event.preventDefault();
+			if (document.getElementById("friendContextMenu").style.display === "block") {
+				document.getElementById("friendContextMenu").style.display = "none";
+			}
+			
+			if (document.getElementById("contextMenu").style.display === "block") {
+				document.getElementById("contextMenu").style.display = "none";
+			}
+			
+			if (document.getElementById("contextMenuBlocked").style.display === "block") {
+				document.getElementById("contextMenuBlocked").style.display = "none";
+			}
 		    showFriendContextMenu(event, friend.id, friend.username);
 		};
 		friendListElement.appendChild(itemElement);
@@ -909,6 +953,17 @@ document.getElementById("unlockusercontext").addEventListener('click', async fun
 				userElement.classList.remove('user-blocked');
                 userElement.oncontextmenu = function(event) {
                     event.preventDefault();
+					if (document.getElementById("friendContextMenu").style.display === "block") {
+						document.getElementById("friendContextMenu").style.display = "none";
+					}
+					
+					if (document.getElementById("contextMenu").style.display === "block") {
+						document.getElementById("contextMenu").style.display = "none";
+					}
+					
+					if (document.getElementById("contextMenuBlocked").style.display === "block") {
+						document.getElementById("contextMenuBlocked").style.display = "none";
+					}
                     showContextMenu(event, id);
                 };
             }
@@ -978,6 +1033,18 @@ document.getElementById("blockusercontext").addEventListener('click', async func
 				userElement.classList.add('user-blocked');
                 userElement.oncontextmenu = function(event) {
                     event.preventDefault();
+					if (document.getElementById("friendContextMenu").style.display === "block") {
+						document.getElementById("friendContextMenu").style.display = "none";
+					}
+					
+					if (document.getElementById("contextMenu").style.display === "block") {
+						document.getElementById("contextMenu").style.display = "none";
+					}
+					
+					if (document.getElementById("contextMenuBlocked").style.display === "block") {
+						document.getElementById("contextMenuBlocked").style.display = "none";
+					}
+					
                     showBlockedContextMenu(event, id);
                 };
             }
