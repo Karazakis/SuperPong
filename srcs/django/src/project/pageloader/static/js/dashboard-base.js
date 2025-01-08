@@ -480,6 +480,7 @@ async function updateFriendListFromServer() {
             try {
                 itemElement.dataset.id = friend.id;
                 itemElement.oncontextmenu = function(event) {
+					
                     event.preventDefault();
 					if (document.getElementById("friendContextMenu").style.display === "block") {
 						document.getElementById("friendContextMenu").style.display = "none";
@@ -610,29 +611,23 @@ function showBlockedContextMenu(event, id) {
 
 	let pathname = window.location.pathname;
     
-    // Mostra o nascondi l'opzione di visualizzazione profilo in base al percorso
     if (pathname.includes('lobby')) {
         viewprofilecontext.style.display = "none";
     } else {
         viewprofilecontext.style.display = "block";
     }
     
-    // Imposta gli ID dataset per gli elementi del contesto
     addfriendcontext.dataset.id = id;
     viewprofilecontext.dataset.id = id;
     blockusercontext.dataset.id = id;
     
-    // Imposta sempre il testo del contesto per bloccare l'utente
     blockusercontext.textContent = "Unlock User";
     
-    // Posiziona il menu contestuale vicino al clic dell'utente
     contextMenu.style.left = event.pageX + "px";
     contextMenu.style.top = event.pageY + "px";
     
-    // Mostra il menu contestuale
     contextMenu.style.display = "block";
     
-    // Nasconde il menu contestuale quando si clicca altrove
     window.onclick = function() {
         contextMenu.style.display = "none";
     };
@@ -683,6 +678,7 @@ function showContextMenu(event, id) {
         contextMenu.style.left = (event.pageX - menuRect.width) + "px";
     }
     
+    // Nasconde il menu contestuale quando si clicca altrove
     window.onclick = function() {
         contextMenu.style.display = "none";
     };
@@ -824,13 +820,28 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 	}
 	const csrfToken = getCookie('csrftoken');
 
-	const user = await recoverUser(localStorage.getItem('userId'));
-    const alreadyFriend = user.user_friend_list.some(friend => friend.id === id);
+	let pending = document.getElementById("pending-requests");
+	let nodes = pending.children; // Usa 'children' per ottenere solo gli elementi figli (escludendo i nodi di testo)
+	let isAlreadyPending = false
 
-    if (alreadyFriend) {
-        alert('Questo utente è già nella tua lista di amici');
-        return;
-    }
+	Array.from(nodes).forEach((child) => { // Converte la HTMLCollection in un array per usare 'forEach'
+		if (child.dataset.requesting_user == id) {  // Controlla se l'attributo 'data-requesting_user' corrisponde
+			alert('You have already a friend request from that user');
+			isAlreadyPending = true // Esci dalla funzione se trovi una corrispondenza
+		}
+	});
+
+	if (isAlreadyPending == true) {
+		return;
+	}
+
+	const user = await recoverUser(localStorage.getItem('userId'));
+	const alreadyFriend = user.user_friend_list.some(friend => friend.id === id);
+
+	if (alreadyFriend) {
+		alert('Questo utente è già nella tua lista di amici');
+		return;
+	}
 
 	const requestData = {
 	    requesting_user: localStorage.getItem('username'),
