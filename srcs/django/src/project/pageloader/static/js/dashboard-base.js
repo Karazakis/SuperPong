@@ -664,14 +664,25 @@ function showContextMenu(event, id) {
     // Imposta sempre il testo del contesto per bloccare l'utente
     blockusercontext.textContent = "Block User";
     
-    // Posiziona il menu contestuale vicino al clic dell'utente
     contextMenu.style.left = event.pageX + "px";
     contextMenu.style.top = event.pageY + "px";
-    
-    // Mostra il menu contestuale
     contextMenu.style.display = "block";
     
-    // Nasconde il menu contestuale quando si clicca altrove
+    // Ottieni le dimensioni del menu contestuale
+    const menuRect = contextMenu.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // Regola la posizione se il menu esce fuori dal viewport
+    if (menuRect.bottom > viewportHeight) {
+        // Sposta il menu verso l'alto se va oltre la parte inferiore del viewport
+        contextMenu.style.top = (event.pageY - menuRect.height) + "px";
+    }
+    if (menuRect.right > viewportWidth) {
+        // Sposta il menu verso sinistra se va oltre il lato destro del viewport
+        contextMenu.style.left = (event.pageX - menuRect.width) + "px";
+    }
+    
     window.onclick = function() {
         contextMenu.style.display = "none";
     };
