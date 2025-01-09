@@ -576,23 +576,23 @@ function startTimerOnline() {
     let countdownElement = document.getElementById('countdown');
     let timerValue = parseInt(timerElement.getAttribute('data-timer'), 10);
 
-    if (typeof GameSocket === 'undefined' || GameSocket === null) {
+    if (typeof window.GameSocket === 'undefined' || window.GameSocket === null) {
         return;
     }
     if (!isNaN(timerValue) && timerValue > 0) {
         let timeRemaining = timerValue;
 
         countdownElement.textContent = timeRemaining;
-        GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
+        window.GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
         const countdownInterval = setInterval(function() {
-            if (GameSocket === null) {
+            if (window.GameSocket === null) {
                 clearInterval(countdownInterval);
                 return;
             }
             
             if (gamePaused === false && gameIsStarting === false) {
                 timeRemaining--;
-                GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
+                window.GameSocket.send(JSON.stringify({ action: 'time_update', time: timeRemaining }));
             }
 
             if (timeRemaining <= 0) {
@@ -602,7 +602,7 @@ function startTimerOnline() {
 
                 clearInterval(countdownInterval);
                 if (isHost && goldenGoal === false) {
-                    GameSocket.send(JSON.stringify({ action: 'game_over' , p1: score[0], p2: score[1] }));
+                    window.GameSocket.send(JSON.stringify({ action: 'game_over' , p1: score[0], p2: score[1] }));
                 }
             }
         }, 1000);
@@ -835,7 +835,7 @@ function launchBall(n2online = 0, ballId = null) {
             let ball;
             if (isOnlineGame !== false) {
                  
-                ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction, 1, GameSocket, ballId);
+                ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction, 1, window.GameSocket, ballId);
             } else if (isOnlineGame === false) {
                 ball = new Ball2(window.gameScene, x, y, 0, new THREE.Vector2(20, 20), direction,1);
             }
@@ -1245,7 +1245,7 @@ function checkScoreHost(ball){
         }
 
         if(score[1] == 0 && gameSettings.gameRules == "score" || goldenGoal === true) {
-            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            window.GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
             
         }
         return(1);     
@@ -1263,7 +1263,7 @@ function checkScoreHost(ball){
    
         if(score[0] == 0 && gameSettings.gameRules == "score" || goldenGoal === true) {
 
-            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            window.GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         }
         return(1);
     }
@@ -1277,7 +1277,7 @@ function checkScoreHost(ball){
             scoreTeam[1]--;
         }
         if(score[2] == 0 && gameSettings.gameRules == "score" || goldenGoal === true){
-            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            window.GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         }
         return(1);
     }
@@ -1291,7 +1291,7 @@ function checkScoreHost(ball){
             scoreTeam[1]--;
         }
         if(score[3] == 0 && gameSettings.gameRules == "score" || goldenGoal === true){
-            GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
+            window.GameSocket.send(JSON.stringify({ action: 'game_over', p1: score[0], p2: score[1] }));
         }
         return(1);
     }
@@ -1413,7 +1413,7 @@ export class Ball2 {
                     this.debounceTimer += dt;
                     if (this.debounceTimer < 0.03) return;
                     this.debounceTimer = 0;
-                    GameSocket.send(JSON.stringify({ action: "ball_update", ballId: this.ballId, position: this.mesh.position, velocity: this.mesh.velocity }));
+                    window.GameSocket.send(JSON.stringify({ action: "ball_update", ballId: this.ballId, position: this.mesh.position, velocity: this.mesh.velocity }));
                 }
         }
         else if(isHost === false && isOnlineGame === true)
@@ -1587,7 +1587,7 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         {   
             keyboardState[event.code] = true;
             const key = getPlayerControl(event.code);
-            GameSocket.send(JSON.stringify({ action: "move", game_id_game: game_id_game, username: username_game, key: key, state: "down" }));
+            window.GameSocket.send(JSON.stringify({ action: "move", game_id_game: game_id_game, username: username_game, key: key, state: "down" }));
         }
     }
     window.addEventListener('keydown', window.handleKeyDownOnline);   
@@ -1597,12 +1597,12 @@ if(gametype == 'remote-game' || gametype == 'tournament')
         {
             keyboardState[event.code] = false;
             const key = getPlayerControl(event.code);
-            GameSocket.send(JSON.stringify({ action: "move", game_id_game: game_id_game, username: username_game, key: key, state: "up" }));
+            window.GameSocket.send(JSON.stringify({ action: "move", game_id_game: game_id_game, username: username_game, key: key, state: "up" }));
         }
     }
     window.addEventListener('keyup', window.handleKeyUpOnline);
 
-    GameSocket.onmessage = function(e) {
+    window.GameSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         if (data.action === "move") {
             if (data.state === 'down') {
@@ -1705,7 +1705,7 @@ if(gametype == 'remote-game' || gametype == 'tournament')
             {
                 launchReadyInterval();
                 connectionOk = true;
-                GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
+                window.GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
             }
         }
         else if (data.action === 'start_game')
@@ -1746,10 +1746,10 @@ function startCountdown() {
     intervalCountdown = setInterval(() => {
         countdownElement.innerText = countdown;
         countdown++;
-        GameSocket.send(JSON.stringify({ action: "time_update", time: countdown }));
+        window.GameSocket.send(JSON.stringify({ action: "time_update", time: countdown }));
         if (countdown == 0) {
             clearInterval(intervalCountdown);
-            GameSocket.send(JSON.stringify({ action: "start_game" }));
+            window.GameSocket.send(JSON.stringify({ action: "start_game" }));
             
             
             if (gameSettings.gameRules == "time") {
@@ -1763,7 +1763,7 @@ function startCountdown() {
 
 function launchReadyInterval() {
     let interval = setInterval(() => {
-        GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
+        window.GameSocket.send(JSON.stringify({ action: "join", game_id_game: game_id_game, username: username_game }));
         if (gamePaused === false) {
             clearInterval(interval);
         }
@@ -1849,7 +1849,7 @@ function animateonline(){
         ball_is_ready = false;
     } else if (isHost && !ball_is_ready && timer >= interval && 0 < maxBalls && gameEnded === false) {
         window.ballLaunch = setTimeout(() => {
-            GameSocket.send(JSON.stringify({ action: "ball_launch", position: Math.floor(Math.random() * 4), ballId: "ball_" + ballCounter }));          
+            window.GameSocket.send(JSON.stringify({ action: "ball_launch", position: Math.floor(Math.random() * 4), ballId: "ball_" + ballCounter }));          
         }, 500);
         ballCounter++;
         timer = 0;
@@ -1922,8 +1922,8 @@ function animateonline(){
                
                 if (checkScoreHost(BALLS[i]) == 1) {
 
-                    GameSocket.send(JSON.stringify({ action: "score_update", score: { p1: score[0], p2: score[1], p3: score[2], p4: score[3], team1: scoreTeam[0], team2: scoreTeam[1] } }));
-                    GameSocket.send(JSON.stringify({ action: "ball_destroy", ballId: BALLS[i].ballId }));
+                    window.GameSocket.send(JSON.stringify({ action: "score_update", score: { p1: score[0], p2: score[1], p3: score[2], p4: score[3], team1: scoreTeam[0], team2: scoreTeam[1] } }));
+                    window.GameSocket.send(JSON.stringify({ action: "ball_destroy", ballId: BALLS[i].ballId }));
                 }
             }
         }
