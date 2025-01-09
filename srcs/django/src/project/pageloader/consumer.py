@@ -1724,23 +1724,39 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         tournament_winner = None
 
         if next_round:
-            slots = await database_sync_to_async(lambda: next_round.slots)()
+            # Recupera e verifica gli slot del round successivo
+            next_round_slots = await database_sync_to_async(lambda: next_round.slots)()
+            winners = {}
 
-            winners = []
             for game in games:
-                if game.status == 'finished' and game.winner:
-                    winners.append((game.id, game.winner))
-                elif game.status != 'finished':
+                if game.status == 'finished':
+                    if game.winner:
+                        slot_number = None
+                        for slot, data in self.current_round.slots.items():
+                            if data['player_id'] == game.winner.id:
+                                slot_number = int(slot)
+                                break
+                        
+                        if slot_number is not None:
+                            # Calcola lo slot nel round successivo
+                            next_slot = (slot_number + 1) // 2
+                            next_slot_key = str(next_slot)
+
+                            # Assegna il vincitore allo slot corretto
+                            winners[next_slot_key] = {
+                                'player_id': game.winner.id,
+                                'username': game.winner.username
+                            }
+                else:
                     all_finished = False
-            winners.sort(key=lambda x: x[0])
 
-            for idx, (_, winner) in enumerate(winners):
-                slot_key = str(idx + 1)
-                slots[slot_key] = {'player_id': winner.id, 'username': winner.username}
+            # Aggiorna solo gli slot completati nel round successivo
+            for slot_key, winner_data in winners.items():
+                next_round_slots[slot_key] = winner_data
 
-            next_round.slots = slots
+            next_round.slots = next_round_slots
             await database_sync_to_async(next_round.save)()
-            updated_slots = slots
+            updated_slots = winners
 
         if is_final_round:
             if len(games) == 1:
@@ -1756,7 +1772,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send_slot_status_update_to_group()
 
         if all_finished:
+            # Se tutti i game sono finiti, passa al round successivo
+            if next_round:
+                await self.send_slot_status_update_to_group()
             await self.mark_round_as_finished()
+
+
+
 
 
 
