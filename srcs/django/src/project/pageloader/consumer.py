@@ -933,8 +933,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         }))
     
 
-
-
 class TournamentConsumer(AsyncWebsocketConsumer):
     users_in_lobby = {}
     processed_tournaments = set()
@@ -1705,67 +1703,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         logger.info(message)
 
 
-    # async def check_current_round_games(self):
-    #     if not self.current_round:
-    #         logger.warning("No current round found to check games.")
-    #         return
-
-    #     games = await database_sync_to_async(list)(
-    #         self.current_round.games.select_related('winner').all()
-    #     )
-    #     if not games:
-    #         logger.warning(f"No games found for round {self.current_round.round_number}.")
-    #         return
-
-    #     next_round_number = self.current_round.round_number + 1
-    #     next_round = await database_sync_to_async(
-    #         Round.objects.filter(tournament=self.tournament, round_number=next_round_number).first
-    #     )()
-    #     is_final_round = not next_round
-
-    #     all_finished = True
-    #     updated_slots = {}
-    #     tournament_winner = None
-
-    #     if next_round:
-    #         slots = await database_sync_to_async(lambda: next_round.slots)()
-
-    #         for idx, game in enumerate(games):
-    #             slot_key = str(idx + 1)
-
-    #             if game.status == 'finished':
-    #                 winner = game.winner
-
-    #                 if not winner:
-    #                     continue
-
-    #                 slots[slot_key] = {'player_id': winner.id, 'username': winner.username}
-    #             else:
-    #                 all_finished = False
-
-    #         next_round.slots = slots
-    #         await database_sync_to_async(next_round.save)()
-    #         updated_slots = slots
-
-    #     if is_final_round:
-    #         if len(games) == 1:
-    #             final_game = games[0]
-    #             if final_game.status == 'finished' and final_game.winner:
-    #                 tournament_winner = final_game.winner
-    #                 await self.handle_tournament_end(tournament_winner)
-    #                 return
-    #             else:
-    #                 return
-
-    #         else:
-    #             logger.error("Unexpected number of games in final round. Check tournament configuration.")
-
-    #     if next_round and updated_slots:
-    #         await self.send_slot_status_update_to_group()
-
-    #     if all_finished:
-    #         await self.mark_round_as_finished()
-
     async def check_current_round_games(self):
         if not self.current_round:
             return
@@ -1820,7 +1757,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         if all_finished:
             await self.mark_round_as_finished()
-
 
 
 

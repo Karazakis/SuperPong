@@ -301,9 +301,7 @@ async function updateUserProfile() {
         if (nicknameElement && profilePictureElement) {
             nicknameElement.innerHTML = `<h4>${user.nickname}</h4>`;
             profilePictureElement.src = "/static/" + user.img_profile;
-        } else {
-        }
-
+        } 
     } catch (error) {
 		recoverUser(id);
     }
