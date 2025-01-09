@@ -304,10 +304,10 @@ async function updateGameInviteStatus(data) {
     let message;
     switch (data.type) {
         case 'accept':
-            message = `${actualTargetUser.nickname} ha accettato l'invito a giocare`;
+            message = `${actualTargetUser.nickname} has accepted your invitation to play`;
             break;
         case 'decline':
-            message = `${actualTargetUser.nickname} ha rifiutato l'invito a giocare`;
+            message = `${actualTargetUser.nickname} has refused your invitation to play`;
             break;
         default:
             console.error('Unhandled game status update:', data.type);
@@ -839,7 +839,7 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 	const alreadyFriend = user.user_friend_list.some(friend => friend.id === id);
 
 	if (alreadyFriend) {
-		alert('Questo utente è già nella tua lista di amici');
+		alert('This user is already in your friend list');
 		return;
 	}
 
@@ -895,7 +895,7 @@ document.getElementById("addfriendcontext").addEventListener('click', async func
 	    } else {
 			const responseData = await response.json();
 			if (responseData.already_exists) { 
-				alert('La richiesta è in attesa di essere accettata o rifutata');
+				alert('The request is pending acceptance or rejection.');
 			} else if (responseData.already_friend) {
 				alert('The user is already a friend.')
 			} else {
@@ -926,7 +926,7 @@ document.getElementById("unlockusercontext").addEventListener('click', async fun
     const id = e.target.dataset.id;
 
     if (id === localStorage.getItem('userId')) {
-        alert('Non puoi bloccare te stesso');
+        alert('You cannot block yourself.');
         return;
     }
 
@@ -1006,7 +1006,7 @@ document.getElementById("blockusercontext").addEventListener('click', async func
     const id = e.target.dataset.id;
 
     if (id === localStorage.getItem('userId')) {
-        alert('Non puoi bloccare te stesso');
+        alert('You cannot block yourself.');
         return;
     }
 
@@ -1138,9 +1138,9 @@ document.getElementById("invitegamecontext").addEventListener('click', async fun
 		if (!response.ok) {
 		    const errorMessage = await response.json();
 		    console.error('Errore durante l\'invio dell\'invito a giocare:', errorMessage);
-		    alert(`Errore durante l'invio dell'invito: ${errorMessage.error}`);
+		    alert(`Error while sending the invitation: ${errorMessage.error}`);
 		} else {
-		    alert('Invito a giocare inviato con successo');
+		    alert('Game invitation sent successfully');
 
 			if (requestType === undefined) {
 				requestType = 'game';
@@ -1221,9 +1221,9 @@ document.getElementById("invitetournamentcontext").addEventListener('click', asy
 		if (!response.ok) {
 		    const errorMessage = await response.json();
 		    console.error('Errore durante l\'invio dell\'invito a torneo:', errorMessage);
-		    alert(`Errore durante l'invio dell'invito: ${errorMessage.error}`);
+		    alert(`Error while sending the invitation: ${errorMessage.error}`);
 		} else {
-		    alert('Invito a torneo inviato con successo');
+		    alert('Tournament invitation sent successfully');
 			if (requestType === undefined) {
 				requestType = 'tournament';
 			}

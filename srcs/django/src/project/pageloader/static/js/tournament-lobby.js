@@ -47,8 +47,6 @@ function getNickname(username) {
             return user.nickname || username;
         }
     }
-    var currentUrl = window.location.pathname;
-    loadPage("api"+currentUrl);
     return username;
 }
 

@@ -26,11 +26,11 @@ document.getElementById("login-form").addEventListener("submit", function(event)
     .then(data => {
         if (data.error) {
             if (data.error === "Username does not exist") {
-                usernameErrorDiv.textContent = "Nome utente non esiste.";
+                usernameErrorDiv.textContent = "Username does not exist.";
             } else if (data.error === "Incorrect password") {
-                passwordErrorDiv.textContent = "Password non corretta.";
+                passwordErrorDiv.textContent = "Incorrect password.";
             } else if (data.error === "Username and password are required") {
-                passwordErrorDiv.textContent = "Username e password sono obbligatori.";
+                passwordErrorDiv.textContent = "Username and password are required.";
             } else {
                 passwordErrorDiv.textContent = "Errore: " + data.error;
             }
@@ -45,11 +45,11 @@ document.getElementById("login-form").addEventListener("submit", function(event)
     .catch(error => {
         if (error.error) {
             if (error.error === "Username does not exist") {
-                usernameErrorDiv.textContent = "Nome utente non esiste.";
+                usernameErrorDiv.textContent = "Username does not exist";
             } else if (error.error === "Incorrect password") {
-                passwordErrorDiv.textContent = "Password non corretta.";
+                passwordErrorDiv.textContent = "Incorrect password.";
             } else if (error.error === "Username and password are required") {
-                passwordErrorDiv.textContent = "Username e password sono obbligatori.";
+                passwordErrorDiv.textContent = "Username and password are required.";
             } else {
                 passwordErrorDiv.textContent = "Errore: " + error.error;
             }

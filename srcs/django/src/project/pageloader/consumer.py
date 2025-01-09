@@ -1703,6 +1703,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         logger.info(message)
 
 
+
+    async def prepare_next_round(self):
+        next_round_number = (self.current_round.round_number + 1)
+        next_round_exists = await database_sync_to_async(Round.objects.filter(
+            tournament=self.tournament, round_number=next_round_number).exists)()
+
+        if next_round_exists:
+            return
+
+        message = await database_sync_to_async(self.tournament.generate_next_round)()
+        logger.info(message)
+
+
     async def check_current_round_games(self):
         if not self.current_round:
             return
@@ -1724,23 +1737,35 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         tournament_winner = None
 
         if next_round:
-            slots = await database_sync_to_async(lambda: next_round.slots)()
+            next_round_slots = await database_sync_to_async(lambda: next_round.slots)()
+            winners = {}
 
-            winners = []
             for game in games:
-                if game.status == 'finished' and game.winner:
-                    winners.append((game.id, game.winner))
-                elif game.status != 'finished':
+                if game.status == 'finished':
+                    if game.winner:
+                        slot_number = None
+                        for slot, data in self.current_round.slots.items():
+                            if data['player_id'] == game.winner.id:
+                                slot_number = int(slot)
+                                break
+                        
+                        if slot_number is not None:
+                            next_slot = (slot_number + 1) // 2
+                            next_slot_key = str(next_slot)
+
+                            winners[next_slot_key] = {
+                                'player_id': game.winner.id,
+                                'username': game.winner.username
+                            }
+                else:
                     all_finished = False
-            winners.sort(key=lambda x: x[0])
 
-            for idx, (_, winner) in enumerate(winners):
-                slot_key = str(idx + 1)
-                slots[slot_key] = {'player_id': winner.id, 'username': winner.username}
+            for slot_key, winner_data in winners.items():
+                next_round_slots[slot_key] = winner_data
 
-            next_round.slots = slots
+            next_round.slots = next_round_slots
             await database_sync_to_async(next_round.save)()
-            updated_slots = slots
+            updated_slots = winners
 
         if is_final_round:
             if len(games) == 1:
@@ -1756,6 +1781,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.send_slot_status_update_to_group()
 
         if all_finished:
+            if next_round:
+                await self.send_slot_status_update_to_group()
             await self.mark_round_as_finished()
 
 
